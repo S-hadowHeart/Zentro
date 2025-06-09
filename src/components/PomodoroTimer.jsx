@@ -13,24 +13,24 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [currentReward, setCurrentReward] = useState(''); // To store the reward
   const [showPunishment, setShowPunishment] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState(''); // To store the punishment
-  const [activeTaskId, setActiveTaskId] = useState('');
+  const [selectedTask, setSelectedTask] = useState('');
   const { user, fetchUser } = useAuth();
   const { tasks, fetchTasks } = useTasks();
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (tasks.length > 0 && !activeTaskId) {
+    if (tasks.length > 0 && !selectedTask) {
       const nonCompletedTasks = tasks.filter(task => !task.completed);
       if (nonCompletedTasks.length > 0) {
-        setActiveTaskId(nonCompletedTasks[0]._id);
+        setSelectedTask(nonCompletedTasks[0]._id);
       }
     } else if (tasks.length === 0) {
-      setActiveTaskId('');
-    } else if (activeTaskId && !tasks.some(task => task._id === activeTaskId)) {
+      setSelectedTask('');
+    } else if (selectedTask && !tasks.some(task => task._id === selectedTask)) {
       const nonCompletedTasks = tasks.filter(task => !task.completed);
-      setActiveTaskId(nonCompletedTasks.length > 0 ? nonCompletedTasks[0]._id : '');
+      setSelectedTask(nonCompletedTasks.length > 0 ? nonCompletedTasks[0]._id : '');
     }
-  }, [tasks, activeTaskId]);
+  }, [tasks, selectedTask]);
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
@@ -109,8 +109,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
           console.error('Failed to update user stats');
         }
 
-        if (activeTaskId) {
-          await incrementPomodorosForTask(activeTaskId, focusDuration);
+        if (selectedTask) {
+          await incrementPomodorosForTask(selectedTask, focusDuration);
         }
 
         if (onPomodoroEnd) {
@@ -166,7 +166,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
   };
 
   const handleStart = () => {
-    if (!activeTaskId) {
+    if (!selectedTask) {
       alert('Please select a cultivation to focus on');
       return;
     }
@@ -212,14 +212,14 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
       <div className="space-y-4">
         <select
-          value={activeTaskId}
-          onChange={(e) => setActiveTaskId(e.target.value)}
+          value={selectedTask}
+          onChange={(e) => setSelectedTask(e.target.value)}
           className="w-full px-4 py-2 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
         >
           <option value="">Select a cultivation to focus on...</option>
           {tasks.map((task) => (
             <option key={task._id} value={task._id}>
-              {task.title}
+              {task.text}
             </option>
           ))}
         </select>
@@ -252,7 +252,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         </div>
       </div>
 
-      {!activeTaskId && (
+      {!selectedTask && (
         <div className="text-center py-8 bg-white/50 rounded-lg border border-emerald-100">
           <FaLeaf className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
           <p className="text-gray-600">Select a cultivation to begin your focus session</p>

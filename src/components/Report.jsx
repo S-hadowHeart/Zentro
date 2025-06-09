@@ -71,8 +71,7 @@ function Report() {
               <h3 className="text-lg font-semibold text-gray-700">{stat.title}</h3>
               <stat.icon className={`w-6 h-6 text-${stat.color.split('-')[1]}-500`} />
             </div>
-            <p className="text-3xl font-bold bg-gradient-to-r bg-clip-text text-transparent"
-               style={{ backgroundImage: `linear-gradient(to right, var(--tw-gradient-stops))`, '--tw-gradient-from': `#${stat.color.split('-')[1]}`, '--tw-gradient-to': `#${stat.color.split('-')[3]}` }}>
+            <p className="text-3xl font-bold text-gray-800">
               {stat.value}
             </p>
           </div>

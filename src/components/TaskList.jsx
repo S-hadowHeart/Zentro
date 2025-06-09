@@ -77,13 +77,13 @@ function TaskList() {
         ) : (
           filteredTasks.map((task) => (
             <div
-              key={task.id}
+              key={task._id}
               className="group bg-white rounded-lg shadow-sm hover:shadow-md border border-emerald-100 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
             >
               <div className="flex items-center justify-between p-4">
                 <div className="flex items-center space-x-3">
                   <button
-                    onClick={() => toggleTask(task.id)}
+                    onClick={() => toggleTask(task._id)}
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ease-in-out ${
                       task.completed
                         ? 'bg-emerald-500 border-emerald-500 text-white'
@@ -101,7 +101,7 @@ function TaskList() {
                   </span>
                 </div>
                 <button
-                  onClick={() => deleteTask(task.id)}
+                  onClick={() => deleteTask(task._id)}
                   className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out"
                 >
                   <FaTrash className="w-4 h-4" />
