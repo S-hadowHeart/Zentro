@@ -39,7 +39,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const incrementPomodorosForTask = async (taskId, duration) => {
     if (!taskId) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks/${taskId}/pomodoro`, {
+      const response = await fetch(`/api/tasks/${taskId}/pomodoro`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        const statsResponse = await fetch('http://localhost:5000/api/users/stats', {
+        const statsResponse = await fetch('/api/users/stats', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        const statsResponse = await fetch('http://localhost:5000/api/users/stats', {
+        const statsResponse = await fetch('/api/users/stats', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

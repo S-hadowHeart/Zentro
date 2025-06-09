@@ -19,7 +19,7 @@ function Report() {
       }
 
       // Fetch stats
-      const statsResponse = await fetch('http://localhost:5000/api/users/pomodoro-stats', {
+      const statsResponse = await fetch('/api/users/pomodoro-stats', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -32,7 +32,7 @@ function Report() {
       const statsData = await statsResponse.json();
 
       // Fetch history
-      const historyResponse = await fetch('http://localhost:5000/api/users/pomodoro-history/daily', {
+      const historyResponse = await fetch('/api/users/pomodoro-history/daily', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

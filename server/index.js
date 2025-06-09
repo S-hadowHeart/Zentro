@@ -55,11 +55,6 @@ const connectWithRetry = async () => {
 
 connectWithRetry();
 
-// Basic route for testing
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Zentro API' });
-});
-
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Promise Rejection:', err);

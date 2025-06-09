@@ -36,7 +36,7 @@ function Settings() {
       }
 
       let requestBody = {};
-      let endpoint = `http://localhost:5000/api/users/${type}`;
+      let endpoint = `/api/users/${type}`;
       let successMessage = '';
 
       if (type === 'rewards' || type === 'punishments') {
