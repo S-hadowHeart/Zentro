@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
+import { FaPlay, FaPause, FaRedo, FaLeaf } from 'react-icons/fa';
 
 function PomodoroTimer({ onPomodoroEnd }) {
   const [focusDuration, setFocusDuration] = useState(25); // in minutes
   const [breakDuration, setBreakDuration] = useState(5); // in minutes
-  const [timeLeft, setTimeLeft] = useState(25 * 60); 
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [showReward, setShowReward] = useState(false);
@@ -15,6 +16,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [activeTaskId, setActiveTaskId] = useState('');
   const { user, fetchUser } = useAuth();
   const { tasks, fetchTasks } = useTasks();
+  const timerRef = useRef(null);
 
   useEffect(() => {
     if (tasks.length > 0 && !activeTaskId) {
@@ -29,6 +31,26 @@ function PomodoroTimer({ onPomodoroEnd }) {
       setActiveTaskId(nonCompletedTasks.length > 0 ? nonCompletedTasks[0]._id : '');
     }
   }, [tasks, activeTaskId]);
+
+  useEffect(() => {
+    if (isRunning && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            handleComplete();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (timeLeft === 0) {
+      clearInterval(timerRef.current);
+      setIsRunning(false);
+      onPomodoroEnd();
+    }
+    return () => clearInterval(timerRef.current);
+  }, [isRunning, timeLeft, handleComplete, onPomodoroEnd]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -58,7 +80,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   };
 
-  const handleComplete = useCallback(async () => {
+  const handleComplete = async () => {
     if (!isBreak) {
       try {
         const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
@@ -100,9 +122,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
     setIsBreak(!isBreak);
     setTimeLeft(isBreak ? focusDuration * 60 : breakDuration * 60);
-  }, [isBreak, user.rewards, activeTaskId, focusDuration, breakDuration, onPomodoroEnd, fetchUser, fetchTasks]);
+  };
 
-  const handleInterrupt = useCallback(async () => {
+  const handleInterrupt = async () => {
     if (!isBreak) {
       try {
         const randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
@@ -141,164 +163,139 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
-  }, [isBreak, user.punishments, focusDuration, onPomodoroEnd, fetchUser]);
+  };
 
-  useEffect(() => {
-    let timer;
-    if (isRunning && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            handleComplete();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+  const handleStart = () => {
+    if (!activeTaskId) {
+      alert('Please select a cultivation to focus on');
+      return;
     }
-    return () => clearInterval(timer);
-  }, [isRunning, timeLeft, handleComplete]);
+    setIsRunning(true);
+    setIsBreak(false);
+  };
 
-  const resetTimer = () => {
+  const handlePause = () => {
+    setIsRunning(false);
+    setIsBreak(false);
+  };
+
+  const handleReset = () => {
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
   };
 
+  const progress = ((focusDuration * 60 - timeLeft) / (focusDuration * 60)) * 100;
+
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center">
-        <h2 className="text-2xl font-bold text-zen-green mb-6">Zen Focus Session</h2>
-        
-        {/* Task Selection */}
-        <div className="mb-6 w-full">
-          <label htmlFor="task-select" className="block text-sm font-medium text-gray-700 mb-2">
-            Present Cultivation
-          </label>
-          <select
-            id="task-select"
-            value={activeTaskId}
-            onChange={(e) => setActiveTaskId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
-          >
-            <option value="">Select a task</option>
-            {tasks
-              .filter(task => !task.completed)
-              .map(task => (
-                <option key={task._id} value={task._id}>
-                  {task.title}
-                </option>
-              ))}
-          </select>
-        </div>
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent mb-2">
+          Zen Focus Session
+        </h2>
+        <p className="text-gray-600">Cultivate your inner peace, one moment at a time</p>
+      </div>
 
-        {/* Custom Timer Settings */}
-        <div className="flex space-x-4 mb-4 justify-center">
-          <div>
-            <label htmlFor="focusDuration" className="block text-zen-green font-semibold mb-1 text-sm">Zen Duration (min)</label>
-            <input
-              type="number"
-              id="focusDuration"
-              value={focusDuration}
-              onChange={(e) => setFocusDuration(Number(e.target.value))}
-              min="1"
-              className="w-24 px-3 py-2 border border-gray-300 rounded-md text-center shadow-sm focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
+      <div className="max-w-md mx-auto">
+        <div className="relative">
+          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-1000 ease-linear"
+              style={{ width: `${progress}%` }}
             />
           </div>
-          <div>
-            <label htmlFor="breakDuration" className="block text-zen-green font-semibold mb-1 text-sm">Reflection (min)</label>
-            <input
-              type="number"
-              id="breakDuration"
-              value={breakDuration}
-              onChange={(e) => setBreakDuration(Number(e.target.value))}
-              min="1"
-              className="w-24 px-3 py-2 border border-gray-300 rounded-md text-center shadow-sm focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
-            />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-4xl font-bold text-gray-800">{formatTime(timeLeft)}</span>
           </div>
         </div>
+      </div>
 
-        {/* Timer Display */}
-        <div className="text-center mb-6">
-          {activeTaskId && (
-            <p className="text-gray-600 mb-2">{tasks.find(task => task._id === activeTaskId)?.title}</p>
-          )}
-          <p className="text-7xl font-bold text-zen-green">{formatTime(timeLeft)}</p>
-          <p className="text-md text-gray-600">{isBreak ? 'Reflection Time' : 'Cultivation Time'}</p>
-        </div>
+      <div className="space-y-4">
+        <select
+          value={activeTaskId}
+          onChange={(e) => setActiveTaskId(e.target.value)}
+          className="w-full px-4 py-2 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+        >
+          <option value="">Select a cultivation to focus on...</option>
+          {tasks.map((task) => (
+            <option key={task._id} value={task._id}>
+              {task.title}
+            </option>
+          ))}
+        </select>
 
-        {/* Controls */}
-        <div className="flex space-x-4">
-          {!isRunning && (
+        <div className="flex justify-center space-x-4">
+          {!isRunning ? (
             <button
-              onClick={() => setIsRunning(true)}
-              disabled={!activeTaskId}
-              className="px-8 py-3 bg-zen-green text-white rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors disabled:opacity-50 shadow-md"
+              onClick={handleStart}
+              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2"
             >
-              Begin Flow
+              <FaPlay className="w-4 h-4" />
+              <span>Begin Flow</span>
             </button>
-          )}
-          {isRunning && (
+          ) : (
             <button
-              onClick={() => setIsRunning(false)}
-              className="px-8 py-3 bg-zen-green text-white rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors shadow-md"
+              onClick={handlePause}
+              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2"
             >
-              Stillness
+              <FaPause className="w-4 h-4" />
+              <span>Stillness</span>
             </button>
           )}
           <button
-            onClick={() => {
-              if (!isBreak) {
-                handleInterrupt();
-              } else {
-                resetTimer();
-              }
-            }}
-            className="px-8 py-3 bg-zen-gray text-zen-green rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors shadow-md"
+            onClick={handleReset}
+            className="px-6 py-3 bg-white text-emerald-600 border border-emerald-200 rounded-lg shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2"
           >
-            Restore Calm
+            <FaRedo className="w-4 h-4" />
+            <span>Restore Calm</span>
           </button>
         </div>
-
-        {/* Reward Modal */}
-        {showReward && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
-              <h3 className="text-2xl font-bold text-zen-green mb-4">Great job! 🎉</h3>
-              <p className="text-gray-700 mb-6">Your reward:</p>
-              <p className="text-xl font-semibold text-zen-green mb-6">
-                {currentReward}
-              </p>
-              <button
-                onClick={() => setShowReward(false)}
-                className="w-full px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors"
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Punishment Modal */}
-        {showPunishment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
-              <h3 className="text-2xl font-bold text-red-500 mb-4">Oops! 😅</h3>
-              <p className="text-gray-700 mb-6">Your punishment:</p>
-              <p className="text-xl font-semibold text-red-500 mb-6">
-                {currentPunishment}
-              </p>
-              <button
-                onClick={() => setShowPunishment(false)}
-                className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-opacity-90 transition-colors"
-              >
-                I'll do it!
-              </button>
-            </div>
-          </div>
-        )}
       </div>
+
+      {!activeTaskId && (
+        <div className="text-center py-8 bg-white/50 rounded-lg border border-emerald-100">
+          <FaLeaf className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
+          <p className="text-gray-600">Select a cultivation to begin your focus session</p>
+        </div>
+      )}
+
+      {/* Reward Modal */}
+      {showReward && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h3 className="text-2xl font-bold text-zen-green mb-4">Great job! 🎉</h3>
+            <p className="text-gray-700 mb-6">Your reward:</p>
+            <p className="text-xl font-semibold text-zen-green mb-6">
+              {currentReward}
+            </p>
+            <button
+              onClick={() => setShowReward(false)}
+              className="w-full px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Punishment Modal */}
+      {showPunishment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h3 className="text-2xl font-bold text-red-500 mb-4">Oops! ��</h3>
+            <p className="text-gray-700 mb-6">Your punishment:</p>
+            <p className="text-xl font-semibold text-red-500 mb-6">
+              {currentPunishment}
+            </p>
+            <button
+              onClick={() => setShowPunishment(false)}
+              className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-opacity-90 transition-colors"
+            >
+              I'll do it!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
