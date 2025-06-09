@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         const data = await response.json();
-        setUser({ ...data.user });
+        setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
         return data.user;
       } else {
         localStorage.removeItem('token');
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        setUser({ ...data.user });
+        setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
         return { success: true };
       } else {
         return { success: false, error: data.error };
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        setUser({ ...data.user });
+        setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
         return { success: true };
       } else {
         return { success: false, error: data.error };

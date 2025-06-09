@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import PomodoroTimer from './PomodoroTimer';
 import TaskList from './TaskList';
@@ -24,25 +24,25 @@ function Dashboard() {
     { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock }
   ];
 
-  const handlePomodoroComplete = () => {
-    if (user.settings.rewardSystemEnabled) {
+  const handlePomodoroComplete = useCallback(() => {
+    if (user && user.settings && user.settings.rewardSystemEnabled) {
       const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
       setReward(randomReward);
       setShowRewardModal(true);
     }
-  };
+  }, [user]);
 
-  const handlePomodoroInterrupt = () => {
-    if (user.settings.rewardSystemEnabled) {
+  const handlePomodoroInterrupt = useCallback(() => {
+    if (user && user.settings && user.settings.rewardSystemEnabled) {
       const randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
       setPunishment(randomPunishment);
       setShowPunishmentModal(true);
     }
-  };
+  }, [user]);
 
-  const handlePomodoroEnd = () => {
+  const handlePomodoroEnd = useCallback(() => {
     setReportRefreshKey(prevKey => prevKey + 1);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-100">

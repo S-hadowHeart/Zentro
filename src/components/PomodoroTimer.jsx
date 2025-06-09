@@ -45,11 +45,17 @@ function PomodoroTimer({ onPomodoroEnd }) {
         });
       }, 1000);
     } else if (timeLeft === 0) {
-      clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
       setIsRunning(false);
       onPomodoroEnd();
     }
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [isRunning, timeLeft, handleComplete, onPomodoroEnd]);
 
   const formatTime = useCallback((seconds) => {
