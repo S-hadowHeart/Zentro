@@ -41,11 +41,11 @@ function Settings() {
 
       if (type === 'rewards' || type === 'punishments') {
         requestBody = { [type]: type === 'rewards' ? rewards : punishments };
-        successMessage = `${type === 'rewards' ? 'Rewards' : 'Punishments'} updated successfully!`;
+        successMessage = `${type === 'rewards' ? 'Seeds of joy nurtured!' : 'Weeds uprooted!'}`;
       } else if (type === 'settings') {
         requestBody = { settings: { dailyGoal: dailyGoal } };
         console.log('Settings: Sending dailyGoal to backend:', dailyGoal);
-        successMessage = 'Settings updated successfully!';
+        successMessage = 'Arrangements harmonized!';
       } else {
         throw new Error('Invalid update type');
       }
