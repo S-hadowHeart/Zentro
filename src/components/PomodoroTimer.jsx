@@ -83,9 +83,12 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const handleComplete = async () => {
     if (!isBreak) {
       try {
-        const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
-        setCurrentReward(randomReward);
-        setShowReward(true);
+        let randomReward = null;
+        if (user && user.rewards && user.rewards.length > 0) {
+          randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
+          setCurrentReward(randomReward);
+          setShowReward(true);
+        }
 
         const token = localStorage.getItem('token');
         if (!token) return;
@@ -127,9 +130,12 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const handleInterrupt = async () => {
     if (!isBreak) {
       try {
-        const randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
-        setCurrentPunishment(randomPunishment);
-        setShowPunishment(true);
+        let randomPunishment = null;
+        if (user && user.punishments && user.punishments.length > 0) {
+          randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
+          setCurrentPunishment(randomPunishment);
+          setShowPunishment(true);
+        }
 
         const token = localStorage.getItem('token');
         if (!token) return;

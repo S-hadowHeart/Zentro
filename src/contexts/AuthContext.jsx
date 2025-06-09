@@ -11,7 +11,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async (token) => {
@@ -28,10 +28,12 @@ export const AuthProvider = ({ children }) => {
         return data.user;
       } else {
         localStorage.removeItem('token');
+        setUser({});
         return null;
       }
     } catch (error) {
       console.error('Error fetching user:', error);
+      setUser({});
       return null;
     } finally {
       setLoading(false);
@@ -43,6 +45,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       fetchUser(token);
     } else {
+      setUser({});
       setLoading(false);
     }
   }, []);
@@ -97,7 +100,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
-    setUser(null);
+    setUser({});
   };
 
   const value = {
