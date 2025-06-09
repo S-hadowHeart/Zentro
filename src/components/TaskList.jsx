@@ -97,7 +97,7 @@ function TaskList() {
                       task.completed ? 'line-through text-gray-400' : ''
                     }`}
                   >
-                    {task.text}
+                    {task.title}
                   </span>
                 </div>
                 <button

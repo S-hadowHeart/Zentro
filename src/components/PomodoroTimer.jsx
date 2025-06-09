@@ -219,7 +219,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
           <option value="">Select a cultivation to focus on...</option>
           {tasks.map((task) => (
             <option key={task._id} value={task._id}>
-              {task.text}
+              {task.title}
             </option>
           ))}
         </select>
