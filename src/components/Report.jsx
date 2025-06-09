@@ -14,9 +14,21 @@ function Report() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/stats');
-        const data = await response.json();
-        setStats(data);
+        const token = localStorage.getItem('token');
+        if (!token) return; // Exit if no token
+
+        const response = await fetch('/api/users/pomodoro-stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        } else {
+          console.error('Failed to fetch stats:', response.status, response.statusText);
+        }
       } catch (error) {
         console.error('Error fetching stats:', error);
       }
