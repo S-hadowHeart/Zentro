@@ -26,7 +26,7 @@ A minimalist and calming productivity tool that helps users stay focused using t
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/S-hadowHeart/Zentro
    cd zentro-timer
    ```
 
@@ -61,6 +61,4 @@ This will start both the frontend (Vite) and backend (Express) servers concurren
 - Frontend runs on: http://localhost:5173
 - Backend runs on: http://localhost:5000
 
-## License
 
-MIT

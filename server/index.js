@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import taskRoutes from './routes/tasks.js';
 import userRoutes from './routes/users.js';
+import path from 'path';
 
 dotenv.config();
 
@@ -18,6 +19,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve static files from the Vite build directory
+app.use(express.static('dist'));
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -28,6 +32,11 @@ app.use((err, req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
+
+// All other GET requests not handled by API routes will return your React app
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve('dist', 'index.html'));
+});
 
 // MongoDB Connection with retry logic
 const connectWithRetry = async () => {
