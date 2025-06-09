@@ -180,7 +180,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
             id="task-select"
             value={activeTaskId}
             onChange={(e) => setActiveTaskId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
           >
             <option value="">Select a task</option>
             {tasks
@@ -203,7 +203,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
               value={focusDuration}
               onChange={(e) => setFocusDuration(Number(e.target.value))}
               min="1"
-              className="w-24 px-3 py-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
+              className="w-24 px-3 py-2 border border-gray-300 rounded-md text-center shadow-sm focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
             />
           </div>
           <div>
@@ -214,7 +214,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
               value={breakDuration}
               onChange={(e) => setBreakDuration(Number(e.target.value))}
               min="1"
-              className="w-24 px-3 py-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
+              className="w-24 px-3 py-2 border border-gray-300 rounded-md text-center shadow-sm focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
             />
           </div>
         </div>
@@ -234,7 +234,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
             <button
               onClick={() => setIsRunning(true)}
               disabled={!activeTaskId}
-              className="px-8 py-3 bg-zen-green text-white rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors disabled:opacity-50"
+              className="px-8 py-3 bg-zen-green text-white rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors disabled:opacity-50 shadow-md"
             >
               Begin Flow
             </button>
@@ -242,7 +242,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
           {isRunning && (
             <button
               onClick={() => setIsRunning(false)}
-              className="px-8 py-3 bg-zen-green text-white rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors"
+              className="px-8 py-3 bg-zen-green text-white rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors shadow-md"
             >
               Stillness
             </button>
@@ -255,7 +255,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 resetTimer();
               }
             }}
-            className="px-8 py-3 bg-zen-gray text-zen-green rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors"
+            className="px-8 py-3 bg-zen-gray text-zen-green rounded-lg font-medium text-lg hover:bg-opacity-90 transition-colors shadow-md"
           >
             Restore Calm
           </button>

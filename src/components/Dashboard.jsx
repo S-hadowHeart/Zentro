@@ -39,7 +39,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-zen-beige flex flex-col">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-md border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-zen-green">Zentro</h1>
           <div className="flex items-center gap-4">
@@ -55,7 +55,7 @@ function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center">
+      <main className="flex-1 flex flex-col items-center justify-center p-4">
         {/* Tabs */}
         <div className="flex gap-4 my-8">
           <button
@@ -86,17 +86,17 @@ function Dashboard() {
 
         {/* Centered Content */}
         <div className="w-full flex justify-center">
-          <div className="w-full max-w-2xl flex flex-col items-center">
-            <div className={`${activeTab === 'timer' ? 'block' : 'hidden'} w-full`}>
+          <div className="w-full max-w-2xl flex flex-col items-center space-y-8">
+            <div className={`${activeTab === 'timer' ? 'block' : 'hidden'} w-full bg-white rounded-lg shadow-xl p-6`}>
               <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
             </div>
-            <div className={`${activeTab === 'cultivations' ? 'block' : 'hidden'} w-full`}>
+            <div className={`${activeTab === 'cultivations' ? 'block' : 'hidden'} w-full bg-white rounded-lg shadow-xl p-6`}>
               <TaskList />
             </div>
-            <div className={`${activeTab === 'arrangements' ? 'block' : 'hidden'} w-full`}>
+            <div className={`${activeTab === 'arrangements' ? 'block' : 'hidden'} w-full bg-white rounded-lg shadow-xl p-6`}>
               <Settings />
             </div>
-            <div className={`${activeTab === 'growth-journal' ? 'block' : 'hidden'} w-full`}>
+            <div className={`${activeTab === 'growth-journal' ? 'block' : 'hidden'} w-full bg-white rounded-lg shadow-xl p-6`}>
               <Report key={reportRefreshKey} />
             </div>
           </div>

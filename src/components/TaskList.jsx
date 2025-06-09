@@ -46,11 +46,11 @@ function TaskList() {
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
               placeholder="Plant a new seed..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent"
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors"
+              className="px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors shadow-md"
             >
               Plant
             </button>
@@ -63,7 +63,7 @@ function TaskList() {
             onClick={() => setFilter('all')}
             className={`px-3 py-1 rounded-md ${
               filter === 'all'
-                ? 'bg-zen-green text-white'
+                ? 'bg-zen-green text-white shadow-sm'
                 : 'bg-zen-gray text-zen-green hover:bg-opacity-90'
             }`}
           >
@@ -73,7 +73,7 @@ function TaskList() {
             onClick={() => setFilter('active')}
             className={`px-3 py-1 rounded-md ${
               filter === 'active'
-                ? 'bg-zen-green text-white'
+                ? 'bg-zen-green text-white shadow-sm'
                 : 'bg-zen-gray text-zen-green hover:bg-opacity-90'
             }`}
           >
@@ -83,7 +83,7 @@ function TaskList() {
             onClick={() => setFilter('completed')}
             className={`px-3 py-1 rounded-md ${
               filter === 'completed'
-                ? 'bg-zen-green text-white'
+                ? 'bg-zen-green text-white shadow-sm'
                 : 'bg-zen-gray text-zen-green hover:bg-opacity-90'
             }`}
           >
@@ -103,14 +103,14 @@ function TaskList() {
           {filteredTasks.map(task => (
             <div
               key={task._id}
-              className="flex items-center justify-between p-3 bg-zen-gray rounded-md"
+              className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm border border-gray-100"
             >
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
                   checked={task.completed}
                   onChange={() => toggleTask(task._id)}
-                  className="w-5 h-5 text-zen-green rounded focus:ring-zen-green"
+                  className="w-5 h-5 text-zen-green rounded focus:ring-zen-green focus:ring-offset-1"
                 />
                 <span className={`${task.completed ? 'line-through text-gray-500' : 'text-gray-700'}`}>
                   {task.title}
@@ -118,7 +118,7 @@ function TaskList() {
               </div>
               <button
                 onClick={() => deleteTask(task._id)}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 shadow-sm"
               >
                 Prune
               </button>

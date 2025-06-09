@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { FaTrash } from 'react-icons/fa';
 
 function Settings() {
   const { user, fetchUser } = useAuth();
@@ -23,11 +24,11 @@ function Settings() {
 
   const handleUpdate = async (type) => {
     if (isUpdating) return; // Prevent multiple updates
-    
+
     setMessage('');
     setIsUpdating(true);
     setUpdateType(type);
-    
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -65,7 +66,7 @@ function Settings() {
       }
 
       setMessage(successMessage);
-      
+
       const updatedUser = await fetchUser(token);
       console.log('Settings: fetchUser returned updatedUser:', updatedUser);
       console.log('Settings: user from AuthContext after fetchUser:', user);
@@ -102,6 +103,35 @@ function Settings() {
     }
   };
 
+  const handleGoalSubmit = (e) => {
+    e.preventDefault();
+    handleUpdate('settings');
+  };
+
+  const handleAddReward = () => {
+    addItem('rewards', newReward, setRewards, setNewReward);
+  };
+
+  const handleRemoveReward = (index) => {
+    removeItem('rewards', index, setRewards);
+  };
+
+  const handleSaveRewards = () => {
+    handleUpdate('rewards');
+  };
+
+  const handleAddPunishment = () => {
+    addItem('punishments', newPunishment, setPunishments, setNewPunishment);
+  };
+
+  const handleRemovePunishment = (index) => {
+    removeItem('punishments', index, setPunishments);
+  };
+
+  const handleSavePunishments = () => {
+    handleUpdate('punishments');
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-zen-green mb-6">Arrangements</h2>
@@ -113,115 +143,108 @@ function Settings() {
       )}
 
       {/* Daily Goal Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold text-zen-green mb-4">Daily Cultivation Goal</h3>
-        <div className="flex gap-2 mb-4">
-          <input
-            type="number"
-            value={dailyGoal}
-            onChange={(e) => setDailyGoal(Number(e.target.value))}
-            min="1"
-            placeholder="Cultivate daily minutes..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent disabled:opacity-50"
-            disabled={isUpdating}
-          />
-          <button
-            onClick={() => handleUpdate('settings')}
-            className="px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors disabled:opacity-50"
-            disabled={isUpdating}
-          >
-            {isUpdating && updateType === 'settings' ? 'Nurturing...' : 'Nurture Goal'}
-          </button>
-        </div>
-      </div>
+      <form onSubmit={handleGoalSubmit} className="mb-8 p-6 bg-white rounded-lg shadow-xl border border-gray-100">
+        <label htmlFor="dailyGoal" className="block text-lg font-semibold text-gray-800 mb-3">Daily Cultivation Goal (minutes):</label>
+        <input
+          type="number"
+          id="dailyGoal"
+          value={dailyGoal}
+          onChange={(e) => setDailyGoal(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
+          placeholder="e.g., 120"
+          required
+        />
+        <button
+          type="submit"
+          className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+        >
+          Nurture Goal
+        </button>
+      </form>
 
-      {/* Rewards Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold text-zen-green mb-4">Seeds of Joy</h3>
-        <div className="flex flex-col gap-2 mb-4">
-          {rewards.map((reward, index) => (
-            <div key={index} className="flex justify-between items-center bg-zen-gray p-3 rounded-md">
-              <span className="text-gray-700">{reward}</span>
-              <button
-                onClick={() => removeItem('rewards', index, setRewards)}
-                className="text-red-500 hover:text-red-700 text-sm"
-                disabled={isUpdating}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2 mb-4">
+      {/* Custom Rewards Section */}
+      <div className="mb-8 p-6 bg-white rounded-lg shadow-xl border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Seeds of Joy</h3>
+        <div className="flex mb-4">
           <input
             type="text"
             value={newReward}
             onChange={(e) => setNewReward(e.target.value)}
+            className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
             placeholder="Sow a new seed of joy..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent disabled:opacity-50"
-            disabled={isUpdating}
           />
           <button
-            onClick={() => addItem('rewards', newReward, setRewards, setNewReward)}
-            className="px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors disabled:opacity-50"
-            disabled={isUpdating}
+            onClick={handleAddReward}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-r-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
           >
             Sow
           </button>
         </div>
-        <button
-          onClick={() => handleUpdate('rewards')}
-          className="w-full px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors disabled:opacity-50"
-          disabled={isUpdating}
-        >
-          {isUpdating && updateType === 'rewards' ? 'Nurturing...' : 'Nurture Seeds'}
-        </button>
+        <ul className="space-y-3">
+          {rewards.map((reward, index) => (
+            <li key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-md border border-gray-200 shadow-sm">
+              <span className="text-gray-700">{reward}</span>
+              <button
+                onClick={() => handleRemoveReward(index)}
+                className="text-red-500 hover:text-red-700 transition duration-300 ease-in-out"
+              >
+                <FaTrash />
+              </button>
+            </li>
+          ))}
+        </ul>
+        {rewards.length > 0 && (
+          <button
+            onClick={handleSaveRewards}
+            className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+          >
+            Nurture Seeds
+          </button>
+        )}
       </div>
 
-      {/* Punishments Section */}
-      <div>
-        <h3 className="text-xl font-semibold text-zen-green mb-4">Weeds to Uproot</h3>
-        <div className="flex flex-col gap-2 mb-4">
-          {punishments.map((punishment, index) => (
-            <div key={index} className="flex justify-between items-center bg-zen-gray p-3 rounded-md">
-              <span className="text-gray-700">{punishment}</span>
-              <button
-                onClick={() => removeItem('punishments', index, setPunishments)}
-                className="text-red-500 hover:text-red-700 text-sm"
-                disabled={isUpdating}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2 mb-4">
+      {/* Custom Punishments Section */}
+      <div className="p-6 bg-white rounded-lg shadow-xl border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Weeds to Uproot</h3>
+        <div className="flex mb-4">
           <input
             type="text"
             value={newPunishment}
             onChange={(e) => setNewPunishment(e.target.value)}
+            className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
             placeholder="Identify a weed to uproot..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-zen-green focus:border-transparent disabled:opacity-50"
-            disabled={isUpdating}
           />
           <button
-            onClick={() => addItem('punishments', newPunishment, setPunishments, setNewPunishment)}
-            className="px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors disabled:opacity-50"
-            disabled={isUpdating}
+            onClick={handleAddPunishment}
+            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-r-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
           >
             Identify
           </button>
         </div>
-        <button
-          onClick={() => handleUpdate('punishments')}
-          className="w-full px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors disabled:opacity-50"
-          disabled={isUpdating}
-        >
-          {isUpdating && updateType === 'punishments' ? 'Uprooting...' : 'Clear Weeds'}
-        </button>
+        <ul className="space-y-3">
+          {punishments.map((punishment, index) => (
+            <li key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-md border border-gray-200 shadow-sm">
+              <span className="text-gray-700">{punishment}</span>
+              <button
+                onClick={() => handleRemovePunishment(index)}
+                className="text-red-500 hover:text-red-700 transition duration-300 ease-in-out"
+              >
+                <FaTrash />
+              </button>
+            </li>
+          ))}
+        </ul>
+        {punishments.length > 0 && (
+          <button
+            onClick={handleSavePunishments}
+            className="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+          >
+            Clear Weeds
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-export default Settings; 
+export default Settings;
