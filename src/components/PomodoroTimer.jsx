@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
 import { FaPlay, FaPause, FaRedo, FaLeaf } from 'react-icons/fa';
@@ -52,13 +52,13 @@ function PomodoroTimer({ onPomodoroEnd }) {
     return () => clearInterval(timerRef.current);
   }, [isRunning, timeLeft, handleComplete, onPomodoroEnd]);
 
-  const formatTime = (seconds) => {
+  const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
-  const incrementPomodorosForTask = async (taskId, duration) => {
+  const incrementPomodorosForTask = useCallback(async (taskId, duration) => {
     if (!taskId) return;
     try {
       const response = await fetch(`/api/tasks/${taskId}/pomodoro`, {
@@ -78,9 +78,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
     } catch (error) {
       console.error('Error updating task:', error);
     }
-  };
+  }, [fetchTasks]);
 
-  const handleComplete = async () => {
+  const handleComplete = useCallback(async () => {
     if (!isBreak) {
       try {
         let randomReward = null;
@@ -125,9 +125,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
     setIsBreak(!isBreak);
     setTimeLeft(isBreak ? focusDuration * 60 : breakDuration * 60);
-  };
+  }, [isBreak, user, focusDuration, selectedTask, fetchUser, incrementPomodorosForTask, onPomodoroEnd, breakDuration]);
 
-  const handleInterrupt = async () => {
+  const handleInterrupt = useCallback(async () => {
     if (!isBreak) {
       try {
         let randomPunishment = null;
@@ -169,27 +169,27 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
-  };
+  }, [isBreak, user, focusDuration, onPomodoroEnd]);
 
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     if (!selectedTask) {
       alert('Please select a cultivation to focus on');
       return;
     }
     setIsRunning(true);
     setIsBreak(false);
-  };
+  }, [selectedTask]);
 
-  const handlePause = () => {
+  const handlePause = useCallback(() => {
     setIsRunning(false);
     setIsBreak(false);
-  };
+  }, []);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
-  };
+  }, [focusDuration]);
 
   const progress = ((focusDuration * 60 - timeLeft) / (focusDuration * 60)) * 100;
 
