@@ -99,12 +99,12 @@ function Dashboard() {
 
       {/* Modals */}
       <RewardModal
-        isOpen={showRewardModal}
+        show={showRewardModal}
         onClose={() => setShowRewardModal(false)}
         reward={reward}
       />
       <PunishmentModal
-        isOpen={showPunishmentModal}
+        show={showPunishmentModal}
         onClose={() => setShowPunishmentModal(false)}
         punishment={punishment}
       />
