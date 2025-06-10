@@ -112,15 +112,15 @@ function PomodoroTimer({ onPomodoroEnd }) {
             clearInterval(intervalId);
             
             if (!isBreakRef.current) {
-              // Focus session ended
+              // Focus session ended - switch to break immediately
+              setIsBreak(true);
+              setTimeLeft(breakDurationRef.current * 60);
+              setIsRunning(true);
+              
+              // Handle completion in the background
               handlePomodoroComplete(focusDurationRef.current).then(() => {
-                // Show reward
+                // Show reward after break has started
                 onPomodoroEndRef.current?.('completed', focusDurationRef.current, user?.rewards, user?.punishments);
-                // Switch to break
-                setIsBreak(true);
-                setTimeLeft(breakDurationRef.current * 60);
-                // Start break timer immediately
-                setIsRunning(true);
               });
             } else {
               // Break session ended
