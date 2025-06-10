@@ -36,17 +36,21 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
         localStorage.removeItem('token');
-        navigate('/login');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     } catch (error) {
       console.error('AuthContext fetch user error:', error);
       setUser(null);
       localStorage.removeItem('token');
-      navigate('/login');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, []);
 
   const logout = useCallback(() => {
     setUser(null);
