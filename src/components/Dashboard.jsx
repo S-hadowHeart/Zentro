@@ -19,6 +19,10 @@ function Dashboard() {
   const [punishment, setPunishment] = useState('');
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
+  console.log('Dashboard: user', user);
+  console.log('Dashboard: location.pathname', location.pathname);
+  console.log('Dashboard: activeTab', activeTab);
+
   useEffect(() => {
     const path = location.pathname.substring(1); // Remove leading slash
     const currentTab = tabs.find(tab => tab.id === path);
