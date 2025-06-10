@@ -129,10 +129,10 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 showNotification(randomReward, 'reward');
               }
               
-              // Update stats in background
+              // Update stats in background without waiting
               handlePomodoroComplete(focusDurationRef.current);
             } else {
-              // Break session ended
+              // Break session ended - switch back to focus immediately
               setIsBreak(false);
               setTimeLeft(focusDurationRef.current * 60);
               setIsRunning(false);
@@ -218,17 +218,23 @@ function PomodoroTimer({ onPomodoroEnd }) {
     <div className="space-y-8">
       {/* Notification Popup */}
       {notification && (
-        <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out ${
-          notification.type === 'reward' ? 'bg-emerald-500' : 'bg-red-500'
-        } text-white z-50`}>
-          <div className="flex items-center space-x-2">
-            <span>{notification.message}</span>
-            <button 
-              onClick={() => setNotification(null)}
-              className="ml-2 hover:opacity-75"
-            >
-              <FaTimes />
-            </button>
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setNotification(null)}></div>
+          <div className={`relative p-8 rounded-xl shadow-2xl transform transition-all duration-300 ease-in-out ${
+            notification.type === 'reward' ? 'bg-emerald-500' : 'bg-red-500'
+          } text-white max-w-md w-full mx-4`}>
+            <div className="text-center">
+              <h3 className="text-2xl font-bold mb-4">
+                {notification.type === 'reward' ? '🎉 Achievement Unlocked!' : 'Time for Reflection'}
+              </h3>
+              <p className="text-xl mb-6">{notification.message}</p>
+              <button 
+                onClick={() => setNotification(null)}
+                className="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg font-semibold transition-all duration-300"
+              >
+                Continue
+              </button>
+            </div>
           </div>
         </div>
       )}
