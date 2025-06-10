@@ -6,6 +6,10 @@ import authRoutes from './routes/auth.js';
 import taskRoutes from './routes/tasks.js';
 import userRoutes from './routes/users.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -14,13 +18,29 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: '*',
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://zentro-yerp.onrender.com', 'http://zentro-yerp.onrender.com']
+    : '*',
   credentials: true
 }));
 app.use(express.json());
 
 // Serve static files from the Vite build directory
-app.use(express.static('dist'));
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -32,19 +52,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something broke!', details: err.message });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/users', userRoutes);
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
 // All other GET requests not handled by API routes will return your React app
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve('dist', 'index.html'));
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // MongoDB Connection with retry logic
