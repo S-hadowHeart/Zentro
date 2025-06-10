@@ -84,7 +84,7 @@ function Dashboard() {
                 </h1>
               </div>
               <div className="h-6 w-px bg-emerald-200"></div>
-              <p className="text-gray-600 italic">Greetings, {user.username}! 🌱</p>
+              <p className="text-gray-600 italic">Greetings, {user?.username}! 🌱</p>
             </div>
             <button
               onClick={logout}

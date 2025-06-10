@@ -1,6 +1,13 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
-const TasksContext = createContext();
+const TasksContext = createContext({
+  tasks: [],
+  loading: true,
+  fetchTasks: () => {},
+  addTask: () => {},
+  toggleTask: () => {},
+  deleteTask: () => {},
+});
 
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
