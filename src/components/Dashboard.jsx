@@ -36,25 +36,25 @@ function Dashboard() {
     }
   }, [location.pathname, tabs]);
 
-  const handlePomodoroEnd = useCallback((eventType, duration, rewards, punishments) => {
+  const handlePomodoroEnd = useCallback((eventType, duration, userRewards, userPunishments) => {
     setReportRefreshKey(prevKey => prevKey + 1);
     
     if (eventType === 'completed') {
-      if (user?.settings?.rewardSystemEnabled && rewards?.length > 0) {
-        const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+      if (user?.settings?.rewardSystemEnabled && userRewards?.length > 0) {
+        const randomReward = userRewards[Math.floor(Math.random() * userRewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
       }
     } else if (eventType === 'interrupted') {
-      if (user?.settings?.rewardSystemEnabled && punishments?.length > 0) {
-        const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
+      if (user?.settings?.rewardSystemEnabled && userPunishments?.length > 0) {
+        const randomPunishment = userPunishments[Math.floor(Math.random() * userPunishments.length)];
         setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
       }
     }
   }, [user]);
 
-  const renderTabContent = useCallback(() => {
+  const renderNonTimerTabContent = useCallback(() => {
     switch (activeTab) {
       case 'tasks':
         return <TaskList />;
@@ -62,12 +62,10 @@ function Dashboard() {
         return <Settings />;
       case 'report':
         return <Report key={reportRefreshKey} />;
-      case 'pomodoro':
-        return <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />;
       default:
-        return <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />;
+        return null; // Don't render anything for pomodoro tab here
     }
-  }, [activeTab, reportRefreshKey, handlePomodoroEnd]);
+  }, [activeTab, reportRefreshKey]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-100">
@@ -129,7 +127,12 @@ function Dashboard() {
 
         {/* Tab Content */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
-          {renderTabContent()}
+          <div style={{ display: activeTab === 'pomodoro' ? 'block' : 'none' }}>
+            <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
+          </div>
+          <div style={{ display: activeTab !== 'pomodoro' ? 'block' : 'none' }}>
+            {renderNonTimerTabContent()}
+          </div>
         </div>
       </main>
 
