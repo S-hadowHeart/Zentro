@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
+        window.location.href = '/tasks';
         return { success: true };
       } else {
         return { success: false, error: data.error };
