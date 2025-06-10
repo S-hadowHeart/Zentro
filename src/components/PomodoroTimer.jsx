@@ -4,6 +4,20 @@ import { useTasks } from '../contexts/TasksContext';
 import { FaPlay, FaPause, FaRedo, FaLeaf } from 'react-icons/fa';
 
 function PomodoroTimer({ onPomodoroEnd }) {
+  console.log('PomodoroTimer component initialized.');
+  console.log('Initial focusDuration:', focusDuration);
+  console.log('Initial breakDuration:', breakDuration);
+  console.log('Initial timeLeft:', timeLeft);
+  console.log('Initial isRunning:', isRunning);
+  console.log('Initial isBreak:', isBreak);
+  console.log('Initial showReward:', showReward);
+  console.log('Initial currentReward:', currentReward);
+  console.log('Initial showPunishment:', showPunishment);
+  console.log('Initial currentPunishment:', currentPunishment);
+  console.log('Initial selectedTask:', selectedTask);
+  console.log('User from useAuth:', user);
+  console.log('Tasks from useTasks:', tasks);
+
   const [focusDuration, setFocusDuration] = useState(25); // in minutes
   const [breakDuration, setBreakDuration] = useState(5); // in minutes
   const [timeLeft, setTimeLeft] = useState(25 * 60);

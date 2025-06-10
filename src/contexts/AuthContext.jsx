@@ -101,6 +101,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser({});
+    window.location.href = '/login';
   };
 
   const value = {
