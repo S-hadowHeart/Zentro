@@ -111,17 +111,16 @@ function PomodoroTimer({ onPomodoroEnd }) {
   useEffect(() => {
     let intervalId = null;
 
-    if (isRunning) {
+    if (isRunning && !notification) {  // Only run timer when there's no notification
       intervalId = setInterval(() => {
         setTimeLeft(prevTimeLeft => {
           if (prevTimeLeft <= 0) {
             clearInterval(intervalId);
             
             if (!isBreakRef.current) {
-              // Focus session ended - switch to break immediately
+              // Focus session ended - prepare for break
               setIsBreak(true);
               setTimeLeft(breakDurationRef.current * 60);
-              setIsRunning(true);
               
               // Show reward notification if available
               if (user?.rewards?.length > 0) {
@@ -149,7 +148,15 @@ function PomodoroTimer({ onPomodoroEnd }) {
         clearInterval(intervalId);
       }
     };
-  }, [isRunning, handlePomodoroComplete, user, showNotification]);
+  }, [isRunning, handlePomodoroComplete, user, showNotification, notification]);
+
+  const handleNotificationClose = useCallback(() => {
+    setNotification(null);
+    // Start the break timer after notification is closed
+    if (isBreakRef.current) {
+      setIsRunning(true);
+    }
+  }, []);
 
   // Remove the effect that was resetting the timer
   // Effect to update time left when durations change
@@ -219,7 +226,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
       {/* Notification Popup */}
       {notification && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setNotification(null)}></div>
+          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={handleNotificationClose}></div>
           <div className={`relative p-8 rounded-xl shadow-2xl transform transition-all duration-300 ease-in-out ${
             notification.type === 'reward' ? 'bg-emerald-500' : 'bg-red-500'
           } text-white max-w-md w-full mx-4`}>
@@ -229,7 +236,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
               </h3>
               <p className="text-xl mb-6">{notification.message}</p>
               <button 
-                onClick={() => setNotification(null)}
+                onClick={handleNotificationClose}
                 className="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg font-semibold transition-all duration-300"
               >
                 Continue
