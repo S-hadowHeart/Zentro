@@ -33,13 +33,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
     onPomodoroEndRef.current = onPomodoroEnd;
   }, [isBreak, focusDuration, breakDuration, onPomodoroEnd]);
 
-  // Effect to update time left when durations change or on initial load
-  useEffect(() => {
-    if (!isRunning && !isBreak) {
-      setTimeLeft(focusDuration * 60);
-    }
-  }, [focusDuration, isRunning, isBreak]);
-
   // Effect to select a task on initial load or when tasks change
   useEffect(() => {
     if (tasks.length > 0) {
@@ -152,6 +145,14 @@ function PomodoroTimer({ onPomodoroEnd }) {
     };
   }, [isRunning, handlePomodoroComplete, user, onPomodoroEndRef]);
 
+  // Remove the effect that was resetting the timer
+  // Effect to update time left when durations change
+  useEffect(() => {
+    if (!isRunning && !isBreak) {
+      setTimeLeft(focusDuration * 60);
+    }
+  }, [focusDuration]);
+
   const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -183,12 +184,18 @@ function PomodoroTimer({ onPomodoroEnd }) {
       alert('Please select a cultivation to focus on');
       return;
     }
-    setIsRunning(true);
-  }, [selectedTask]);
+    if (!isRunning) {
+      setIsRunning(true);
+    }
+  }, [selectedTask, isRunning]);
 
   const handlePause = useCallback(() => {
-    setIsRunning(prevIsRunning => !prevIsRunning);
-  }, []);
+    if (isRunning) {
+      setIsRunning(false);
+    } else {
+      setIsRunning(true);
+    }
+  }, [isRunning]);
 
   const handleReset = useCallback(() => {
     // Stop the timer
