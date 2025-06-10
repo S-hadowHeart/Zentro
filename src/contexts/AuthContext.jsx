@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async (token) => {
+    console.log('fetchUser: attempting to fetch user with token:', token);
     try {
       const response = await fetch('/api/auth/me', {
         headers: {
@@ -24,15 +25,17 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         const data = await response.json();
+        console.log('fetchUser: successfully fetched user data:', data.user);
         setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
         return data.user;
       } else {
+        console.error('fetchUser: Failed to fetch user, response not OK:', response.status);
         localStorage.removeItem('token');
         setUser({});
         return null;
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
+      console.error('fetchUser: Error during API call:', error);
       setUser({});
       return null;
     }
@@ -40,6 +43,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('AuthContext useEffect: token from localStorage:', token);
     if (token) {
       setLoading(true);
       fetchUser(token).finally(() => setLoading(false));
