@@ -17,6 +17,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [selectedTask, setSelectedTask] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
   const timerRef = useRef(null);
 
   // Refs for stable callbacks
@@ -188,21 +189,23 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   const handlePause = useCallback(() => {
     setIsRunning(false);
-  }, []);
-
-  const handleReset = useCallback(() => {
-    if (isRunning && !isBreak) {
+    if (!isBreak) {
       handlePomodoroInterrupt(focusDuration).then(() => {
         onPomodoroEndRef.current?.('interrupted', focusDuration, user?.rewards, user?.punishments);
-        setIsRunning(false);
-        setIsBreak(false);
-        setTimeLeft(focusDuration * 60);
       });
-    } else {
-      setIsRunning(false);
-      setIsBreak(false);
-      setTimeLeft(focusDuration * 60);
     }
+  }, [isBreak, focusDuration, handlePomodoroInterrupt, user, onPomodoroEndRef]);
+
+  const handleReset = useCallback(async () => {
+    setIsResetting(true);
+    if (isRunning && !isBreak) {
+      await handlePomodoroInterrupt(focusDuration);
+      onPomodoroEndRef.current?.('interrupted', focusDuration, user?.rewards, user?.punishments);
+    }
+    setIsRunning(false);
+    setIsBreak(false);
+    setTimeLeft(focusDuration * 60);
+    setTimeout(() => setIsResetting(false), 500); // Add a small delay for the animation
   }, [isRunning, isBreak, focusDuration, handlePomodoroInterrupt, user, onPomodoroEndRef]);
 
   const currentDuration = isBreak ? breakDuration : focusDuration;
@@ -272,8 +275,13 @@ function PomodoroTimer({ onPomodoroEnd }) {
           <button
             onClick={handleReset}
             className="flex items-center space-x-2 px-6 py-3 bg-gray-300 text-gray-800 rounded-full shadow-lg hover:bg-gray-400 transition duration-300"
+            disabled={isResetting}
           >
-            <FaRedo />
+            {isResetting ? (
+              <FaSpinner className="animate-spin" />
+            ) : (
+              <FaRedo />
+            )}
             <span>Reset Cycle</span>
           </button>
         </div>
