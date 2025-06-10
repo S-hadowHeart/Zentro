@@ -6,10 +6,10 @@ const TasksContext = createContext(null);
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
-  const fetchTasks = useCallback(async () => {
-    if (!user) {
+  const fetchTasks = useCallback(async (currentUserId) => {
+    if (!currentUserId) {
       setTasks([]);
       setLoading(false);
       return;
@@ -18,10 +18,15 @@ export function TasksProvider({ children }) {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      if (!token) {
+        setTasks([]);
+        setLoading(false);
+        return;
+      }
 
       const response = await fetch('/api/tasks', {
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
@@ -38,11 +43,20 @@ export function TasksProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, []);
 
   const updateTasks = useCallback((updatedTaskData) => {
     setTasks(updatedTaskData);
   }, []);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      fetchTasks(user._id);
+    } else if (!authLoading && !user) {
+      setTasks([]);
+      setLoading(false);
+    }
+  }, [authLoading, user?._id, fetchTasks]);
 
   const addTask = useCallback(async (title) => {
     try {
@@ -137,10 +151,6 @@ export function TasksProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
-
   const value = useMemo(() => ({
     tasks,
     loading,
@@ -148,8 +158,9 @@ export function TasksProvider({ children }) {
     addTask,
     toggleTask,
     deleteTask,
-    updateTasks
-  }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask, updateTasks]);
+    updateTasks,
+    incrementPomodorosForTask
+  }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask, updateTasks, incrementPomodorosForTask]);
 
   return (
     <TasksContext.Provider value={value}>
