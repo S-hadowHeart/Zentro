@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaCog, FaSeedling, FaLeaf, FaSun, FaMoon, FaPlus, FaCheck } from 'react-icons/fa';
 
 function Settings() {
   const { user, fetchUser } = useAuth();
@@ -17,13 +17,12 @@ function Settings() {
     if (user) {
       setRewards(user.rewards || []);
       setPunishments(user.punishments || []);
-      console.log('Settings: User object updated. Current dailyGoal from user:', user.settings?.dailyGoal);
       setDailyGoal(user.settings?.dailyGoal || 25);
     }
   }, [user]);
 
   const handleUpdate = async (type) => {
-    if (isUpdating) return; // Prevent multiple updates
+    if (isUpdating) return;
 
     setMessage('');
     setIsUpdating(true);
@@ -45,7 +44,6 @@ function Settings() {
         successMessage = `${type === 'rewards' ? 'Seeds of joy nurtured!' : 'Weeds uprooted!'}`;
       } else if (type === 'settings') {
         requestBody = { settings: { dailyGoal: dailyGoal } };
-        console.log('Settings: Sending dailyGoal to backend:', dailyGoal);
         successMessage = 'Arrangements harmonized!';
       } else {
         throw new Error('Invalid update type');
@@ -66,17 +64,8 @@ function Settings() {
       }
 
       setMessage(successMessage);
-
-      const updatedUser = await fetchUser(token);
-      console.log('Settings: fetchUser returned updatedUser:', updatedUser);
-      console.log('Settings: user from AuthContext after fetchUser:', user);
-
-      if (!updatedUser) {
-        throw new Error('Failed to refresh user data');
-      }
-      console.log('Settings: User object after fetchUser (in handleUpdate):', updatedUser);
+      await fetchUser(token);
     } catch (error) {
-      console.error('Update error:', error);
       setMessage(`Error updating ${type}: ${error.message || 'Server unreachable. Please check if the server is running.'}`);
     } finally {
       setIsUpdating(false);
@@ -133,62 +122,102 @@ function Settings() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold text-zen-green mb-6">Arrangements</h2>
+    <div className="space-y-8">
+      <div className="flex items-center space-x-3">
+        <div className="p-2 rounded-full bg-emerald-50">
+          <FaCog className="w-6 h-6 text-emerald-600" />
+        </div>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
+          Arrangements
+        </h2>
+      </div>
 
       {message && (
-        <div className={`mb-4 p-3 rounded-md text-sm ${message.includes('Error') ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-500'}`}>
-          {message}
+        <div className={`p-4 rounded-xl text-sm flex items-center space-x-2 ${
+          message.includes('Error') 
+            ? 'bg-red-50 text-red-500 border border-red-100' 
+            : 'bg-emerald-50 text-emerald-500 border border-emerald-100'
+        }`}>
+          {message.includes('Error') ? (
+            <FaMoon className="w-5 h-5" />
+          ) : (
+            <FaSun className="w-5 h-5" />
+          )}
+          <span>{message}</span>
         </div>
       )}
 
       {/* Daily Goal Section */}
-      <form onSubmit={handleGoalSubmit} className="mb-8 p-6 bg-white rounded-lg shadow-xl border border-gray-100">
-        <label htmlFor="dailyGoal" className="block text-lg font-semibold text-gray-800 mb-3">Daily Cultivation Goal (minutes):</label>
-        <input
-          type="number"
-          id="dailyGoal"
-          value={dailyGoal}
-          onChange={(e) => setDailyGoal(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
-          placeholder="e.g., 120"
-          required
-        />
+      <form onSubmit={handleGoalSubmit} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+        <div className="flex items-center space-x-3 mb-4">
+          <FaSeedling className="w-5 h-5 text-emerald-600" />
+          <label htmlFor="dailyGoal" className="text-lg font-semibold text-gray-800">Daily Cultivation Goal (minutes)</label>
+        </div>
+        <div className="relative">
+          <input
+            type="number"
+            id="dailyGoal"
+            value={dailyGoal}
+            onChange={(e) => setDailyGoal(e.target.value)}
+            className="w-full px-4 py-3 pl-12 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+            placeholder="e.g., 120"
+            required
+          />
+          <FaLeaf className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-500" />
+        </div>
         <button
           type="submit"
-          className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+          disabled={isUpdating}
+          className="mt-4 w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          Nurture Goal
+          {isUpdating ? (
+            <>
+              <FaCog className="w-4 h-4 animate-spin" />
+              <span>Harmonizing...</span>
+            </>
+          ) : (
+            <>
+              <FaCheck className="w-4 h-4" />
+              <span>Nurture Goal</span>
+            </>
+          )}
         </button>
       </form>
 
       {/* Custom Rewards Section */}
-      <div className="mb-8 p-6 bg-white rounded-lg shadow-xl border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Seeds of Joy</h3>
-        <div className="flex mb-4">
-          <input
-            type="text"
-            value={newReward}
-            onChange={(e) => setNewReward(e.target.value)}
-            className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
-            placeholder="Sow a new seed of joy..."
-          />
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+        <div className="flex items-center space-x-3 mb-4">
+          <FaSun className="w-5 h-5 text-emerald-600" />
+          <h3 className="text-lg font-semibold text-gray-800">Seeds of Joy</h3>
+        </div>
+        <div className="flex gap-3 mb-4">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={newReward}
+              onChange={(e) => setNewReward(e.target.value)}
+              className="w-full px-4 py-3 pl-12 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+              placeholder="Sow a new seed of joy..."
+            />
+            <FaSeedling className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-500" />
+          </div>
           <button
             onClick={handleAddReward}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-r-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+            className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
           >
-            Sow
+            <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
+            <span>Sow</span>
           </button>
         </div>
         <ul className="space-y-3">
           {rewards.map((reward, index) => (
-            <li key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-md border border-gray-200 shadow-sm">
+            <li key={index} className="group flex justify-between items-center bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-emerald-100 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
               <span className="text-gray-700">{reward}</span>
               <button
                 onClick={() => handleRemoveReward(index)}
-                className="text-red-500 hover:text-red-700 transition duration-300 ease-in-out"
+                className="p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out rounded-lg hover:bg-red-50"
               >
-                <FaTrash />
+                <FaTrash className="w-4 h-4" />
               </button>
             </li>
           ))}
@@ -196,40 +225,58 @@ function Settings() {
         {rewards.length > 0 && (
           <button
             onClick={handleSaveRewards}
-            className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+            disabled={isUpdating}
+            className="mt-6 w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Nurture Seeds
+            {isUpdating ? (
+              <>
+                <FaCog className="w-4 h-4 animate-spin" />
+                <span>Nurturing...</span>
+              </>
+            ) : (
+              <>
+                <FaCheck className="w-4 h-4" />
+                <span>Nurture Seeds</span>
+              </>
+            )}
           </button>
         )}
       </div>
 
       {/* Custom Punishments Section */}
-      <div className="p-6 bg-white rounded-lg shadow-xl border border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Weeds to Uproot</h3>
-        <div className="flex mb-4">
-          <input
-            type="text"
-            value={newPunishment}
-            onChange={(e) => setNewPunishment(e.target.value)}
-            className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:ring-emerald-500 focus:border-emerald-500 shadow-sm"
-            placeholder="Identify a weed to uproot..."
-          />
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+        <div className="flex items-center space-x-3 mb-4">
+          <FaMoon className="w-5 h-5 text-emerald-600" />
+          <h3 className="text-lg font-semibold text-gray-800">Weeds to Uproot</h3>
+        </div>
+        <div className="flex gap-3 mb-4">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={newPunishment}
+              onChange={(e) => setNewPunishment(e.target.value)}
+              className="w-full px-4 py-3 pl-12 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+              placeholder="Identify a weed to uproot..."
+            />
+            <FaLeaf className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-500" />
+          </div>
           <button
             onClick={handleAddPunishment}
-            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-r-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+            className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
           >
-            Identify
+            <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
+            <span>Identify</span>
           </button>
         </div>
         <ul className="space-y-3">
           {punishments.map((punishment, index) => (
-            <li key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-md border border-gray-200 shadow-sm">
+            <li key={index} className="group flex justify-between items-center bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-emerald-100 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
               <span className="text-gray-700">{punishment}</span>
               <button
                 onClick={() => handleRemovePunishment(index)}
-                className="text-red-500 hover:text-red-700 transition duration-300 ease-in-out"
+                className="p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out rounded-lg hover:bg-red-50"
               >
-                <FaTrash />
+                <FaTrash className="w-4 h-4" />
               </button>
             </li>
           ))}
@@ -237,9 +284,20 @@ function Settings() {
         {punishments.length > 0 && (
           <button
             onClick={handleSavePunishments}
-            className="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md"
+            disabled={isUpdating}
+            className="mt-6 w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Clear Weeds
+            {isUpdating ? (
+              <>
+                <FaCog className="w-4 h-4 animate-spin" />
+                <span>Clearing...</span>
+              </>
+            ) : (
+              <>
+                <FaCheck className="w-4 h-4" />
+                <span>Clear Weeds</span>
+              </>
+            )}
           </button>
         )}
       </div>

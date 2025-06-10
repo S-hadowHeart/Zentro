@@ -6,7 +6,7 @@ import Settings from './Settings';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 import Report from './Report';
-import { FaTasks, FaCog, FaChartBar, FaClock } from 'react-icons/fa';
+import { FaTasks, FaCog, FaChartBar, FaClock, FaLeaf, FaSignOutAlt } from 'react-icons/fa';
 import { useLocation, Link } from 'react-router-dom';
 
 function Dashboard() {
@@ -63,21 +63,35 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-100">
+      {/* Decorative elements */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute top-40 right-10 w-64 h-64 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-10 left-1/2 w-64 h-64 bg-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-emerald-100 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
-                Zentro Garden
-              </h1>
+              <div className="flex items-center space-x-2">
+                <div className="p-2 rounded-full bg-emerald-50">
+                  <FaLeaf className="w-6 h-6 text-emerald-600" />
+                </div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
+                  Zentro Garden
+                </h1>
+              </div>
+              <div className="h-6 w-px bg-emerald-200"></div>
               <p className="text-gray-600 italic">Greetings, {user.username}! 🌱</p>
             </div>
             <button
               onClick={logout}
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out"
+              className="group flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out"
             >
-              Seek Tranquility
+              <span>Seek Tranquility</span>
+              <FaSignOutAlt className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
