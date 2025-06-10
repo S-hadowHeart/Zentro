@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
@@ -11,47 +12,59 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const fetchUser = async (token) => {
-    console.log('fetchUser: attempting to fetch user with token:', token);
+  const fetchUser = useCallback(async (token) => {
+    setLoading(true);
     try {
       const response = await fetch('/api/auth/me', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
       if (response.ok) {
         const data = await response.json();
+        setUser(data.user);
         console.log('fetchUser: successfully fetched user data:', data.user);
-        setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
-        return data.user;
       } else {
-        console.error('fetchUser: Failed to fetch user, response not OK:', response.status);
+        setUser(null);
         localStorage.removeItem('token');
-        setUser({});
-        return null;
+        navigate('/login');
       }
     } catch (error) {
-      console.error('fetchUser: Error during API call:', error);
-      setUser({});
-      return null;
+      console.error('AuthContext fetch user error:', error);
+      setUser(null);
+      localStorage.removeItem('token');
+      navigate('/login');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('token');
+    navigate('/login');
+  }, [navigate]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('AuthContext useEffect: token from localStorage:', token);
     if (token) {
-      setLoading(true);
-      fetchUser(token).finally(() => setLoading(false));
+      fetchUser(token);
     } else {
-      setUser({});
       setLoading(false);
     }
-  }, []);
+  }, [fetchUser]);
+
+  const authContextValue = useMemo(() => ({
+    user,
+    setUser,
+    loading,
+    fetchUser,
+    logout,
+  }), [user, loading, fetchUser, logout]);
 
   const login = async (username, password) => {
     try {
@@ -106,24 +119,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser({});
-    window.location.href = '/login';
-  };
-
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    fetchUser
-  };
-
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
+    <AuthContext.Provider value={authContextValue}>
+      {children}
     </AuthContext.Provider>
   );
 }; 

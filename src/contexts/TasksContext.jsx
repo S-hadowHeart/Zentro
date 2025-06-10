@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const TasksContext = createContext();
 
@@ -6,7 +6,8 @@ export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
@@ -20,15 +21,17 @@ export function TasksProvider({ children }) {
       if (response.ok) {
         const data = await response.json();
         setTasks(data);
+      } else {
+        setTasks([]);
       }
     } catch (error) {
       console.error('Error fetching tasks:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const addTask = async (title) => {
+  const addTask = useCallback(async (title) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
@@ -50,9 +53,9 @@ export function TasksProvider({ children }) {
     } catch (error) {
       console.error('Error adding task:', error);
     }
-  };
+  }, []);
 
-  const toggleTask = async (taskId) => {
+  const toggleTask = useCallback(async (taskId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
@@ -74,9 +77,9 @@ export function TasksProvider({ children }) {
     } catch (error) {
       console.error('Error toggling task:', error);
     }
-  };
+  }, []);
 
-  const deleteTask = async (taskId) => {
+  const deleteTask = useCallback(async (taskId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
@@ -94,23 +97,23 @@ export function TasksProvider({ children }) {
     } catch (error) {
       console.error('Error deleting task:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [fetchTasks]);
 
-  const value = {
+  const contextValue = useMemo(() => ({
     tasks,
     loading,
     fetchTasks,
     addTask,
     toggleTask,
     deleteTask
-  };
+  }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask]);
 
   return (
-    <TasksContext.Provider value={value}>
+    <TasksContext.Provider value={contextValue}>
       {children}
     </TasksContext.Provider>
   );
