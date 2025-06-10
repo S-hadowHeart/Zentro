@@ -42,9 +42,6 @@ function Dashboard() {
       
       setReportRefreshKey(prevKey => prevKey + 1);
       
-      // Fetch the latest user data after a pomodoro session ends
-      await fetchUser(localStorage.getItem('token'));
-
       // Use the provided rewards and punishments arrays
       if (eventType === 'completed') {
         if (rewards && rewards.length > 0) {
@@ -64,7 +61,7 @@ function Dashboard() {
     } catch (error) {
       console.error('Error in handlePomodoroEnd:', error);
     }
-  }, [fetchUser]);
+  }, []);
 
   // Debug effect to monitor modal states
   useEffect(() => {

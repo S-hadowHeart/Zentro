@@ -5,8 +5,8 @@ import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner, FaPlusCircle, FaTimes } fro
 import { Link } from 'react-router-dom';
 
 function PomodoroTimer({ onPomodoroEnd }) {
-  const { user, fetchUser } = useAuth();
-  const { tasks, fetchTasks } = useTasks();
+  const { user, fetchUser, updateUser } = useAuth();
+  const { tasks, fetchTasks, incrementPomodorosForTask } = useTasks();
   const [notification, setNotification] = useState(null);
 
   const initialFocusDuration = user?.settings?.pomodoroDuration || 25;
@@ -66,7 +66,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
       });
 
       if (statsResponse.ok) {
-        // Dashboard will handle fetchUser() call
+        const updatedUserStats = await statsResponse.json();
+        updateUser(updatedUserStats.user);
       }
 
       if (selectedTask) {
@@ -75,7 +76,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     } catch (error) {
       console.error('Error during pomodoro complete process:', error);
     }
-  }, [selectedTask]);
+  }, [selectedTask, updateUser, incrementPomodorosForTask]);
 
   const handlePomodoroInterrupt = useCallback(async (duration) => {
     try {
@@ -95,12 +96,13 @@ function PomodoroTimer({ onPomodoroEnd }) {
       });
 
       if (statsResponse.ok) {
-        // Dashboard will handle fetchUser() call
+        const updatedUserStats = await statsResponse.json();
+        updateUser(updatedUserStats.user);
       }
     } catch (error) {
       console.error('Error during pomodoro interrupt process:', error);
     }
-  }, []);
+  }, [updateUser]);
 
   const showNotification = useCallback((message, type) => {
     setNotification({ message, type });
@@ -167,39 +169,11 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, []);
 
-  // Remove the effect that was resetting the timer
-  // Effect to update time left when durations change
-  useEffect(() => {
-    if (!isRunning && !isBreak) {
-      setTimeLeft(focusDuration * 60);
-    }
-  }, [focusDuration]);
-
   const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }, []);
-
-  const incrementPomodorosForTask = useCallback(async (taskId, duration) => {
-    if (!taskId) return;
-    try {
-      const response = await fetch(`/api/tasks/${taskId}/pomodoro`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ duration })
-      });
-
-      if (response.ok) {
-        await fetchTasks();
-      }
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  }, [fetchTasks]);
 
   const handleStart = useCallback(() => {
     if (!selectedTask) {
@@ -211,28 +185,28 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [selectedTask, isRunning]);
 
-  const handlePause = useCallback(async () => {
+  const handlePause = useCallback(() => {
     if (isRunning) {
       setIsRunning(false);
-      // If a focus session is interrupted, handle it
-      if (!isBreak && timeLeft > 0) {
-        const interruptedDuration = focusDuration * 60 - timeLeft;
-        await handlePomodoroInterrupt(interruptedDuration);
-        // Call onPomodoroEnd with eventType and interrupted duration for punishment handling
-        onPomodoroEndRef.current('interrupted', interruptedDuration, user.rewards, user.punishments);
-      }
+      // Removed: No longer handling interruption stats or resetting on pause
     } else {
       setIsRunning(true);
     }
-  }, [isRunning, isBreak, timeLeft, focusDuration, handlePomodoroInterrupt, user.rewards, user.punishments]);
+  }, [isRunning]);
 
-  const handleReset = useCallback(() => {
+  const handleReset = useCallback(async () => {
+    // If a focus session was running and is being reset, treat it as interrupted
+    if (isRunning && !isBreak && timeLeft > 0) {
+      const interruptedDuration = focusDuration * 60 - timeLeft;
+      await handlePomodoroInterrupt(interruptedDuration);
+      onPomodoroEndRef.current('interrupted', interruptedDuration, user.rewards, user.punishments);
+    }
     // Stop the timer
     setIsRunning(false);
     // Reset to initial state
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
-  }, [focusDuration]);
+  }, [isRunning, isBreak, timeLeft, focusDuration, handlePomodoroInterrupt, user.rewards, user.punishments]);
 
   const currentDuration = isBreak ? breakDuration : focusDuration;
   const progress = ((currentDuration * 60 - timeLeft) / (currentDuration * 60)) * 100;

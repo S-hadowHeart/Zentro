@@ -40,6 +40,10 @@ export function TasksProvider({ children }) {
     }
   }, [user]);
 
+  const updateTasks = useCallback((updatedTaskData) => {
+    setTasks(updatedTaskData);
+  }, []);
+
   const addTask = useCallback(async (title) => {
     try {
       const token = localStorage.getItem('token');
@@ -61,6 +65,31 @@ export function TasksProvider({ children }) {
       }
     } catch (error) {
       console.error('Error adding task:', error);
+    }
+  }, []);
+
+  const incrementPomodorosForTask = useCallback(async (taskId, duration) => {
+    if (!taskId) return;
+    try {
+      const response = await fetch(`/api/tasks/${taskId}/pomodoro`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ duration })
+      });
+
+      if (response.ok) {
+        const updatedTask = await response.json();
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task._id === updatedTask._id ? updatedTask : task
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
     }
   }, []);
 
@@ -118,8 +147,9 @@ export function TasksProvider({ children }) {
     fetchTasks,
     addTask,
     toggleTask,
-    deleteTask
-  }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask]);
+    deleteTask,
+    updateTasks
+  }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask, updateTasks]);
 
   return (
     <TasksContext.Provider value={value}>

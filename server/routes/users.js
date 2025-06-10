@@ -197,11 +197,8 @@ router.patch('/stats',
       }
 
       await req.user.save();
-      res.json({ 
-        pomodoroStats: req.user.pomodoroStats, 
-        currentStreak: req.user.currentStreak, 
-        longestStreak: req.user.longestStreak, 
-        settings: req.user.settings
+      res.json({
+        user: req.user // Return the entire user object
       });
     } catch (error) {
       console.error('Error updating pomodoro stats and streak:', error);

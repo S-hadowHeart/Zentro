@@ -60,6 +60,13 @@ export const AuthProvider = ({ children }) => {
     navigate('/login');
   }, [navigate]);
 
+  const updateUser = useCallback((updatedUserData) => {
+    setUser(prevUser => ({
+      ...prevUser,
+      ...updatedUserData
+    }));
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     fetchUser(token);
@@ -123,8 +130,9 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     register,
-    fetchUser
-  }), [user, loading, login, logout, register, fetchUser]);
+    fetchUser,
+    updateUser
+  }), [user, loading, login, logout, register, fetchUser, updateUser]);
 
   return (
     <AuthContext.Provider value={value}>
