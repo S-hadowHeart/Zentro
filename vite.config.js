@@ -5,10 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     react({
-      jsxRuntime: 'classic',
+      jsxRuntime: 'automatic',
       babel: {
         plugins: [
-          ['@babel/plugin-transform-react-jsx', { runtime: 'classic' }]
+          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
         ]
       }
     })
