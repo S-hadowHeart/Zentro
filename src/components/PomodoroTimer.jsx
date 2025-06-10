@@ -110,44 +110,44 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   // Timer effect
   useEffect(() => {
+    let intervalId = null;
+
     if (isRunning) {
-      timerRef.current = setInterval(() => {
+      intervalId = setInterval(() => {
         setTimeLeft(prevTimeLeft => {
           if (prevTimeLeft <= 0) {
-            clearInterval(timerRef.current);
+            clearInterval(intervalId);
             setIsRunning(false);
 
             if (!isBreakRef.current) {
-              // Focus session ended, log stats, and transition to break
+              // Focus session ended
               handlePomodoroComplete(focusDurationRef.current).then(() => {
-                // Always trigger reward on completion
+                // Show reward
                 onPomodoroEndRef.current?.('completed', focusDurationRef.current, user?.rewards, user?.punishments);
+                // Switch to break
                 setIsBreak(true);
                 setTimeLeft(breakDurationRef.current * 60);
-                // Start break timer automatically
+                // Start break timer after a short delay
                 setTimeout(() => {
                   setIsRunning(true);
-                }, 1000); // Small delay to ensure state updates
+                }, 1000);
               });
             } else {
-              // Break session ended, reset to focus
+              // Break session ended
               onPomodoroEndRef.current?.('break_ended');
               setIsBreak(false);
               setTimeLeft(focusDurationRef.current * 60);
             }
+            return 0;
           }
           return prevTimeLeft - 1;
         });
       }, 1000);
-    } else {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
     }
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
+      if (intervalId) {
+        clearInterval(intervalId);
       }
     };
   }, [isRunning, handlePomodoroComplete, user, onPomodoroEndRef]);
@@ -187,14 +187,19 @@ function PomodoroTimer({ onPomodoroEnd }) {
   }, [selectedTask]);
 
   const handlePause = useCallback(() => {
-    // Simply pause the timer without resetting
-    setIsRunning(false);
-  }, []);
+    if (isRunning) {
+      // Only pause if running
+      setIsRunning(false);
+    } else {
+      // Resume from where we left off
+      setIsRunning(true);
+    }
+  }, [isRunning]);
 
   const handleReset = useCallback(() => {
-    // Show loading state
+    // Stop the timer
     setIsRunning(false);
-    // Reset without punishment
+    // Reset to initial state
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
   }, [focusDuration]);

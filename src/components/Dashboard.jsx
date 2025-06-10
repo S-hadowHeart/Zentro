@@ -38,25 +38,38 @@ function Dashboard() {
 
   const handlePomodoroEnd = useCallback(async (eventType, duration, rewards, punishments) => {
     try {
+      console.log('Pomodoro ended:', { eventType, duration, rewards, punishments }); // Debug log
+      
       setReportRefreshKey(prevKey => prevKey + 1);
       
       // Fetch the latest user data after a pomodoro session ends
       await fetchUser(localStorage.getItem('token'));
 
       // Use the provided rewards and punishments arrays
-      if (eventType === 'completed' && rewards && rewards.length > 0) {
-        const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
-        setCurrentReward(randomReward);
-        setShowRewardModal(true);
-      } else if (eventType === 'interrupted' && punishments && punishments.length > 0) {
-        const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
-        setCurrentPunishment(randomPunishment);
-        setShowPunishmentModal(true);
+      if (eventType === 'completed') {
+        if (rewards && rewards.length > 0) {
+          const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+          console.log('Showing reward:', randomReward); // Debug log
+          setCurrentReward(randomReward);
+          setShowRewardModal(true);
+        }
+      } else if (eventType === 'interrupted') {
+        if (punishments && punishments.length > 0) {
+          const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
+          console.log('Showing punishment:', randomPunishment); // Debug log
+          setCurrentPunishment(randomPunishment);
+          setShowPunishmentModal(true);
+        }
       }
     } catch (error) {
       console.error('Error in handlePomodoroEnd:', error);
     }
   }, [fetchUser]);
+
+  // Debug effect to monitor modal states
+  useEffect(() => {
+    console.log('Modal states:', { showRewardModal, showPunishmentModal, currentReward, currentPunishment });
+  }, [showRewardModal, showPunishmentModal, currentReward, currentPunishment]);
 
   const renderNonTimerTabContent = useCallback(() => {
     switch (activeTab) {
