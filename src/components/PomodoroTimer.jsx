@@ -135,11 +135,15 @@ function PomodoroTimer({ onPomodoroEnd }) {
               
               // Update stats in background
               handlePomodoroComplete(focusDurationRef.current);
+              // Call onPomodoroEnd with eventType, duration, and user's rewards/punishments
+              onPomodoroEndRef.current('completed', focusDurationRef.current, user.rewards, user.punishments);
             } else {
               // Break session ended
               setIsBreak(false);
               setTimeLeft(focusDurationRef.current * 60);
               setIsRunning(false);
+              // Call onPomodoroEnd for break session end if needed, though usually not for rewards/punishments
+              onPomodoroEndRef.current('breakEnded', breakDurationRef.current);
             }
             return 0;
           }
@@ -207,13 +211,20 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [selectedTask, isRunning]);
 
-  const handlePause = useCallback(() => {
+  const handlePause = useCallback(async () => {
     if (isRunning) {
       setIsRunning(false);
+      // If a focus session is interrupted, handle it
+      if (!isBreak && timeLeft > 0) {
+        const interruptedDuration = focusDuration * 60 - timeLeft;
+        await handlePomodoroInterrupt(interruptedDuration);
+        // Call onPomodoroEnd with eventType and interrupted duration for punishment handling
+        onPomodoroEndRef.current('interrupted', interruptedDuration, user.rewards, user.punishments);
+      }
     } else {
       setIsRunning(true);
     }
-  }, [isRunning]);
+  }, [isRunning, isBreak, timeLeft, focusDuration, handlePomodoroInterrupt, user.rewards, user.punishments]);
 
   const handleReset = useCallback(() => {
     // Stop the timer
