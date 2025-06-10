@@ -10,7 +10,7 @@ import { FaTasks, FaCog, FaChartBar, FaClock, FaLeaf, FaSignOutAlt } from 'react
 import { useLocation, Link } from 'react-router-dom';
 
 function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, fetchUser } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('pomodoro');
   const [showRewardModal, setShowRewardModal] = useState(false);
@@ -36,30 +36,30 @@ function Dashboard() {
     }
   }, [location.pathname, tabs]);
 
-  const handlePomodoroEnd = useCallback((eventType, duration, userRewards, userPunishments) => {
-    console.log('Dashboard: handlePomodoroEnd called.', { eventType, duration, userRewards, userPunishments, rewardSystemEnabled: user?.settings?.rewardSystemEnabled });
+  const handlePomodoroEnd = useCallback(async (eventType, duration) => {
     setReportRefreshKey(prevKey => prevKey + 1);
     
+    // Fetch the latest user data after a pomodoro session ends
+    await fetchUser(localStorage.getItem('token'));
+
+    // Get the latest user object directly from useAuth after the fetch
+    const { user: latestUser } = useAuth();
+
+    // Use the updated user object to display rewards/punishments
     if (eventType === 'completed') {
-      if (user?.settings?.rewardSystemEnabled && userRewards && userRewards.length > 0) {
-        const randomReward = userRewards[Math.floor(Math.random() * userRewards.length)];
-        console.log('Dashboard: Showing reward', randomReward);
+      if (latestUser?.settings?.rewardSystemEnabled && latestUser?.rewards && latestUser.rewards.length > 0) {
+        const randomReward = latestUser.rewards[Math.floor(Math.random() * latestUser.rewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
-      } else {
-        console.log('Dashboard: Reward system not enabled or no rewards.');
       }
     } else if (eventType === 'interrupted') {
-      if (user?.settings?.rewardSystemEnabled && userPunishments && userPunishments.length > 0) {
-        const randomPunishment = userPunishments[Math.floor(Math.random() * userPunishments.length)];
-        console.log('Dashboard: Showing punishment', randomPunishment);
+      if (latestUser?.settings?.rewardSystemEnabled && latestUser?.punishments && latestUser.punishments.length > 0) {
+        const randomPunishment = latestUser.punishments[Math.floor(Math.random() * latestUser.punishments.length)];
         setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
-      } else {
-        console.log('Dashboard: Reward system not enabled or no punishments.');
       }
     }
-  }, [user]);
+  }, [fetchUser]);
 
   const renderNonTimerTabContent = useCallback(() => {
     switch (activeTab) {
@@ -133,11 +133,11 @@ function Dashboard() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
-          <div style={{ display: activeTab === 'pomodoro' ? 'block' : 'none' }}>
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl relative">
+          <div className={`transition-all duration-300 ease-in-out ${activeTab === 'pomodoro' ? 'opacity-100 visible relative' : 'opacity-0 invisible absolute top-0 left-0 w-full'}`}>
             <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
           </div>
-          <div style={{ display: activeTab !== 'pomodoro' ? 'block' : 'none' }}>
+          <div className={`transition-all duration-300 ease-in-out ${activeTab !== 'pomodoro' ? 'opacity-100 visible relative' : 'opacity-0 invisible absolute top-0 left-0 w-full'}`}>
             {renderNonTimerTabContent()}
           </div>
         </div>

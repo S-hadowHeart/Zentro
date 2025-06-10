@@ -48,11 +48,11 @@ export const AuthProvider = ({ children }) => {
   }, []); // Dependencies are stable
 
   // Effect to handle navigation after auth state is determined
-  useEffect(() => {
-    if (!loading && !user && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-      navigate('/login');
-    }
-  }, [loading, user, navigate]);
+  // useEffect(() => {
+  //   if (!loading && !user && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+  //     navigate('/login');
+  //   }
+  // }, [loading, user, navigate]);
 
   const logout = useCallback(() => {
     setUser(null);

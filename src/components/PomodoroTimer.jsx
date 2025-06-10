@@ -72,19 +72,16 @@ function PomodoroTimer({ onPomodoroEnd }) {
       });
 
       if (statsResponse.ok) {
-        await fetchUser(token);
+        // Dashboard will handle fetchUser() call
       }
 
       if (selectedTask) {
         await incrementPomodorosForTask(selectedTask, duration);
       }
-      // Pass reward/punishment info up to parent (Dashboard)
-      onPomodoroEndRef.current?.('completed', duration, user?.rewards, user?.punishments);
-
     } catch (error) {
       console.error('Error during pomodoro complete process:', error);
     }
-  }, [user, selectedTask, fetchUser]);
+  }, [selectedTask]);
 
   const handlePomodoroInterrupt = useCallback(async (duration) => {
     try {
@@ -104,15 +101,12 @@ function PomodoroTimer({ onPomodoroEnd }) {
       });
 
       if (statsResponse.ok) {
-        await fetchUser(token);
+        // Dashboard will handle fetchUser() call
       }
-      // Pass punishment info up to parent (Dashboard)
-      onPomodoroEndRef.current?.('interrupted', duration, user?.rewards, user?.punishments);
-
     } catch (error) {
       console.error('Error during pomodoro interrupt process:', error);
     }
-  }, [user, fetchUser]);
+  }, []);
 
   // Timer effect
   useEffect(() => {
@@ -124,14 +118,17 @@ function PomodoroTimer({ onPomodoroEnd }) {
             setIsRunning(false);
 
             if (!isBreakRef.current) {
-              // Focus session ended, start break
-              handlePomodoroComplete(focusDurationRef.current);
-              setIsBreak(true);
-              return breakDurationRef.current * 60;
+              // Focus session ended, log stats, and transition to break
+              handlePomodoroComplete(focusDurationRef.current).then(() => {
+                onPomodoroEndRef.current?.('completed', focusDurationRef.current, user?.rewards, user?.punishments);
+                setIsBreak(true);
+                setTimeLeft(breakDurationRef.current * 60);
+              });
             } else {
               // Break session ended, reset to focus
+              onPomodoroEndRef.current?.('break_ended');
               setIsBreak(false);
-              return focusDurationRef.current * 60;
+              setTimeLeft(focusDurationRef.current * 60);
             }
           }
           return prevTimeLeft - 1;
@@ -148,7 +145,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         clearInterval(timerRef.current);
       }
     };
-  }, [isRunning, handlePomodoroComplete]); // Added handlePomodoroComplete to dependencies
+  }, [isRunning, handlePomodoroComplete, user, onPomodoroEndRef]);
 
   const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -182,7 +179,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
       return;
     }
     setIsRunning(true);
-    // Set initial time based on current state (focus or break)
     if (!isBreak) {
       setTimeLeft(focusDuration * 60);
     } else {
@@ -195,14 +191,19 @@ function PomodoroTimer({ onPomodoroEnd }) {
   }, []);
 
   const handleReset = useCallback(() => {
-    // If resetting a running focus session, treat as interrupt
     if (isRunning && !isBreak) {
-      handlePomodoroInterrupt(focusDuration); // Pass current focus duration
+      handlePomodoroInterrupt(focusDuration).then(() => {
+        onPomodoroEndRef.current?.('interrupted', focusDuration, user?.rewards, user?.punishments);
+        setIsRunning(false);
+        setIsBreak(false);
+        setTimeLeft(focusDuration * 60);
+      });
+    } else {
+      setIsRunning(false);
+      setIsBreak(false);
+      setTimeLeft(focusDuration * 60);
     }
-    setIsRunning(false);
-    setIsBreak(false);
-    setTimeLeft(focusDuration * 60);
-  }, [isRunning, isBreak, focusDuration, handlePomodoroInterrupt]);
+  }, [isRunning, isBreak, focusDuration, handlePomodoroInterrupt, user, onPomodoroEndRef]);
 
   const currentDuration = isBreak ? breakDuration : focusDuration;
   const progress = ((currentDuration * 60 - timeLeft) / (currentDuration * 60)) * 100;
