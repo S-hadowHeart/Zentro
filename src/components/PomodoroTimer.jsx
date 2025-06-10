@@ -48,6 +48,60 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [tasks, selectedTask]);
 
+  useEffect(() => {
+    if (isRunning && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            handleComplete();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (timeLeft === 0) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      setIsRunning(false);
+      onPomodoroEnd();
+    }
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isRunning, timeLeft, handleComplete, onPomodoroEnd]);
+
+  const formatTime = useCallback((seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }, []);
+
+  const incrementPomodorosForTask = useCallback(async (taskId, duration) => {
+    if (!taskId) return;
+    try {
+      const response = await fetch(`/api/tasks/${taskId}/pomodoro`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ duration })
+      });
+
+      if (response.ok) {
+        await fetchTasks(); // Refresh tasks after updating pomodoros
+      } else {
+        console.error('Failed to update task pomodoros');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  }, [fetchTasks]);
+
   const handleComplete = useCallback(async () => {
     if (!isBreak) {
       try {
@@ -93,61 +147,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
     setIsBreak(!isBreak);
     setTimeLeft(isBreak ? focusDuration * 60 : breakDuration * 60);
-  }, [isBreak, user, focusDuration, selectedTask, fetchUser, incrementPomodorosForTask, onPomodoroEnd, breakDuration]);
-
-  const incrementPomodorosForTask = useCallback(async (taskId, duration) => {
-    if (!taskId) return;
-    try {
-      const response = await fetch(`/api/tasks/${taskId}/pomodoro`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ duration })
-      });
-
-      if (response.ok) {
-        await fetchTasks(); // Refresh tasks after updating pomodoros
-      } else {
-        console.error('Failed to update task pomodoros');
-      }
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  }, [fetchTasks]);
-
-  useEffect(() => {
-    if (isRunning && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            handleComplete();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else if (timeLeft === 0) {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      setIsRunning(false);
-      onPomodoroEnd();
-    }
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [isRunning, timeLeft, handleComplete, onPomodoroEnd]);
-
-  const formatTime = useCallback((seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }, []);
+  }, [isBreak, user, focusDuration, selectedTask, fetchUser, incrementPomodorosForTask, breakDuration]);
 
   const handleInterrupt = useCallback(async () => {
     if (!isBreak) {
