@@ -20,10 +20,10 @@ function Dashboard() {
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
   const tabs = useMemo(() => [
-    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock },
-    { id: 'tasks', label: 'Cultivations', icon: FaTasks },
-    { id: 'settings', label: 'Arrangements', icon: FaCog },
-    { id: 'report', label: 'Growth Journal', icon: FaChartBar }
+    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaLeaf },
+    { id: 'tasks', label: 'Cultivations', icon: FaLeaf },
+    { id: 'settings', label: 'Arrangements', icon: FaLeaf },
+    { id: 'report', label: 'Growth Journal', icon: FaLeaf }
   ], []);
 
   useEffect(() => {
@@ -37,19 +37,26 @@ function Dashboard() {
   }, [location.pathname, tabs]);
 
   const handlePomodoroEnd = useCallback((eventType, duration, userRewards, userPunishments) => {
+    console.log('Dashboard: handlePomodoroEnd called.', { eventType, duration, userRewards, userPunishments, rewardSystemEnabled: user?.settings?.rewardSystemEnabled });
     setReportRefreshKey(prevKey => prevKey + 1);
     
     if (eventType === 'completed') {
-      if (user?.settings?.rewardSystemEnabled && userRewards?.length > 0) {
+      if (user?.settings?.rewardSystemEnabled && userRewards && userRewards.length > 0) {
         const randomReward = userRewards[Math.floor(Math.random() * userRewards.length)];
+        console.log('Dashboard: Showing reward', randomReward);
         setCurrentReward(randomReward);
         setShowRewardModal(true);
+      } else {
+        console.log('Dashboard: Reward system not enabled or no rewards.');
       }
     } else if (eventType === 'interrupted') {
-      if (user?.settings?.rewardSystemEnabled && userPunishments?.length > 0) {
+      if (user?.settings?.rewardSystemEnabled && userPunishments && userPunishments.length > 0) {
         const randomPunishment = userPunishments[Math.floor(Math.random() * userPunishments.length)];
+        console.log('Dashboard: Showing punishment', randomPunishment);
         setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
+      } else {
+        console.log('Dashboard: Reward system not enabled or no punishments.');
       }
     }
   }, [user]);
@@ -63,7 +70,7 @@ function Dashboard() {
       case 'report':
         return <Report key={reportRefreshKey} />;
       default:
-        return null; // Don't render anything for pomodoro tab here
+        return null;
     }
   }, [activeTab, reportRefreshKey]);
 
