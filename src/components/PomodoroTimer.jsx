@@ -118,15 +118,19 @@ function PomodoroTimer({ onPomodoroEnd }) {
             clearInterval(intervalId);
             
             if (!isBreakRef.current) {
-              // Focus session ended - switch to break immediately
-              setIsBreak(true);
-              setTimeLeft(breakDurationRef.current * 60);
-              setIsRunning(true);
-              
-              // Show reward notification if available
+              // Focus session ended - show reward first, then switch to break
               if (user?.rewards?.length > 0) {
                 const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
                 showNotification(randomReward, 'reward');
+                // Don't start break timer yet - it will start when notification is closed
+                setIsBreak(true);
+                setTimeLeft(breakDurationRef.current * 60);
+                setIsRunning(false);
+              } else {
+                // No rewards, switch to break immediately
+                setIsBreak(true);
+                setTimeLeft(breakDurationRef.current * 60);
+                setIsRunning(true);
               }
               
               // Update stats in background
