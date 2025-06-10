@@ -145,17 +145,17 @@ router.get('/me', auth, async (req, res) => {
       user: {
         id: req.user._id,
         username: req.user.username,
-        rewards: req.user.rewards,
-        punishments: req.user.punishments,
+        rewards: req.user.rewards || [],
+        punishments: req.user.punishments || [],
         settings: {
-          pomodoroDuration: req.user.settings.pomodoroDuration,
-          breakDuration: req.user.settings.breakDuration,
-          rewardSystemEnabled: req.user.settings.rewardSystemEnabled,
-          dailyGoal: req.user.settings.dailyGoal
+          pomodoroDuration: req.user.settings?.pomodoroDuration ?? 25,
+          breakDuration: req.user.settings?.breakDuration ?? 5,
+          rewardSystemEnabled: req.user.settings?.rewardSystemEnabled ?? true,
+          dailyGoal: req.user.settings?.dailyGoal ?? 0
         },
-        pomodoroStats: req.user.pomodoroStats,
-        currentStreak: req.user.currentStreak,
-        longestStreak: req.user.longestStreak
+        pomodoroStats: req.user.pomodoroStats || { completed: 0, interrupted: 0, totalDuration: 0 },
+        currentStreak: req.user.currentStreak ?? 0,
+        longestStreak: req.user.longestStreak ?? 0
       }
     });
   } catch (error) {
