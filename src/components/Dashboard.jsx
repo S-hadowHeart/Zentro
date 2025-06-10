@@ -7,12 +7,12 @@ import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 import Report from './Report';
 import { FaTasks, FaCog, FaChartBar, FaClock } from 'react-icons/fa';
-import { useParams, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 
 function Dashboard() {
   const { user, logout } = useAuth();
-  const { tabId } = useParams();
-  const [activeTab, setActiveTab] = useState(tabId || 'tasks');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState('tasks'); // Default tab
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showPunishmentModal, setShowPunishmentModal] = useState(false);
   const [reward, setReward] = useState('');
@@ -20,13 +20,15 @@ function Dashboard() {
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
   useEffect(() => {
-    if (tabId && tabs.some(tab => tab.id === tabId)) {
-      setActiveTab(tabId);
-    } else if (tabId && !tabs.some(tab => tab.id === tabId)) {
-      // Redirect to default if an invalid tabId is provided
+    const path = location.pathname.substring(1); // Remove leading slash
+    const currentTab = tabs.find(tab => tab.id === path);
+    if (currentTab) {
+      setActiveTab(currentTab.id);
+    } else {
+      // If an invalid path, default to tasks
       setActiveTab('tasks');
     }
-  }, [tabId]);
+  }, [location.pathname]);
 
   const tabs = [
     { id: 'tasks', label: 'Cultivations', icon: FaTasks },

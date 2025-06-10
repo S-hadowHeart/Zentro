@@ -20,19 +20,31 @@ function AppRoutes() {
     <Routes>
       <Route
         path="/login"
-        element={!user ? <EnterTheGarden /> : <Navigate to="/" />}
+        element={!(user && user._id) ? <EnterTheGarden /> : <Navigate to="/" />}
       />
       <Route
         path="/register"
-        element={!user ? <CultivatePath /> : <Navigate to="/" />}
+        element={!(user && user._id) ? <CultivatePath /> : <Navigate to="/" />}
       />
       <Route
         path="/"
-        element={user ? <Navigate to="/tasks" /> : <Navigate to="/login" />}
+        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
-        path="/:tabId"
-        element={user ? <Dashboard /> : <Navigate to="/login" />}
+        path="/tasks"
+        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/settings"
+        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/report"
+        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/pomodoro"
+        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
       />
     </Routes>
   );
