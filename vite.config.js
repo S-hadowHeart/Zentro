@@ -19,5 +19,16 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom']
+  },
+  server: {
+    port: 3000,
+    strictPort: true,
+    host: true,
+    watch: {
+      usePolling: true
+    }
+  },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
   }
 })

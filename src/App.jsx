@@ -21,50 +21,87 @@ function AppRoutes() {
     <Routes>
       <Route
         path="/login"
-        element={!user ? <EnterTheGarden /> : <Navigate to="/" />}
+        element={!user ? <EnterTheGarden /> : <Navigate to="/" replace />}
       />
       <Route
         path="/register"
-        element={!user ? <CultivatePath /> : <Navigate to="/" />}
+        element={!user ? <CultivatePath /> : <Navigate to="/" replace />}
       />
       <Route
         path="/"
-        element={user ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/tasks"
-        element={user ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/settings"
-        element={user ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/report"
-        element={user ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/pomodoro"
-        element={user ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
       />
-      {/* Redirect any other routes to the root */}
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
+}
+
+// Wrap the app with error boundary
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-zen-green text-white rounded hover:bg-opacity-90"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 // Main App component with proper provider order
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-zen-beige">
-        <AuthProvider>
-          <TasksProvider>
-            <AppRoutes />
-          </TasksProvider>
-        </AuthProvider>
-      </div>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <div className="min-h-screen bg-zen-beige">
+          <AuthProvider>
+            <TasksProvider>
+              <AppRoutes />
+            </TasksProvider>
+          </AuthProvider>
+        </div>
+      </Router>
+    </ErrorBoundary>
   );
 }
 
