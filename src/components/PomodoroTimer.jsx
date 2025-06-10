@@ -179,7 +179,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [fetchTasks]);
 
-  const handleStart = useCallback(() => {
+  const handleStart = useCallback((e) => {
+    e.preventDefault(); // Prevent default behavior
     if (!selectedTask) {
       alert('Please select a cultivation to focus on');
       return;
@@ -189,7 +190,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [selectedTask, isRunning]);
 
-  const handlePause = useCallback(() => {
+  const handlePause = useCallback((e) => {
+    e.preventDefault(); // Prevent default behavior
     if (isRunning) {
       // If timer is running, pause it and show punishment
       setIsRunning(false);
@@ -203,7 +205,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [isRunning, isBreak, handlePomodoroInterrupt, user, onPomodoroEndRef]);
 
-  const handleReset = useCallback(() => {
+  const handleReset = useCallback((e) => {
+    e.preventDefault(); // Prevent default behavior
     // Stop the timer
     setIsRunning(false);
     // Show punishment if not in break mode
@@ -266,6 +269,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
           {!isRunning ? (
             <button
               onClick={handleStart}
+              type="button"
               className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 transition duration-300"
             >
               <FaPlay />
@@ -274,6 +278,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
           ) : (
             <button
               onClick={handlePause}
+              type="button"
               className="flex items-center space-x-2 px-6 py-3 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition duration-300"
             >
               <FaPause />
@@ -282,6 +287,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
           )}
           <button
             onClick={handleReset}
+            type="button"
             className="flex items-center space-x-2 px-6 py-3 bg-gray-300 text-gray-800 rounded-full shadow-lg hover:bg-gray-400 transition duration-300"
           >
             <FaRedo />
