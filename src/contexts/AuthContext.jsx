@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
@@ -13,6 +14,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchUser = async (token) => {
     console.log('fetchUser: attempting to fetch user with token:', token);
@@ -70,7 +72,7 @@ export const AuthProvider = ({ children }) => {
         console.log('Login successful, received user data:', data.user);
         setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
         console.log('User state after setting:', data.user);
-        window.location.href = '/tasks';
+        navigate('/tasks');
         return { success: true };
       } else {
         console.log('Login failed, server response:', data.error);
@@ -109,7 +111,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser({});
-    window.location.href = '/login';
+    navigate('/login');
   };
 
   const value = {
