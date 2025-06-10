@@ -2,15 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
 import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner, FaPlusCircle } from 'react-icons/fa';
-import RewardModal from './RewardModal';
-import PunishmentModal from './PunishmentModal';
 import { Link } from 'react-router-dom';
 
 function PomodoroTimer({ onPomodoroEnd }) {
   const { user, fetchUser } = useAuth();
   const { tasks, fetchTasks } = useTasks();
 
-  // Use user settings for initial durations if available
   const initialFocusDuration = user?.settings?.pomodoroDuration || 25;
   const initialBreakDuration = user?.settings?.breakDuration || 5;
 
@@ -19,22 +16,14 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [timeLeft, setTimeLeft] = useState(initialFocusDuration * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
-  const [showRewardModal, setShowRewardModal] = useState(false);
-  const [currentReward, setCurrentReward] = useState('');
-  const [showPunishmentModal, setShowPunishmentModal] = useState(false);
-  const [currentPunishment, setCurrentPunishment] = useState('');
   const [selectedTask, setSelectedTask] = useState('');
   const timerRef = useRef(null);
 
-  // Initialize refs with their initial values
+  // Refs for stable callbacks
   const isBreakRef = useRef(isBreak);
   const focusDurationRef = useRef(focusDuration);
   const breakDurationRef = useRef(breakDuration);
-  const handleCompleteRef = useRef(null);
-  const handleInterruptRef = useRef(null);
   const onPomodoroEndRef = useRef(onPomodoroEnd);
-  const setIsRunningRef = useRef(setIsRunning);
-  const setIsBreakRef = useRef(setIsBreak);
 
   // Update refs when values change
   useEffect(() => {
@@ -42,9 +31,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     focusDurationRef.current = focusDuration;
     breakDurationRef.current = breakDuration;
     onPomodoroEndRef.current = onPomodoroEnd;
-    setIsRunningRef.current = setIsRunning;
-    setIsBreakRef.current = setIsBreak;
-  }, [isBreak, focusDuration, breakDuration, onPomodoroEnd, setIsRunning, setIsBreak]);
+  }, [isBreak, focusDuration, breakDuration, onPomodoroEnd]);
 
   // Effect to update time left when durations change or on initial load
   useEffect(() => {
@@ -67,15 +54,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [tasks]);
 
-  const handleComplete = useCallback(async (duration) => {
+  const handlePomodoroComplete = useCallback(async (duration) => {
     try {
-      let randomReward = null;
-      if (user?.rewards && user.rewards.length > 0) {
-        randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
-        setCurrentReward(randomReward);
-        setShowRewardModal(true);
-      }
-
       const token = localStorage.getItem('token');
       if (!token) return;
 
@@ -87,7 +67,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
         },
         body: JSON.stringify({
           completed: true,
-          reward: randomReward,
           duration: duration
         })
       });
@@ -99,20 +78,16 @@ function PomodoroTimer({ onPomodoroEnd }) {
       if (selectedTask) {
         await incrementPomodorosForTask(selectedTask, duration);
       }
+      // Pass reward/punishment info up to parent (Dashboard)
+      onPomodoroEndRef.current?.('completed', duration, user?.rewards, user?.punishments);
+
     } catch (error) {
       console.error('Error during pomodoro complete process:', error);
     }
   }, [user, selectedTask, fetchUser]);
 
-  const handleInterrupt = useCallback(async (duration) => {
+  const handlePomodoroInterrupt = useCallback(async (duration) => {
     try {
-      let randomPunishment = null;
-      if (user?.punishments && user.punishments.length > 0) {
-        randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
-        setCurrentPunishment(randomPunishment);
-        setShowPunishmentModal(true);
-      }
-
       const token = localStorage.getItem('token');
       if (!token) return;
 
@@ -124,7 +99,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
         },
         body: JSON.stringify({
           completed: false,
-          punishment: randomPunishment,
           duration: duration
         })
       });
@@ -132,33 +106,31 @@ function PomodoroTimer({ onPomodoroEnd }) {
       if (statsResponse.ok) {
         await fetchUser(token);
       }
+      // Pass punishment info up to parent (Dashboard)
+      onPomodoroEndRef.current?.('interrupted', duration, user?.rewards, user?.punishments);
+
     } catch (error) {
       console.error('Error during pomodoro interrupt process:', error);
     }
   }, [user, fetchUser]);
-
-  // Update the refs for the handlers
-  useEffect(() => {
-    handleCompleteRef.current = handleComplete;
-    handleInterruptRef.current = handleInterrupt;
-  }, [handleComplete, handleInterrupt]);
 
   // Timer effect
   useEffect(() => {
     if (isRunning) {
       timerRef.current = setInterval(() => {
         setTimeLeft(prevTimeLeft => {
-          if (prevTimeLeft <= 0) { // Changed from 1 to 0 for precise timer end
+          if (prevTimeLeft <= 0) {
             clearInterval(timerRef.current);
             setIsRunning(false);
 
             if (!isBreakRef.current) {
-              handleCompleteRef.current?.(focusDurationRef.current); // Pass duration for stats
+              // Focus session ended, start break
+              handlePomodoroComplete(focusDurationRef.current);
               setIsBreak(true);
               return breakDurationRef.current * 60;
             } else {
+              // Break session ended, reset to focus
               setIsBreak(false);
-              onPomodoroEndRef.current?.();
               return focusDurationRef.current * 60;
             }
           }
@@ -176,7 +148,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         clearInterval(timerRef.current);
       }
     };
-  }, [isRunning]);
+  }, [isRunning, handlePomodoroComplete]); // Added handlePomodoroComplete to dependencies
 
   const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -210,13 +182,12 @@ function PomodoroTimer({ onPomodoroEnd }) {
       return;
     }
     setIsRunning(true);
-    // Reset time left to the current duration if not already running a session
+    // Set initial time based on current state (focus or break)
     if (!isBreak) {
       setTimeLeft(focusDuration * 60);
     } else {
       setTimeLeft(breakDuration * 60);
     }
-
   }, [selectedTask, focusDuration, breakDuration, isBreak]);
 
   const handlePause = useCallback(() => {
@@ -224,33 +195,56 @@ function PomodoroTimer({ onPomodoroEnd }) {
   }, []);
 
   const handleReset = useCallback(() => {
+    // If resetting a running focus session, treat as interrupt
+    if (isRunning && !isBreak) {
+      handlePomodoroInterrupt(focusDuration); // Pass current focus duration
+    }
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
-  }, [focusDuration]);
+  }, [isRunning, isBreak, focusDuration, handlePomodoroInterrupt]);
 
-  const progress = ((isBreak ? breakDuration * 60 : focusDuration * 60) - timeLeft) / (isBreak ? breakDuration * 60 : focusDuration * 60) * 100;
+  const currentDuration = isBreak ? breakDuration : focusDuration;
+  const progress = ((currentDuration * 60 - timeLeft) / (currentDuration * 60)) * 100;
 
   return (
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent mb-2">
-          {isBreak ? 'Break Time' : 'Focus Session'}
+          {isBreak ? 'Rejuvenation Time' : 'Cultivation Session'}
         </h2>
         <p className="text-gray-600">
-          {isBreak ? 'Take a moment to breathe' : 'Stay focused and cultivate your garden'}
+          {isBreak ? 'Take a moment to breathe and restore your energy' : 'Stay focused and cultivate your garden'}
         </p>
       </div>
 
       <div className="flex flex-col items-center space-y-6">
         <div className="relative w-64 h-64">
-          <div className="absolute inset-0 rounded-full border-8 border-emerald-100"></div>
-          <div
-            className="absolute inset-0 rounded-full border-8 border-emerald-500"
-            style={{
-              clipPath: `polygon(50% 50%, 50% 0%, ${50 + 50 * Math.sin((progress / 100) * 2 * Math.PI - Math.PI / 2)}% ${50 + 50 * Math.cos((progress / 100) * 2 * Math.PI - Math.PI / 2)}%)`
-            }}
-          ></div>
+          <svg className="w-full h-full" viewBox="0 0 100 100">
+            {/* Background circle */}
+            <circle
+              className="text-emerald-100"
+              strokeWidth="8"
+              stroke="currentColor"
+              fill="transparent"
+              r="46"
+              cx="50"
+              cy="50"
+            />
+            {/* Progress circle */}
+            <circle
+              className="text-emerald-500 transform -rotate-90 origin-center"
+              strokeWidth="8"
+              stroke="currentColor"
+              fill="transparent"
+              r="46"
+              cx="50"
+              cy="50"
+              strokeDasharray={2 * Math.PI * 46}
+              strokeDashoffset={2 * Math.PI * 46 * (1 - progress / 100)}
+              style={{ transition: 'stroke-dashoffset 1s linear' }}
+            />
+          </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-4xl font-bold text-emerald-600">{formatTime(timeLeft)}</span>
           </div>
@@ -263,7 +257,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
               className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 transition duration-300"
             >
               <FaPlay />
-              <span>Start</span>
+              <span>Begin Cultivation</span>
             </button>
           ) : (
             <button
@@ -271,7 +265,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
               className="flex items-center space-x-2 px-6 py-3 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition duration-300"
             >
               <FaPause />
-              <span>Pause</span>
+              <span>Pause Rhythm</span>
             </button>
           )}
           <button
@@ -279,15 +273,15 @@ function PomodoroTimer({ onPomodoroEnd }) {
             className="flex items-center space-x-2 px-6 py-3 bg-gray-300 text-gray-800 rounded-full shadow-lg hover:bg-gray-400 transition duration-300"
           >
             <FaRedo />
-            <span>Reset</span>
+            <span>Reset Cycle</span>
           </button>
         </div>
 
         <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 border border-emerald-100 space-y-4">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Customize Session</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Adjust Rhythm</h3>
           
           <div>
-            <label htmlFor="focusDuration" className="block text-sm font-medium text-gray-700 mb-1">Focus Duration (minutes):</label>
+            <label htmlFor="focusDuration" className="block text-sm font-medium text-gray-700 mb-1">Cultivation Duration (minutes):</label>
             <input
               type="number"
               id="focusDuration"
@@ -300,7 +294,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
           </div>
 
           <div>
-            <label htmlFor="breakDuration" className="block text-sm font-medium text-gray-700 mb-1">Break Duration (minutes):</label>
+            <label htmlFor="breakDuration" className="block text-sm font-medium text-gray-700 mb-1">Rejuvenation Duration (minutes):</label>
             <input
               type="number"
               id="breakDuration"
@@ -321,23 +315,14 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 onChange={(e) => setSelectedTask(e.target.value)}
                 className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white pr-8"
               >
-                {tasks.length === 0 && (
-                  <option value="">No cultivations found</option>
+                {tasks.filter(task => !task.completed).length === 0 && (
+                  <option value="">No unharvested cultivations</option>
                 )}
                 {tasks.filter(task => !task.completed).map((task) => (
                   <option key={task._id} value={task._id}>
                     {task.title}
                   </option>
                 ))}
-                 {tasks.filter(task => task.completed).length > 0 && (
-                  <optgroup label="Completed Cultivations">
-                    {tasks.filter(task => task.completed).map((task) => (
-                      <option key={task._id} value={task._id} disabled>
-                        {task.title} (Completed)
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -345,29 +330,18 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 </svg>
               </div>
             </div>
-            {tasks.length === 0 && (
+            {tasks.filter(task => !task.completed).length === 0 && (
               <p className="mt-2 text-sm text-gray-500 flex items-center space-x-1">
-                <span>No cultivations yet.</span>
+                <span>All cultivations harvested.</span>
                 <Link to="/tasks" className="text-emerald-600 hover:underline flex items-center space-x-1">
                   <FaPlusCircle className="w-4 h-4" />
-                  <span>Add a new one</span>
+                  <span>Plant a new seed</span>
                 </Link>
               </p>
             )}
           </div>
         </div>
       </div>
-
-      <RewardModal
-        show={showRewardModal}
-        onClose={() => setShowRewardModal(false)}
-        reward={currentReward}
-      />
-      <PunishmentModal
-        show={showPunishmentModal}
-        onClose={() => setShowPunishmentModal(false)}
-        punishment={currentPunishment}
-      />
     </div>
   );
 }

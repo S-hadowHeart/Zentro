@@ -15,8 +15,8 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState('pomodoro');
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showPunishmentModal, setShowPunishmentModal] = useState(false);
-  const [reward, setReward] = useState('');
-  const [punishment, setPunishment] = useState('');
+  const [currentReward, setCurrentReward] = useState('');
+  const [currentPunishment, setCurrentPunishment] = useState('');
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
   const tabs = useMemo(() => [
@@ -36,25 +36,23 @@ function Dashboard() {
     }
   }, [location.pathname, tabs]);
 
-  const handlePomodoroComplete = useCallback(() => {
-    if (user?.settings?.rewardSystemEnabled && user?.rewards?.length > 0) {
-      const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
-      setReward(randomReward);
-      setShowRewardModal(true);
-    }
-  }, [user]);
-
-  const handlePomodoroInterrupt = useCallback(() => {
-    if (user?.settings?.rewardSystemEnabled && user?.punishments?.length > 0) {
-      const randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
-      setPunishment(randomPunishment);
-      setShowPunishmentModal(true);
-    }
-  }, [user]);
-
-  const handlePomodoroEnd = useCallback(() => {
+  const handlePomodoroEnd = useCallback((eventType, duration, rewards, punishments) => {
     setReportRefreshKey(prevKey => prevKey + 1);
-  }, []);
+    
+    if (eventType === 'completed') {
+      if (user?.settings?.rewardSystemEnabled && rewards?.length > 0) {
+        const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+        setCurrentReward(randomReward);
+        setShowRewardModal(true);
+      }
+    } else if (eventType === 'interrupted') {
+      if (user?.settings?.rewardSystemEnabled && punishments?.length > 0) {
+        const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
+        setCurrentPunishment(randomPunishment);
+        setShowPunishmentModal(true);
+      }
+    }
+  }, [user]);
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
@@ -139,12 +137,12 @@ function Dashboard() {
       <RewardModal
         show={showRewardModal}
         onClose={() => setShowRewardModal(false)}
-        reward={reward}
+        reward={currentReward}
       />
       <PunishmentModal
         show={showPunishmentModal}
         onClose={() => setShowPunishmentModal(false)}
-        punishment={punishment}
+        punishment={currentPunishment}
       />
     </div>
   );
