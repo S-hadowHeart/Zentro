@@ -117,14 +117,10 @@ function PomodoroTimer({ onPomodoroEnd }) {
               setTimeLeft(breakDurationRef.current * 60);
               setIsRunning(true);
               
-              // Handle completion in the background
-              handlePomodoroComplete(focusDurationRef.current).then(() => {
-                // Show reward after break has started
-                onPomodoroEndRef.current?.('completed', focusDurationRef.current, user?.rewards, user?.punishments);
-              });
+              // Just update stats without showing reward
+              handlePomodoroComplete(focusDurationRef.current);
             } else {
               // Break session ended
-              onPomodoroEndRef.current?.('break_ended');
               setIsBreak(false);
               setTimeLeft(focusDurationRef.current * 60);
               setIsRunning(false);
@@ -141,7 +137,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         clearInterval(intervalId);
       }
     };
-  }, [isRunning, handlePomodoroComplete, user, onPomodoroEndRef]);
+  }, [isRunning, handlePomodoroComplete]);
 
   // Remove the effect that was resetting the timer
   // Effect to update time left when durations change
