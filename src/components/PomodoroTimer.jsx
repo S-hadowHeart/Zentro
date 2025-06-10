@@ -35,10 +35,10 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   // Effect to update time left when durations change or on initial load
   useEffect(() => {
-    if (!isRunning) {
+    if (!isRunning && !isBreak) {
       setTimeLeft(focusDuration * 60);
     }
-  }, [focusDuration, isRunning]);
+  }, [focusDuration, isRunning, isBreak]);
 
   // Effect to select a task on initial load or when tasks change
   useEffect(() => {
