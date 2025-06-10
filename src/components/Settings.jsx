@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTrash, FaCog, FaSeedling, FaLeaf, FaSun, FaMoon, FaPlus, FaCheck } from 'react-icons/fa';
+import { FaTrash, FaCog, FaSeedling, FaLeaf, FaSun, FaMoon, FaPlus, FaCheck, FaClock } from 'react-icons/fa';
 
 function Settings() {
-  const { user, fetchUser } = useAuth();
+  const { user, fetchUser, updateUser } = useAuth();
   const [rewards, setRewards] = useState([]);
   const [punishments, setPunishments] = useState([]);
   const [newReward, setNewReward] = useState('');
@@ -12,12 +12,16 @@ function Settings() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateType, setUpdateType] = useState(null);
   const [dailyGoal, setDailyGoal] = useState(25);
+  const [pomodoroDurationSetting, setPomodoroDurationSetting] = useState(user?.settings?.pomodoroDuration || 25);
+  const [breakDurationSetting, setBreakDurationSetting] = useState(user?.settings?.breakDuration || 5);
 
   useEffect(() => {
     if (user) {
       setRewards(user.rewards || []);
       setPunishments(user.punishments || []);
       setDailyGoal(user.settings?.dailyGoal || 25);
+      setPomodoroDurationSetting(user.settings?.pomodoroDuration || 25);
+      setBreakDurationSetting(user.settings?.breakDuration || 5);
     }
   }, [user]);
 
@@ -43,7 +47,13 @@ function Settings() {
         requestBody = { [type]: type === 'rewards' ? rewards : punishments };
         successMessage = `${type === 'rewards' ? 'Seeds of joy nurtured!' : 'Weeds uprooted!'}`;
       } else if (type === 'settings') {
-        requestBody = { settings: { dailyGoal: dailyGoal } };
+        requestBody = { 
+          settings: {
+            dailyGoal: dailyGoal,
+            pomodoroDuration: pomodoroDurationSetting,
+            breakDuration: breakDurationSetting
+          }
+        };
         successMessage = 'Arrangements harmonized!';
       } else {
         throw new Error('Invalid update type');
@@ -64,7 +74,9 @@ function Settings() {
       }
 
       setMessage(successMessage);
-      await fetchUser(token);
+      const updatedUserData = await response.json();
+      updateUser(updatedUserData.user);
+
     } catch (error) {
       setMessage(`Error updating ${type}: ${error.message || 'Server unreachable. Please check if the server is running.'}`);
     } finally {
@@ -183,6 +195,57 @@ function Settings() {
           )}
         </button>
       </form>
+
+      {/* Pomodoro and Break Duration Settings */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+        <div className="flex items-center space-x-3 mb-4">
+          <FaClock className="w-5 h-5 text-emerald-600" />
+          <h3 className="text-lg font-semibold text-gray-800">Rhythm Adjustments</h3>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="pomodoroDurationSetting" className="block text-sm font-medium text-gray-700 mb-1">Focus Duration (minutes):</label>
+            <input
+              type="number"
+              id="pomodoroDurationSetting"
+              value={pomodoroDurationSetting}
+              onChange={(e) => setPomodoroDurationSetting(Math.max(1, parseInt(e.target.value) || 0))}
+              min="1"
+              max="60"
+              className="w-full px-4 py-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+            />
+          </div>
+          <div>
+            <label htmlFor="breakDurationSetting" className="block text-sm font-medium text-gray-700 mb-1">Break Duration (minutes):</label>
+            <input
+              type="number"
+              id="breakDurationSetting"
+              value={breakDurationSetting}
+              onChange={(e) => setBreakDurationSetting(Math.max(1, parseInt(e.target.value) || 0))}
+              min="1"
+              max="30"
+              className="w-full px-4 py-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+            />
+          </div>
+          <button
+            onClick={() => handleUpdate('settings')}
+            disabled={isUpdating}
+            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isUpdating && updateType === 'settings' ? (
+              <>
+                <FaCog className="w-4 h-4 animate-spin" />
+                <span>Adjusting Rhythm...</span>
+              </>
+            ) : (
+              <>
+                <FaCheck className="w-4 h-4" />
+                <span>Adjust Rhythm</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
 
       {/* Custom Rewards Section */}
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">

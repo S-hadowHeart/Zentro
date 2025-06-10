@@ -9,12 +9,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const { tasks, fetchTasks, incrementPomodorosForTask } = useTasks();
   const [notification, setNotification] = useState(null);
 
-  const initialFocusDuration = user?.settings?.pomodoroDuration || 25;
-  const initialBreakDuration = user?.settings?.breakDuration || 5;
-
-  const [focusDuration, setFocusDuration] = useState(initialFocusDuration);
-  const [breakDuration, setBreakDuration] = useState(initialBreakDuration);
-  const [timeLeft, setTimeLeft] = useState(initialFocusDuration * 60);
+  const [timeLeft, setTimeLeft] = useState(user?.settings?.pomodoroDuration * 60 || 25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [selectedTask, setSelectedTask] = useState('');
@@ -22,17 +17,17 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   // Refs for stable callbacks
   const isBreakRef = useRef(isBreak);
-  const focusDurationRef = useRef(focusDuration);
-  const breakDurationRef = useRef(breakDuration);
+  const focusDurationRef = useRef(user?.settings?.pomodoroDuration || 25);
+  const breakDurationRef = useRef(user?.settings?.breakDuration || 5);
   const onPomodoroEndRef = useRef(onPomodoroEnd);
 
   // Update refs when values change
   useEffect(() => {
     isBreakRef.current = isBreak;
-    focusDurationRef.current = focusDuration;
-    breakDurationRef.current = breakDuration;
+    focusDurationRef.current = user?.settings?.pomodoroDuration || 25;
+    breakDurationRef.current = user?.settings?.breakDuration || 5;
     onPomodoroEndRef.current = onPomodoroEnd;
-  }, [isBreak, focusDuration, breakDuration, onPomodoroEnd]);
+  }, [isBreak, user?.settings?.pomodoroDuration, user?.settings?.breakDuration, onPomodoroEnd]);
 
   // Effect to select a task on initial load or when tasks change
   useEffect(() => {
@@ -181,14 +176,14 @@ function PomodoroTimer({ onPomodoroEnd }) {
       return;
     }
     if (!isRunning) {
+      setTimeLeft((isBreak ? (user?.settings?.breakDuration || 5) : (user?.settings?.pomodoroDuration || 25)) * 60);
       setIsRunning(true);
     }
-  }, [selectedTask, isRunning]);
+  }, [selectedTask, isRunning, isBreak, user?.settings?.pomodoroDuration, user?.settings?.breakDuration]);
 
   const handlePause = useCallback(() => {
     if (isRunning) {
       setIsRunning(false);
-      // Removed: No longer handling interruption stats or resetting on pause
     } else {
       setIsRunning(true);
     }
@@ -197,18 +192,18 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const handleReset = useCallback(async () => {
     // If a focus session was running and is being reset, treat it as interrupted
     if (isRunning && !isBreak && timeLeft > 0) {
-      const interruptedDuration = focusDuration * 60 - timeLeft;
+      const interruptedDuration = (user?.settings?.pomodoroDuration || 25) * 60 - timeLeft;
       await handlePomodoroInterrupt(interruptedDuration);
       onPomodoroEndRef.current('interrupted', interruptedDuration, user.rewards, user.punishments);
     }
     // Stop the timer
     setIsRunning(false);
-    // Reset to initial state
+    // Reset to initial state, reflecting current settings
     setIsBreak(false);
-    setTimeLeft(focusDuration * 60);
-  }, [isRunning, isBreak, timeLeft, focusDuration, handlePomodoroInterrupt, user.rewards, user.punishments]);
+    setTimeLeft((user?.settings?.pomodoroDuration || 25) * 60);
+  }, [isRunning, isBreak, timeLeft, user?.settings?.pomodoroDuration, handlePomodoroInterrupt, user.rewards, user.punishments]);
 
-  const currentDuration = isBreak ? breakDuration : focusDuration;
+  const currentDuration = isBreak ? (user?.settings?.breakDuration || 5) : (user?.settings?.pomodoroDuration || 25);
   const progress = ((currentDuration * 60 - timeLeft) / (currentDuration * 60)) * 100;
 
   return (
@@ -307,32 +302,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
         <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 border border-emerald-100 space-y-4">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Adjust Rhythm</h3>
           
-          <div>
-            <label htmlFor="focusDuration" className="block text-sm font-medium text-gray-700 mb-1">Cultivation Duration (minutes):</label>
-            <input
-              type="number"
-              id="focusDuration"
-              value={focusDuration}
-              onChange={(e) => setFocusDuration(Math.max(1, parseInt(e.target.value) || 0))}
-              min="1"
-              max="60"
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="breakDuration" className="block text-sm font-medium text-gray-700 mb-1">Rejuvenation Duration (minutes):</label>
-            <input
-              type="number"
-              id="breakDuration"
-              value={breakDuration}
-              onChange={(e) => setBreakDuration(Math.max(1, parseInt(e.target.value) || 0))}
-              min="1"
-              max="30"
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
-            />
-          </div>
-
           <div>
             <label htmlFor="selectTask" className="block text-sm font-medium text-gray-700 mb-1">Select Cultivation:</label>
             <div className="relative">
