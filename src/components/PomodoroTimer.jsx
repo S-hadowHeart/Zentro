@@ -125,7 +125,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 setIsBreak(true);
                 setTimeLeft(breakDurationRef.current * 60);
                 // Start break timer automatically
-                setIsRunning(true);
+                setTimeout(() => {
+                  setIsRunning(true);
+                }, 1000); // Small delay to ensure state updates
               });
             } else {
               // Break session ended, reset to focus
@@ -182,12 +184,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
       return;
     }
     setIsRunning(true);
-    if (!isBreak) {
-      setTimeLeft(focusDuration * 60);
-    } else {
-      setTimeLeft(breakDuration * 60);
-    }
-  }, [selectedTask, focusDuration, breakDuration, isBreak]);
+  }, [selectedTask]);
 
   const handlePause = useCallback(() => {
     // Simply pause the timer without resetting

@@ -36,31 +36,22 @@ function Dashboard() {
     }
   }, [location.pathname, tabs]);
 
-  const handlePomodoroEnd = useCallback(async (eventType, duration) => {
+  const handlePomodoroEnd = useCallback(async (eventType, duration, rewards, punishments) => {
     try {
       setReportRefreshKey(prevKey => prevKey + 1);
       
       // Fetch the latest user data after a pomodoro session ends
       await fetchUser(localStorage.getItem('token'));
 
-      // Get the latest user object directly from useAuth after the fetch
-      const { user: latestUser } = useAuth();
-
-      // Use the updated user object to display rewards/punishments
-      if (eventType === 'completed') {
-        // Always show reward if available
-        if (latestUser?.rewards && latestUser.rewards.length > 0) {
-          const randomReward = latestUser.rewards[Math.floor(Math.random() * latestUser.rewards.length)];
-          setCurrentReward(randomReward);
-          setShowRewardModal(true);
-        }
-      } else if (eventType === 'interrupted') {
-        // Only show punishment if reward system is enabled
-        if (latestUser?.settings?.rewardSystemEnabled && latestUser?.punishments && latestUser.punishments.length > 0) {
-          const randomPunishment = latestUser.punishments[Math.floor(Math.random() * latestUser.punishments.length)];
-          setCurrentPunishment(randomPunishment);
-          setShowPunishmentModal(true);
-        }
+      // Use the provided rewards and punishments arrays
+      if (eventType === 'completed' && rewards && rewards.length > 0) {
+        const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+        setCurrentReward(randomReward);
+        setShowRewardModal(true);
+      } else if (eventType === 'interrupted' && punishments && punishments.length > 0) {
+        const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
+        setCurrentPunishment(randomPunishment);
+        setShowPunishmentModal(true);
       }
     } catch (error) {
       console.error('Error in handlePomodoroEnd:', error);
