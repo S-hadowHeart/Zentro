@@ -37,29 +37,33 @@ function Dashboard() {
   }, [location.pathname, tabs]);
 
   const handlePomodoroEnd = useCallback(async (eventType, duration) => {
-    setReportRefreshKey(prevKey => prevKey + 1);
-    
-    // Fetch the latest user data after a pomodoro session ends
-    await fetchUser(localStorage.getItem('token'));
+    try {
+      setReportRefreshKey(prevKey => prevKey + 1);
+      
+      // Fetch the latest user data after a pomodoro session ends
+      await fetchUser(localStorage.getItem('token'));
 
-    // Get the latest user object directly from useAuth after the fetch
-    const { user: latestUser } = useAuth();
+      // Get the latest user object directly from useAuth after the fetch
+      const { user: latestUser } = useAuth();
 
-    // Use the updated user object to display rewards/punishments
-    if (eventType === 'completed') {
-      // Always show reward if available
-      if (latestUser?.rewards && latestUser.rewards.length > 0) {
-        const randomReward = latestUser.rewards[Math.floor(Math.random() * latestUser.rewards.length)];
-        setCurrentReward(randomReward);
-        setShowRewardModal(true);
+      // Use the updated user object to display rewards/punishments
+      if (eventType === 'completed') {
+        // Always show reward if available
+        if (latestUser?.rewards && latestUser.rewards.length > 0) {
+          const randomReward = latestUser.rewards[Math.floor(Math.random() * latestUser.rewards.length)];
+          setCurrentReward(randomReward);
+          setShowRewardModal(true);
+        }
+      } else if (eventType === 'interrupted') {
+        // Only show punishment if reward system is enabled
+        if (latestUser?.settings?.rewardSystemEnabled && latestUser?.punishments && latestUser.punishments.length > 0) {
+          const randomPunishment = latestUser.punishments[Math.floor(Math.random() * latestUser.punishments.length)];
+          setCurrentPunishment(randomPunishment);
+          setShowPunishmentModal(true);
+        }
       }
-    } else if (eventType === 'interrupted') {
-      // Only show punishment if reward system is enabled
-      if (latestUser?.settings?.rewardSystemEnabled && latestUser?.punishments && latestUser.punishments.length > 0) {
-        const randomPunishment = latestUser.punishments[Math.floor(Math.random() * latestUser.punishments.length)];
-        setCurrentPunishment(randomPunishment);
-        setShowPunishmentModal(true);
-      }
+    } catch (error) {
+      console.error('Error in handlePomodoroEnd:', error);
     }
   }, [fetchUser]);
 

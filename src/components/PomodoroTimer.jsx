@@ -124,6 +124,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 onPomodoroEndRef.current?.('completed', focusDurationRef.current, user?.rewards, user?.punishments);
                 setIsBreak(true);
                 setTimeLeft(breakDurationRef.current * 60);
+                // Start break timer automatically
+                setIsRunning(true);
               });
             } else {
               // Break session ended, reset to focus
@@ -188,14 +190,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
   }, [selectedTask, focusDuration, breakDuration, isBreak]);
 
   const handlePause = useCallback(() => {
+    // Simply pause the timer without resetting
     setIsRunning(false);
-    // Reset timer to initial state when paused
-    if (!isBreak) {
-      setTimeLeft(focusDuration * 60);
-    } else {
-      setTimeLeft(breakDuration * 60);
-    }
-  }, [isBreak, focusDuration, breakDuration]);
+  }, []);
 
   const handleReset = useCallback(() => {
     // Show loading state
