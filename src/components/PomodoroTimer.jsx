@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
-import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner, FaPlusCircle } from 'react-icons/fa';
+import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner, FaPlusCircle, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 function PomodoroTimer({ onPomodoroEnd }) {
   const { user, fetchUser } = useAuth();
   const { tasks, fetchTasks } = useTasks();
+  const [notification, setNotification] = useState(null);
 
   const initialFocusDuration = user?.settings?.pomodoroDuration || 25;
   const initialBreakDuration = user?.settings?.breakDuration || 5;
@@ -101,6 +102,11 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, []);
 
+  const showNotification = useCallback((message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000); // Hide after 3 seconds
+  }, []);
+
   // Timer effect
   useEffect(() => {
     let intervalId = null;
@@ -117,7 +123,13 @@ function PomodoroTimer({ onPomodoroEnd }) {
               setTimeLeft(breakDurationRef.current * 60);
               setIsRunning(true);
               
-              // Just update stats without showing reward
+              // Show reward notification if available
+              if (user?.rewards?.length > 0) {
+                const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
+                showNotification(randomReward, 'reward');
+              }
+              
+              // Update stats in background
               handlePomodoroComplete(focusDurationRef.current);
             } else {
               // Break session ended
@@ -137,7 +149,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         clearInterval(intervalId);
       }
     };
-  }, [isRunning, handlePomodoroComplete]);
+  }, [isRunning, handlePomodoroComplete, user, showNotification]);
 
   // Remove the effect that was resetting the timer
   // Effect to update time left when durations change
@@ -204,6 +216,23 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   return (
     <div className="space-y-8">
+      {/* Notification Popup */}
+      {notification && (
+        <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out ${
+          notification.type === 'reward' ? 'bg-emerald-500' : 'bg-red-500'
+        } text-white z-50`}>
+          <div className="flex items-center space-x-2">
+            <span>{notification.message}</span>
+            <button 
+              onClick={() => setNotification(null)}
+              className="ml-2 hover:opacity-75"
+            >
+              <FaTimes />
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="text-center">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent mb-2">
           {isBreak ? 'Rejuvenation Time' : 'Cultivation Session'}
