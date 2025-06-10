@@ -20,10 +20,10 @@ function Dashboard() {
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
   const tabs = useMemo(() => [
-    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock },
-    { id: 'tasks', label: 'Cultivations', icon: FaTasks },
-    { id: 'settings', label: 'Arrangements', icon: FaCog },
-    { id: 'report', label: 'Growth Journal', icon: FaChartBar }
+    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaLeaf },
+    { id: 'tasks', label: 'Cultivations', icon: FaLeaf },
+    { id: 'settings', label: 'Arrangements', icon: FaLeaf },
+    { id: 'report', label: 'Growth Journal', icon: FaLeaf }
   ], []);
 
   useEffect(() => {
@@ -36,26 +36,32 @@ function Dashboard() {
     }
   }, [location.pathname, tabs]);
 
-  const handlePomodoroEnd = useCallback(async (eventType, duration, rewards, punishments) => {
+  const handlePomodoroEnd = useCallback(async (eventType, duration) => {
     setReportRefreshKey(prevKey => prevKey + 1);
     
-    // Fetch the latest user data after a pomodoro session ends to ensure UI is up-to-date
+    // Fetch the latest user data after a pomodoro session ends
     await fetchUser(localStorage.getItem('token'));
 
+    // Get the latest user object directly from useAuth after the fetch
+    const { user: latestUser } = useAuth();
+
+    // Use the updated user object to display rewards/punishments
     if (eventType === 'completed') {
-      if (user?.settings?.rewardSystemEnabled && rewards && rewards.length > 0) {
-        const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+      // Always show reward if available
+      if (latestUser?.rewards && latestUser.rewards.length > 0) {
+        const randomReward = latestUser.rewards[Math.floor(Math.random() * latestUser.rewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
       }
     } else if (eventType === 'interrupted') {
-      if (user?.settings?.rewardSystemEnabled && punishments && punishments.length > 0) {
-        const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
+      // Only show punishment if reward system is enabled
+      if (latestUser?.settings?.rewardSystemEnabled && latestUser?.punishments && latestUser.punishments.length > 0) {
+        const randomPunishment = latestUser.punishments[Math.floor(Math.random() * latestUser.punishments.length)];
         setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
       }
     }
-  }, [fetchUser, user]);
+  }, [fetchUser]);
 
   const renderNonTimerTabContent = useCallback(() => {
     switch (activeTab) {
