@@ -46,6 +46,8 @@ function AppRoutes() {
         path="/pomodoro"
         element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
       />
+      {/* Redirect any other routes to the root */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

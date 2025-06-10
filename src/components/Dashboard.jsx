@@ -12,7 +12,7 @@ import { useLocation, Link } from 'react-router-dom';
 function Dashboard() {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('tasks'); // Default tab
+  const [activeTab, setActiveTab] = useState('pomodoro'); // Changed default tab to pomodoro
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showPunishmentModal, setShowPunishmentModal] = useState(false);
   const [reward, setReward] = useState('');
@@ -29,16 +29,16 @@ function Dashboard() {
     if (currentTab) {
       setActiveTab(currentTab.id);
     } else {
-      // If an invalid path, default to tasks
-      setActiveTab('tasks');
+      // If an invalid path, default to pomodoro
+      setActiveTab('pomodoro');
     }
   }, [location.pathname]);
 
   const tabs = [
+    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock },
     { id: 'tasks', label: 'Cultivations', icon: FaTasks },
     { id: 'settings', label: 'Arrangements', icon: FaCog },
-    { id: 'report', label: 'Growth Journal', icon: FaChartBar },
-    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock }
+    { id: 'report', label: 'Growth Journal', icon: FaChartBar }
   ];
 
   const handlePomodoroComplete = useCallback(() => {
