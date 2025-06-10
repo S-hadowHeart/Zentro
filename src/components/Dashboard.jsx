@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import PomodoroTimer from './PomodoroTimer';
 import TaskList from './TaskList';
@@ -7,15 +7,26 @@ import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 import Report from './Report';
 import { FaTasks, FaCog, FaChartBar, FaClock } from 'react-icons/fa';
+import { useParams, Link } from 'react-router-dom';
 
 function Dashboard() {
   const { user, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('tasks');
+  const { tabId } = useParams();
+  const [activeTab, setActiveTab] = useState(tabId || 'tasks');
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showPunishmentModal, setShowPunishmentModal] = useState(false);
   const [reward, setReward] = useState('');
   const [punishment, setPunishment] = useState('');
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
+
+  useEffect(() => {
+    if (tabId && tabs.some(tab => tab.id === tabId)) {
+      setActiveTab(tabId);
+    } else if (tabId && !tabs.some(tab => tab.id === tabId)) {
+      // Redirect to default if an invalid tabId is provided
+      setActiveTab('tasks');
+    }
+  }, [tabId]);
 
   const tabs = [
     { id: 'tasks', label: 'Cultivations', icon: FaTasks },
@@ -72,9 +83,9 @@ function Dashboard() {
         <div className="mb-8">
           <div className="flex space-x-2 p-1 bg-white/50 backdrop-blur-sm rounded-xl shadow-lg border border-emerald-100">
             {tabs.map((tab) => (
-              <button
+              <Link
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                to={`/${tab.id}`}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
@@ -83,7 +94,7 @@ function Dashboard() {
               >
                 <tab.icon className="w-5 h-5" />
                 <span>{tab.label}</span>
-              </button>
+              </Link>
             ))}
           </div>
         </div>

@@ -28,6 +28,10 @@ function AppRoutes() {
       />
       <Route
         path="/"
+        element={user ? <Navigate to="/tasks" /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/:tabId"
         element={user ? <Dashboard /> : <Navigate to="/login" />}
       />
     </Routes>
