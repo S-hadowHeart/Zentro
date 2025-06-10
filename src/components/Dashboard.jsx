@@ -20,10 +20,10 @@ function Dashboard() {
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
   const tabs = useMemo(() => [
-    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaLeaf },
-    { id: 'tasks', label: 'Cultivations', icon: FaLeaf },
-    { id: 'settings', label: 'Arrangements', icon: FaLeaf },
-    { id: 'report', label: 'Growth Journal', icon: FaLeaf }
+    { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock },
+    { id: 'tasks', label: 'Cultivations', icon: FaTasks },
+    { id: 'settings', label: 'Arrangements', icon: FaCog },
+    { id: 'report', label: 'Growth Journal', icon: FaChartBar }
   ], []);
 
   useEffect(() => {
