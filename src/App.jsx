@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import EnterTheGarden from './components/auth/Login';
 import CultivatePath from './components/auth/Register';
