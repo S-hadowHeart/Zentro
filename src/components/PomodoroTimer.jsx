@@ -20,6 +20,11 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const { tasks, fetchTasks, loading: tasksLoading } = useTasks();
   const timerRef = useRef(null);
 
+  // Refs for functions to ensure stable identity for useEffect dependencies
+  const handleCompleteRef = useRef();
+  const handleInterruptRef = useRef();
+
+  // Initial render guard and loading display
   if (authLoading || tasksLoading || !user) {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100 min-h-[300px]">
@@ -29,20 +34,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     );
   }
 
-  console.log('PomodoroTimer component initialized.');
-  console.log('Initial focusDuration:', focusDuration);
-  console.log('Initial breakDuration:', breakDuration);
-  console.log('Initial timeLeft:', timeLeft);
-  console.log('Initial isRunning:', isRunning);
-  console.log('Initial isBreak:', isBreak);
-  console.log('Initial showRewardModal:', showRewardModal);
-  console.log('Initial currentReward:', currentReward);
-  console.log('Initial showPunishmentModal:', showPunishmentModal);
-  console.log('Initial currentPunishment:', currentPunishment);
-  console.log('Initial selectedTask:', selectedTask);
-  console.log('User from useAuth:', user);
-  console.log('Tasks from useTasks:', tasks);
-
+  // Effect to select a task on initial load or when tasks change
   useEffect(() => {
     if (tasks.length > 0 && !selectedTask) {
       const nonCompletedTasks = tasks.filter(task => !task.completed);
@@ -57,31 +49,41 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [tasks, selectedTask]);
 
+  // This useEffect manages the countdown interval
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            handleComplete();
-            return 0;
-          }
-          return prev - 1;
-        });
+        setTimeLeft((prev) => prev - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      setIsRunning(false);
-      onPomodoroEnd();
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
     }
+
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [isRunning, timeLeft, handleComplete, onPomodoroEnd]);
+  }, [isRunning, timeLeft]); // timeLeft is a dependency to ensure clearInterval is called if it reaches 0 (though ideally the next effect handles this)
+
+  // This useEffect handles the transition between focus/break sessions and completion logic
+  useEffect(() => {
+    if (timeLeft === 0 && !isRunning) { // Timer reached 0 and is not running (i.e., completed a segment)
+      if (!isBreak) { // Just finished a focus session
+        if (handleCompleteRef.current) {
+          handleCompleteRef.current(); // Call side-effects of completion
+        }
+        setIsBreak(true); // Switch to break
+        setTimeLeft(breakDuration * 60); // Set break time
+      } else { // Just finished a break session
+        setIsBreak(false); // Switch back to focus
+        setTimeLeft(focusDuration * 60); // Set focus time
+        if (onPomodoroEnd) {
+          onPomodoroEnd(); // Notify Dashboard of full cycle completion
+        }
+      }
+    }
+  }, [timeLeft, isRunning, isBreak, focusDuration, breakDuration, onPomodoroEnd]);
 
   const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -111,96 +113,101 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
   }, [fetchTasks]);
 
+  // handleComplete now only manages side effects (rewards, stats, tasks, onPomodoroEnd)
   const handleComplete = useCallback(async () => {
-    if (!isBreak) {
-      try {
-        let randomReward = null;
-        if (user && user.rewards && user.rewards.length > 0) {
-          randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
-          setCurrentReward(randomReward);
-          setShowRewardModal(true);
-        }
-
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const statsResponse = await fetch('/api/users/stats', {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            completed: true,
-            reward: randomReward,
-            duration: focusDuration
-          })
-        });
-
-        if (statsResponse.ok) {
-          await fetchUser(token);
-        } else {
-          console.error('Failed to update user stats');
-        }
-
-        if (selectedTask) {
-          await incrementPomodorosForTask(selectedTask, focusDuration);
-        }
-
-        if (onPomodoroEnd) {
-          onPomodoroEnd();
-        }
-      } catch (error) {
-        console.error('Error during pomodoro complete process:', error);
+    try {
+      let randomReward = null;
+      if (user?.rewards && user.rewards.length > 0) {
+        randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
+        setCurrentReward(randomReward);
+        setShowRewardModal(true);
       }
-    }
-    setIsBreak(!isBreak);
-    setTimeLeft(isBreak ? focusDuration * 60 : breakDuration * 60);
-  }, [isBreak, user, focusDuration, selectedTask, fetchUser, incrementPomodorosForTask, breakDuration, onPomodoroEnd]);
 
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const statsResponse = await fetch('/api/users/stats', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          completed: true,
+          reward: randomReward,
+          duration: focusDuration
+        })
+      });
+
+      if (statsResponse.ok) {
+        await fetchUser(token);
+      } else {
+        console.error('Failed to update user stats');
+      }
+
+      if (selectedTask) {
+        await incrementPomodorosForTask(selectedTask, focusDuration);
+      }
+
+      if (onPomodoroEnd) {
+        // onPomodoroEnd is now called in the new useEffect when a full cycle completes,
+        // but if it's meant to trigger after every focus session, it should be here too.
+        // Keeping it here for consistent behavior with Dashboard's report refresh.
+        onPomodoroEnd();
+      }
+    } catch (error) {
+      console.error('Error during pomodoro complete process:', error);
+    }
+  }, [user, focusDuration, selectedTask, fetchUser, incrementPomodorosForTask, onPomodoroEnd]);
+
+  // handleInterrupt now only manages side effects (punishments, stats, onPomodoroEnd)
   const handleInterrupt = useCallback(async () => {
-    if (!isBreak) {
-      try {
-        let randomPunishment = null;
-        if (user && user.punishments && user.punishments.length > 0) {
-          randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
-          setCurrentPunishment(randomPunishment);
-          setShowPunishmentModal(true);
-        }
-
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const statsResponse = await fetch('/api/users/stats', {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            completed: false,
-            punishment: randomPunishment,
-            duration: focusDuration
-          })
-        });
-
-        if (statsResponse.ok) {
-          await fetchUser(token);
-        } else {
-          console.error('Failed to update user stats on interrupt');
-        }
-
-        if (onPomodoroEnd) {
-          onPomodoroEnd();
-        }
-      } catch (error) {
-        console.error('Error during pomodoro interrupt process:', error);
+    try {
+      let randomPunishment = null;
+      if (user?.punishments && user.punishments.length > 0) {
+        randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
+        setCurrentPunishment(randomPunishment);
+        setShowPunishmentModal(true);
       }
+
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const statsResponse = await fetch('/api/users/stats', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          completed: false,
+          punishment: randomPunishment,
+          duration: focusDuration
+        })
+      });
+
+      if (statsResponse.ok) {
+        await fetchUser(token);
+      } else {
+        console.error('Failed to update user stats on interrupt');
+      }
+
+      if (onPomodoroEnd) {
+        onPomodoroEnd();
+      }
+    } catch (error) {
+      console.error('Error during pomodoro interrupt process:', error);
     }
-    setIsRunning(false);
-    setIsBreak(false);
-    setTimeLeft(focusDuration * 60);
-  }, [isBreak, user, focusDuration, onPomodoroEnd, fetchUser]);
+  }, [user, focusDuration, onPomodoroEnd, fetchUser]);
+
+  // Update refs when handleComplete/handleInterrupt change
+  useEffect(() => {
+    handleCompleteRef.current = handleComplete;
+  }, [handleComplete]);
+
+  useEffect(() => {
+    handleInterruptRef.current = handleInterrupt;
+  }, [handleInterrupt]);
 
   const handleStart = useCallback(() => {
     if (!selectedTask) {
@@ -213,8 +220,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   const handlePause = useCallback(() => {
     setIsRunning(false);
-    setIsBreak(false);
-  }, []);
+  }, []); // Only setIsRunning
 
   const handleReset = useCallback(() => {
     setIsRunning(false);
@@ -288,7 +294,12 @@ function PomodoroTimer({ onPomodoroEnd }) {
             </button>
           )}
           <button
-            onClick={handleInterrupt}
+            onClick={() => {
+              setIsRunning(false);
+              setIsBreak(false);
+              setTimeLeft(focusDuration * 60);
+              handleInterruptRef.current(); // Call the side-effect function
+            }}
             className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center space-x-2"
           >
             <FaRedo className="w-5 h-5" />
@@ -304,14 +315,11 @@ function PomodoroTimer({ onPomodoroEnd }) {
         </div>
       )}
 
-      {/* Reward Modal */}
       <RewardModal
         show={showRewardModal}
         onClose={() => setShowRewardModal(false)}
         reward={currentReward}
       />
-
-      {/* Punishment Modal */}
       <PunishmentModal
         show={showPunishmentModal}
         onClose={() => setShowPunishmentModal(false)}
