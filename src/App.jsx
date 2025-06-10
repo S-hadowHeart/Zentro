@@ -20,31 +20,31 @@ function AppRoutes() {
     <Routes>
       <Route
         path="/login"
-        element={!(user && user._id) ? <EnterTheGarden /> : <Navigate to="/" />}
+        element={!(user && user.id) ? <EnterTheGarden /> : <Navigate to="/" />}
       />
       <Route
         path="/register"
-        element={!(user && user._id) ? <CultivatePath /> : <Navigate to="/" />}
+        element={!(user && user.id) ? <CultivatePath /> : <Navigate to="/" />}
       />
       <Route
         path="/"
-        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/tasks"
-        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/settings"
-        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/report"
-        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/pomodoro"
-        element={(user && user._id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
       />
     </Routes>
   );
