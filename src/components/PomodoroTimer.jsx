@@ -187,14 +187,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
   }, [selectedTask]);
 
   const handlePause = useCallback(() => {
-    if (isRunning) {
-      // Only pause if running
-      setIsRunning(false);
-    } else {
-      // Resume from where we left off
-      setIsRunning(true);
-    }
-  }, [isRunning]);
+    setIsRunning(prevIsRunning => !prevIsRunning);
+  }, []);
 
   const handleReset = useCallback(() => {
     // Stop the timer
