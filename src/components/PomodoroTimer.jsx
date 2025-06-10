@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
-import { FaPlay, FaPause, FaRedo, FaLeaf } from 'react-icons/fa';
+import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner } from 'react-icons/fa';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 
@@ -16,9 +16,18 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [showPunishmentModal, setShowPunishmentModal] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState(''); // To store the punishment
   const [selectedTask, setSelectedTask] = useState('');
-  const { user, fetchUser } = useAuth();
-  const { tasks, fetchTasks } = useTasks();
+  const { user, fetchUser, loading: authLoading } = useAuth();
+  const { tasks, fetchTasks, loading: tasksLoading } = useTasks();
   const timerRef = useRef(null);
+
+  if (authLoading || tasksLoading || !user) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100 min-h-[300px]">
+        <FaSpinner className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
+        <p className="text-lg text-gray-700">Cultivating focus, please wait...</p>
+      </div>
+    );
+  }
 
   console.log('PomodoroTimer component initialized.');
   console.log('Initial focusDuration:', focusDuration);
@@ -147,7 +156,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     }
     setIsBreak(!isBreak);
     setTimeLeft(isBreak ? focusDuration * 60 : breakDuration * 60);
-  }, [isBreak, user, focusDuration, selectedTask, fetchUser, incrementPomodorosForTask, breakDuration]);
+  }, [isBreak, user, focusDuration, selectedTask, fetchUser, incrementPomodorosForTask, breakDuration, onPomodoroEnd]);
 
   const handleInterrupt = useCallback(async () => {
     if (!isBreak) {
@@ -191,7 +200,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setIsRunning(false);
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
-  }, [isBreak, user, focusDuration, onPomodoroEnd]);
+  }, [isBreak, user, focusDuration, onPomodoroEnd, fetchUser]);
 
   const handleStart = useCallback(() => {
     if (!selectedTask) {
@@ -253,29 +262,37 @@ function PomodoroTimer({ onPomodoroEnd }) {
         </select>
 
         <div className="flex justify-center space-x-4">
-          {!isRunning ? (
+          {!isRunning && (timeLeft === focusDuration * 60 || timeLeft === 0) ? (
             <button
               onClick={handleStart}
-              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2"
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center space-x-2"
             >
-              <FaPlay className="w-4 h-4" />
-              <span>Begin Flow</span>
+              <FaPlay className="w-5 h-5" />
+              <span>Start Focus</span>
+            </button>
+          ) : isRunning ? (
+            <button
+              onClick={handlePause}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center space-x-2"
+            >
+              <FaPause className="w-5 h-5" />
+              <span>Pause</span>
             </button>
           ) : (
             <button
-              onClick={handlePause}
-              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2"
+              onClick={handleReset}
+              className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center space-x-2"
             >
-              <FaPause className="w-4 h-4" />
-              <span>Stillness</span>
+              <FaRedo className="w-5 h-5" />
+              <span>Reset</span>
             </button>
           )}
           <button
-            onClick={handleReset}
-            className="px-6 py-3 bg-white text-emerald-600 border border-emerald-200 rounded-lg shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2"
+            onClick={handleInterrupt}
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 flex items-center space-x-2"
           >
-            <FaRedo className="w-4 h-4" />
-            <span>Restore Calm</span>
+            <FaRedo className="w-5 h-5" />
+            <span>Interrupt</span>
           </button>
         </div>
       </div>
