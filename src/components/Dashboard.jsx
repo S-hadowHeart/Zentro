@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import PomodoroTimer from './PomodoroTimer';
 import TaskList from './TaskList';
@@ -12,37 +12,32 @@ import { useLocation, Link } from 'react-router-dom';
 function Dashboard() {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('pomodoro'); // Changed default tab to pomodoro
+  const [activeTab, setActiveTab] = useState('pomodoro');
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showPunishmentModal, setShowPunishmentModal] = useState(false);
   const [reward, setReward] = useState('');
   const [punishment, setPunishment] = useState('');
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
 
-  console.log('Dashboard: user', user);
-  console.log('Dashboard: location.pathname', location.pathname);
-  console.log('Dashboard: activeTab', activeTab);
-
-  useEffect(() => {
-    const path = location.pathname.substring(1); // Remove leading slash
-    const currentTab = tabs.find(tab => tab.id === path);
-    if (currentTab) {
-      setActiveTab(currentTab.id);
-    } else {
-      // If an invalid path, default to pomodoro
-      setActiveTab('pomodoro');
-    }
-  }, [location.pathname]);
-
-  const tabs = [
+  const tabs = useMemo(() => [
     { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock },
     { id: 'tasks', label: 'Cultivations', icon: FaTasks },
     { id: 'settings', label: 'Arrangements', icon: FaCog },
     { id: 'report', label: 'Growth Journal', icon: FaChartBar }
-  ];
+  ], []);
+
+  useEffect(() => {
+    const path = location.pathname.substring(1);
+    const currentTab = tabs.find(tab => tab.id === path);
+    if (currentTab) {
+      setActiveTab(currentTab.id);
+    } else {
+      setActiveTab('pomodoro');
+    }
+  }, [location.pathname, tabs]);
 
   const handlePomodoroComplete = useCallback(() => {
-    if (user && user.settings && user.settings.rewardSystemEnabled) {
+    if (user?.settings?.rewardSystemEnabled && user?.rewards?.length > 0) {
       const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
       setReward(randomReward);
       setShowRewardModal(true);
@@ -50,7 +45,7 @@ function Dashboard() {
   }, [user]);
 
   const handlePomodoroInterrupt = useCallback(() => {
-    if (user && user.settings && user.settings.rewardSystemEnabled) {
+    if (user?.settings?.rewardSystemEnabled && user?.punishments?.length > 0) {
       const randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
       setPunishment(randomPunishment);
       setShowPunishmentModal(true);
@@ -60,6 +55,21 @@ function Dashboard() {
   const handlePomodoroEnd = useCallback(() => {
     setReportRefreshKey(prevKey => prevKey + 1);
   }, []);
+
+  const renderTabContent = useCallback(() => {
+    switch (activeTab) {
+      case 'tasks':
+        return <TaskList />;
+      case 'settings':
+        return <Settings />;
+      case 'report':
+        return <Report key={reportRefreshKey} />;
+      case 'pomodoro':
+        return <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />;
+      default:
+        return <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />;
+    }
+  }, [activeTab, reportRefreshKey, handlePomodoroEnd]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-100">
@@ -121,10 +131,7 @@ function Dashboard() {
 
         {/* Tab Content */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
-          {activeTab === 'tasks' && <TaskList />}
-          {activeTab === 'settings' && <Settings />}
-          {activeTab === 'report' && <Report key={reportRefreshKey} />}
-          {activeTab === 'pomodoro' && <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />}
+          {renderTabContent()}
         </div>
       </main>
 
