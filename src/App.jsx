@@ -1,10 +1,10 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import EnterTheGarden from './components/auth/Login';
 import CultivatePath from './components/auth/Register';
 import Dashboard from './components/Dashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { TasksProvider } from './contexts/TasksContext';
+import { TasksProvider, useTasks } from './contexts/TasksContext';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -13,11 +13,12 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Routes component
-const AppRoutes = () => {
-  const { user, loading } = useAuth();
+// This component will conditionally render routes or loading
+function AuthenticatedRoutes() {
+  const { user, loading: authLoading } = useAuth();
+  const { loading: tasksLoading } = useTasks();
 
-  if (loading) {
+  if (authLoading || tasksLoading) {
     return <LoadingSpinner />;
   }
 
@@ -35,40 +36,28 @@ const AppRoutes = () => {
         path="/"
         element={user ? <Navigate to="/pomodoro" replace /> : <Navigate to="/login" replace />}
       />
-      <Route
-        path="/tasks"
-        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
-      />
-      <Route
-        path="/settings"
-        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
-      />
-      <Route
-        path="/report"
-        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
-      />
-      <Route
-        path="/pomodoro"
-        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
-      />
+      {/* All authenticated routes */}
+      <Route path="/tasks" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
+      <Route path="/settings" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
+      <Route path="/report" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
+      <Route path="/pomodoro" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/pomodoro" replace />} />
     </Routes>
   );
-};
+}
 
-// Main App component
+// Main App component with proper provider order
 const App = () => {
   return (
     <Router>
-      <Suspense fallback={<LoadingSpinner />}>
+      <div className="min-h-screen bg-zen-beige">
         <AuthProvider>
           <TasksProvider>
-            <div className="min-h-screen bg-zen-beige">
-              <AppRoutes />
-            </div>
+            {/* AuthenticatedRoutes will handle its own loading */}
+            <AuthenticatedRoutes />
           </TasksProvider>
         </AuthProvider>
-      </Suspense>
+      </div>
     </Router>
   );
 };

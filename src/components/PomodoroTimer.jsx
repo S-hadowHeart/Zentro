@@ -7,8 +7,8 @@ import PunishmentModal from './PunishmentModal';
 import { Link } from 'react-router-dom';
 
 function PomodoroTimer({ onPomodoroEnd }) {
-  const { user, fetchUser, loading: authLoading } = useAuth();
-  const { tasks, fetchTasks, loading: tasksLoading } = useTasks();
+  const { user, fetchUser } = useAuth();
+  const { tasks, fetchTasks } = useTasks();
 
   // Use user settings for initial durations if available
   const initialFocusDuration = user?.settings?.pomodoroDuration || 25;
@@ -52,16 +52,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
       setTimeLeft(focusDuration * 60);
     }
   }, [focusDuration, isRunning]);
-
-  // Initial render guard and loading display
-  if (authLoading || tasksLoading || !user) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100 min-h-[300px]">
-        <FaSpinner className="w-10 h-10 text-emerald-500 animate-spin mb-4" />
-        <p className="text-lg text-gray-700">Cultivating focus, please wait...</p>
-      </div>
-    );
-  }
 
   // Effect to select a task on initial load or when tasks change
   useEffect(() => {

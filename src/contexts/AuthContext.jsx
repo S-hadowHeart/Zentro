@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = useCallback(async (token) => {
     if (!token) {
+      setUser(null); // Ensure user is null if no token
       setLoading(false);
       return;
     }
@@ -36,21 +37,22 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
         localStorage.removeItem('token');
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
-        }
       }
     } catch (error) {
       console.error('AuthContext fetch user error:', error);
       setUser(null);
       localStorage.removeItem('token');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // Dependencies are stable
+
+  // Effect to handle navigation after auth state is determined
+  useEffect(() => {
+    if (!loading && !user && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+      navigate('/login');
+    }
+  }, [loading, user, navigate]);
 
   const logout = useCallback(() => {
     setUser(null);
