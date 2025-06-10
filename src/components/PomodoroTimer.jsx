@@ -110,8 +110,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         setTimeLeft(prevTimeLeft => {
           if (prevTimeLeft <= 0) {
             clearInterval(intervalId);
-            setIsRunning(false);
-
+            
             if (!isBreakRef.current) {
               // Focus session ended
               handlePomodoroComplete(focusDurationRef.current).then(() => {
@@ -120,16 +119,15 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 // Switch to break
                 setIsBreak(true);
                 setTimeLeft(breakDurationRef.current * 60);
-                // Start break timer after a short delay
-                setTimeout(() => {
-                  setIsRunning(true);
-                }, 1000);
+                // Start break timer immediately
+                setIsRunning(true);
               });
             } else {
               // Break session ended
               onPomodoroEndRef.current?.('break_ended');
               setIsBreak(false);
               setTimeLeft(focusDurationRef.current * 60);
+              setIsRunning(false);
             }
             return 0;
           }
