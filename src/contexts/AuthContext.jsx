@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        console.log('fetchUser: successfully fetched user data:', data.user);
       } else {
         setUser(null);
         localStorage.removeItem('token');
@@ -58,15 +57,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [fetchUser]);
 
-  const authContextValue = useMemo(() => ({
-    user,
-    setUser,
-    loading,
-    fetchUser,
-    logout,
-  }), [user, loading, fetchUser, logout]);
-
-  const login = async (username, password) => {
+  const login = useCallback(async (username, password) => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -80,22 +71,19 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        console.log('Login successful, received user data:', data.user);
         setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
-        console.log('User state after setting:', data.user);
-        window.location.href = '/tasks';
+        navigate('/tasks');
         return { success: true };
       } else {
-        console.log('Login failed, server response:', data.error);
         return { success: false, error: data.error };
       }
     } catch (error) {
       console.error('Error during login API call:', error);
       return { success: false, error: 'Server error' };
     }
-  };
+  }, [navigate]);
 
-  const register = async (username, password) => {
+  const register = useCallback(async (username, password) => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -110,6 +98,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
+        navigate('/tasks');
         return { success: true };
       } else {
         return { success: false, error: data.error };
@@ -117,7 +106,17 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return { success: false, error: 'Server error' };
     }
-  };
+  }, [navigate]);
+
+  const authContextValue = useMemo(() => ({
+    user,
+    setUser,
+    loading,
+    fetchUser,
+    logout,
+    login,
+    register
+  }), [user, loading, fetchUser, logout, login, register]);
 
   return (
     <AuthContext.Provider value={authContextValue}>

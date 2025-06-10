@@ -54,15 +54,15 @@ function AppRoutes() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <TasksProvider>
-          <div className="min-h-screen bg-zen-beige">
+    <div className="min-h-screen bg-zen-beige">
+      <Router>
+        <AuthProvider>
+          <TasksProvider>
             <AppRoutes />
-          </div>
-        </TasksProvider>
-      </AuthProvider>
-    </Router>
+          </TasksProvider>
+        </AuthProvider>
+      </Router>
+    </div>
   );
 }
 
