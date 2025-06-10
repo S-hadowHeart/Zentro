@@ -8,7 +8,9 @@ function Report() {
     today: 0,
     week: 0,
     month: 0,
-    streak: 0
+    streak: 0,
+    dailyGoal: 120, // Default to 120 minutes if not fetched
+    todayFocusTime: 0
   });
 
   useEffect(() => {
@@ -25,7 +27,14 @@ function Report() {
 
         if (response.ok) {
           const data = await response.json();
-          setStats(data);
+          setStats({
+            today: data.daily || 0,
+            week: data.weekly || 0,
+            month: data.monthly || 0,
+            streak: data.currentStreak || 0,
+            dailyGoal: data.dailyGoal || 120,
+            todayFocusTime: data.todayFocusTime || 0
+          });
         } else {
           console.error('Failed to fetch stats:', response.status, response.statusText);
         }
@@ -35,12 +44,12 @@ function Report() {
     };
 
     fetchStats();
-  }, []);
+  }, [user]); // Add user to dependency array to re-fetch if user changes
 
   const statCards = [
     {
       title: "Today's Cultivation",
-      value: `${Math.floor(stats.today / 60)}h ${stats.today % 60}m`,
+      value: `${Math.floor(stats.todayFocusTime / 60)}h ${stats.todayFocusTime % 60}m`,
       icon: FaClock,
       color: "from-emerald-500 to-emerald-600"
     },
@@ -97,7 +106,7 @@ function Report() {
             <div>
               <p className="text-emerald-700 font-medium">Daily Goal Progress</p>
               <p className="text-sm text-emerald-600">
-                {Math.min(100, Math.floor((stats.today / (user.dailyGoal || 120)) * 100))}% of your daily goal
+                {Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}% of your daily goal
               </p>
             </div>
             <div className="w-16 h-16 relative">
@@ -117,7 +126,7 @@ function Report() {
                   fill="none"
                   stroke="#10B981"
                   strokeWidth="3"
-                  strokeDasharray={`${Math.min(100, Math.floor((stats.today / (user.dailyGoal || 120)) * 100))}, 100`}
+                  strokeDasharray={`${Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}, 100`}
                 />
               </svg>
             </div>

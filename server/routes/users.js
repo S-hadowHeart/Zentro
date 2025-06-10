@@ -216,6 +216,7 @@ router.get('/pomodoro-stats', auth, async (req, res) => {
     const now = new Date();
     const startOfDay = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())); // Start of current day in UTC
     const startOfWeek = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay())); // Start of current week (Sunday) in UTC
+    const startOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1)); // Start of current month in UTC
     
     // Fetch total focus time for the current day for the daily goal check
     const todayFocusTimeAggregate = await PomodoroHistory.aggregate([
@@ -236,10 +237,15 @@ router.get('/pomodoro-stats', auth, async (req, res) => {
       { $match: { user: req.user._id, completedAt: { $gte: startOfWeek } } },
       { $group: { _id: null, totalDuration: { $sum: '$duration' } } }
     ]);
+    const monthlyCount = await PomodoroHistory.aggregate([
+      { $match: { user: req.user._id, completedAt: { $gte: startOfMonth } } },
+      { $group: { _id: null, totalDuration: { $sum: '$duration' } } }
+    ]);
 
     res.json({
       daily: dailyCount.length > 0 ? dailyCount[0].totalDuration : 0,
       weekly: weeklyCount.length > 0 ? weeklyCount[0].totalDuration : 0,
+      monthly: monthlyCount.length > 0 ? monthlyCount[0].totalDuration : 0,
       allTime: allTimeCount.length > 0 ? allTimeCount[0].totalDuration : 0,
       currentStreak: req.user.currentStreak,
       longestStreak: req.user.longestStreak,

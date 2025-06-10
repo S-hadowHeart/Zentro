@@ -25,15 +25,15 @@ const AppRoutes = () => {
     <Routes>
       <Route
         path="/login"
-        element={!user ? <EnterTheGarden /> : <Navigate to="/" replace />}
+        element={!user ? <EnterTheGarden /> : <Navigate to="/pomodoro" replace />}
       />
       <Route
         path="/register"
-        element={!user ? <CultivatePath /> : <Navigate to="/login" replace />}
+        element={!user ? <CultivatePath /> : <Navigate to="/pomodoro" replace />}
       />
       <Route
         path="/"
-        element={user ? <Dashboard /> : <Navigate to="/login" replace />}
+        element={user ? <Navigate to="/pomodoro" replace /> : <Navigate to="/login" replace />}
       />
       <Route
         path="/tasks"
@@ -51,7 +51,7 @@ const AppRoutes = () => {
         path="/pomodoro"
         element={user ? <Dashboard /> : <Navigate to="/login" replace />}
       />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/pomodoro" replace />} />
     </Routes>
   );
 };

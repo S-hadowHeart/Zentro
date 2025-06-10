@@ -1,14 +1,22 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
-import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner } from 'react-icons/fa';
+import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner, FaPlusCircle } from 'react-icons/fa';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
+import { Link } from 'react-router-dom';
 
 function PomodoroTimer({ onPomodoroEnd }) {
-  const [focusDuration, setFocusDuration] = useState(25);
-  const [breakDuration, setBreakDuration] = useState(5);
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const { user, fetchUser, loading: authLoading } = useAuth();
+  const { tasks, fetchTasks, loading: tasksLoading } = useTasks();
+
+  // Use user settings for initial durations if available
+  const initialFocusDuration = user?.settings?.pomodoroDuration || 25;
+  const initialBreakDuration = user?.settings?.breakDuration || 5;
+
+  const [focusDuration, setFocusDuration] = useState(initialFocusDuration);
+  const [breakDuration, setBreakDuration] = useState(initialBreakDuration);
+  const [timeLeft, setTimeLeft] = useState(initialFocusDuration * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
@@ -16,8 +24,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [showPunishmentModal, setShowPunishmentModal] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState('');
   const [selectedTask, setSelectedTask] = useState('');
-  const { user, fetchUser, loading: authLoading } = useAuth();
-  const { tasks, fetchTasks, loading: tasksLoading } = useTasks();
   const timerRef = useRef(null);
 
   // Initialize refs with their initial values
@@ -39,6 +45,13 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setIsRunningRef.current = setIsRunning;
     setIsBreakRef.current = setIsBreak;
   }, [isBreak, focusDuration, breakDuration, onPomodoroEnd, setIsRunning, setIsBreak]);
+
+  // Effect to update time left when durations change or on initial load
+  useEffect(() => {
+    if (!isRunning) {
+      setTimeLeft(focusDuration * 60);
+    }
+  }, [focusDuration, isRunning]);
 
   // Initial render guard and loading display
   if (authLoading || tasksLoading || !user) {
@@ -145,12 +158,12 @@ function PomodoroTimer({ onPomodoroEnd }) {
     if (isRunning) {
       timerRef.current = setInterval(() => {
         setTimeLeft(prevTimeLeft => {
-          if (prevTimeLeft <= 1) {
+          if (prevTimeLeft <= 0) { // Changed from 1 to 0 for precise timer end
             clearInterval(timerRef.current);
             setIsRunning(false);
 
             if (!isBreakRef.current) {
-              handleCompleteRef.current?.(focusDurationRef.current);
+              handleCompleteRef.current?.(focusDurationRef.current); // Pass duration for stats
               setIsBreak(true);
               return breakDurationRef.current * 60;
             } else {
@@ -207,8 +220,14 @@ function PomodoroTimer({ onPomodoroEnd }) {
       return;
     }
     setIsRunning(true);
-    setIsBreak(false);
-  }, [selectedTask]);
+    // Reset time left to the current duration if not already running a session
+    if (!isBreak) {
+      setTimeLeft(focusDuration * 60);
+    } else {
+      setTimeLeft(breakDuration * 60);
+    }
+
+  }, [selectedTask, focusDuration, breakDuration, isBreak]);
 
   const handlePause = useCallback(() => {
     setIsRunning(false);
@@ -220,7 +239,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setTimeLeft(focusDuration * 60);
   }, [focusDuration]);
 
-  const progress = ((focusDuration * 60 - timeLeft) / (focusDuration * 60)) * 100;
+  const progress = ((isBreak ? breakDuration * 60 : focusDuration * 60) - timeLeft) / (isBreak ? breakDuration * 60 : focusDuration * 60) * 100;
 
   return (
     <div className="space-y-8">
@@ -239,7 +258,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
           <div
             className="absolute inset-0 rounded-full border-8 border-emerald-500"
             style={{
-              clipPath: `polygon(50% 50%, 50% 0%, ${50 + 50 * Math.cos((progress / 100) * 2 * Math.PI)}% ${50 + 50 * Math.sin((progress / 100) * 2 * Math.PI)}%)`
+              clipPath: `polygon(50% 50%, 50% 0%, ${50 + 50 * Math.sin((progress / 100) * 2 * Math.PI - Math.PI / 2)}% ${50 + 50 * Math.cos((progress / 100) * 2 * Math.PI - Math.PI / 2)}%)`
             }}
           ></div>
           <div className="absolute inset-0 flex items-center justify-center">
@@ -251,27 +270,101 @@ function PomodoroTimer({ onPomodoroEnd }) {
           {!isRunning ? (
             <button
               onClick={handleStart}
-              className="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+              className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 transition duration-300"
             >
-              <FaPlay className="inline-block mr-2" />
-              Start
+              <FaPlay />
+              <span>Start</span>
             </button>
           ) : (
             <button
               onClick={handlePause}
-              className="px-6 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+              className="flex items-center space-x-2 px-6 py-3 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition duration-300"
             >
-              <FaPause className="inline-block mr-2" />
-              Pause
+              <FaPause />
+              <span>Pause</span>
             </button>
           )}
           <button
             onClick={handleReset}
-            className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            className="flex items-center space-x-2 px-6 py-3 bg-gray-300 text-gray-800 rounded-full shadow-lg hover:bg-gray-400 transition duration-300"
           >
-            <FaRedo className="inline-block mr-2" />
-            Reset
+            <FaRedo />
+            <span>Reset</span>
           </button>
+        </div>
+
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 border border-emerald-100 space-y-4">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Customize Session</h3>
+          
+          <div>
+            <label htmlFor="focusDuration" className="block text-sm font-medium text-gray-700 mb-1">Focus Duration (minutes):</label>
+            <input
+              type="number"
+              id="focusDuration"
+              value={focusDuration}
+              onChange={(e) => setFocusDuration(Math.max(1, parseInt(e.target.value) || 0))}
+              min="1"
+              max="60"
+              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="breakDuration" className="block text-sm font-medium text-gray-700 mb-1">Break Duration (minutes):</label>
+            <input
+              type="number"
+              id="breakDuration"
+              value={breakDuration}
+              onChange={(e) => setBreakDuration(Math.max(1, parseInt(e.target.value) || 0))}
+              min="1"
+              max="30"
+              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="selectTask" className="block text-sm font-medium text-gray-700 mb-1">Select Cultivation:</label>
+            <div className="relative">
+              <select
+                id="selectTask"
+                value={selectedTask}
+                onChange={(e) => setSelectedTask(e.target.value)}
+                className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white pr-8"
+              >
+                {tasks.length === 0 && (
+                  <option value="">No cultivations found</option>
+                )}
+                {tasks.filter(task => !task.completed).map((task) => (
+                  <option key={task._id} value={task._id}>
+                    {task.title}
+                  </option>
+                ))}
+                 {tasks.filter(task => task.completed).length > 0 && (
+                  <optgroup label="Completed Cultivations">
+                    {tasks.filter(task => task.completed).map((task) => (
+                      <option key={task._id} value={task._id} disabled>
+                        {task.title} (Completed)
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                </svg>
+              </div>
+            </div>
+            {tasks.length === 0 && (
+              <p className="mt-2 text-sm text-gray-500 flex items-center space-x-1">
+                <span>No cultivations yet.</span>
+                <Link to="/tasks" className="text-emerald-600 hover:underline flex items-center space-x-1">
+                  <FaPlusCircle className="w-4 h-4" />
+                  <span>Add a new one</span>
+                </Link>
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
