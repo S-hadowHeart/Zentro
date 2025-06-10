@@ -36,23 +36,21 @@ function Dashboard() {
     }
   }, [location.pathname, tabs]);
 
-  const handlePomodoroEnd = useCallback(async (eventType, duration) => {
+  const handlePomodoroEnd = useCallback(async (eventType, duration, rewards, punishments) => {
     setReportRefreshKey(prevKey => prevKey + 1);
     
-    // Fetch the latest user data after a pomodoro session ends
+    // Fetch the latest user data after a pomodoro session ends to ensure UI is up-to-date
     await fetchUser(localStorage.getItem('token'));
 
-    // Use the updated user object directly from the Dashboard component's scope
-    // No need to call useAuth() again here.
     if (eventType === 'completed') {
-      if (user?.settings?.rewardSystemEnabled && user?.rewards && user.rewards.length > 0) {
-        const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
+      if (user?.settings?.rewardSystemEnabled && rewards && rewards.length > 0) {
+        const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
       }
     } else if (eventType === 'interrupted') {
-      if (user?.settings?.rewardSystemEnabled && user?.punishments && user.punishments.length > 0) {
-        const randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
+      if (user?.settings?.rewardSystemEnabled && punishments && punishments.length > 0) {
+        const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
         setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
       }

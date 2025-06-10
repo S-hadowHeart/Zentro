@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
-import { FaPlay, FaPause, FaRedo, FaLeaf, FaSpinner, FaPlusCircle } from 'react-icons/fa';
+import { FaPlay, FaPause, FaRedo, FaPlusCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 function PomodoroTimer({ onPomodoroEnd }) {
@@ -17,7 +17,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [selectedTask, setSelectedTask] = useState('');
-  const [isResetting, setIsResetting] = useState(false);
   const timerRef = useRef(null);
 
   // Refs for stable callbacks
@@ -33,13 +32,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
     breakDurationRef.current = breakDuration;
     onPomodoroEndRef.current = onPomodoroEnd;
   }, [isBreak, focusDuration, breakDuration, onPomodoroEnd]);
-
-  // Effect to update time left when durations change or on initial load
-  useEffect(() => {
-    if (!isRunning) {
-      setTimeLeft(focusDuration * 60);
-    }
-  }, [focusDuration, isRunning]);
 
   // Effect to select a task on initial load or when tasks change
   useEffect(() => {
@@ -179,33 +171,33 @@ function PomodoroTimer({ onPomodoroEnd }) {
       alert('Please select a cultivation to focus on');
       return;
     }
+    if (isRunning) return;
+
     setIsRunning(true);
-    if (!isBreak) {
-      setTimeLeft(focusDuration * 60);
-    } else {
-      setTimeLeft(breakDuration * 60);
+    // If the timer is at 0 (fresh start or just completed a session),
+    // set it to the full duration. Otherwise, it's resuming from a pause.
+    if (timeLeft === 0) {
+      setTimeLeft((isBreak ? breakDuration : focusDuration) * 60);
     }
-  }, [selectedTask, focusDuration, breakDuration, isBreak]);
+  }, [selectedTask, focusDuration, breakDuration, isBreak, timeLeft, isRunning]);
 
   const handlePause = useCallback(() => {
     setIsRunning(false);
-    if (!isBreak) {
-      handlePomodoroInterrupt(focusDuration).then(() => {
-        onPomodoroEndRef.current?.('interrupted', focusDuration, user?.rewards, user?.punishments);
-      });
-    }
-  }, [isBreak, focusDuration, handlePomodoroInterrupt, user, onPomodoroEndRef]);
+  }, []);
 
   const handleReset = useCallback(async () => {
-    setIsResetting(true);
-    if (isRunning && !isBreak) {
+    const wasRunning = isRunning; // Capture state before stopping
+    const wasBreak = isBreak; // Capture state before resetting
+
+    setIsRunning(false);
+    setIsBreak(false);
+    setTimeLeft(focusDuration * 60); // Always reset to focus time
+
+    // Only punish if it was a running focus session that was interrupted
+    if (wasRunning && !wasBreak) {
       await handlePomodoroInterrupt(focusDuration);
       onPomodoroEndRef.current?.('interrupted', focusDuration, user?.rewards, user?.punishments);
     }
-    setIsRunning(false);
-    setIsBreak(false);
-    setTimeLeft(focusDuration * 60);
-    setTimeout(() => setIsResetting(false), 500); // Add a small delay for the animation
   }, [isRunning, isBreak, focusDuration, handlePomodoroInterrupt, user, onPomodoroEndRef]);
 
   const currentDuration = isBreak ? breakDuration : focusDuration;
@@ -275,13 +267,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
           <button
             onClick={handleReset}
             className="flex items-center space-x-2 px-6 py-3 bg-gray-300 text-gray-800 rounded-full shadow-lg hover:bg-gray-400 transition duration-300"
-            disabled={isResetting}
           >
-            {isResetting ? (
-              <FaSpinner className="animate-spin" />
-            ) : (
-              <FaRedo />
-            )}
+            <FaRedo />
             <span>Reset Cycle</span>
           </button>
         </div>
