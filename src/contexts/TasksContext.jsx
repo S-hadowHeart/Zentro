@@ -1,19 +1,20 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { useAuth } from './AuthContext';
 
-const TasksContext = createContext({
-  tasks: [],
-  loading: true,
-  fetchTasks: () => {},
-  addTask: () => {},
-  toggleTask: () => {},
-  deleteTask: () => {},
-});
+const TasksContext = createContext(null);
 
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   const fetchTasks = useCallback(async () => {
+    if (!user) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -33,10 +34,11 @@ export function TasksProvider({ children }) {
       }
     } catch (error) {
       console.error('Error fetching tasks:', error);
+      setTasks([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const addTask = useCallback(async (title) => {
     try {
@@ -110,7 +112,7 @@ export function TasksProvider({ children }) {
     fetchTasks();
   }, [fetchTasks]);
 
-  const contextValue = useMemo(() => ({
+  const value = useMemo(() => ({
     tasks,
     loading,
     fetchTasks,
@@ -120,7 +122,7 @@ export function TasksProvider({ children }) {
   }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask]);
 
   return (
-    <TasksContext.Provider value={contextValue}>
+    <TasksContext.Provider value={value}>
       {children}
     </TasksContext.Provider>
   );

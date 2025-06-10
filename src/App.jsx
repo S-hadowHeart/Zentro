@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TasksProvider } from './contexts/TasksContext';
 
+// Separate the routes into their own component to prevent initialization issues
 function AppRoutes() {
   const { user, loading } = useAuth();
 
@@ -20,31 +21,31 @@ function AppRoutes() {
     <Routes>
       <Route
         path="/login"
-        element={!(user && user.id) ? <EnterTheGarden /> : <Navigate to="/" />}
+        element={!user ? <EnterTheGarden /> : <Navigate to="/" />}
       />
       <Route
         path="/register"
-        element={!(user && user.id) ? <CultivatePath /> : <Navigate to="/" />}
+        element={!user ? <CultivatePath /> : <Navigate to="/" />}
       />
       <Route
         path="/"
-        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/tasks"
-        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/settings"
-        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/report"
-        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/pomodoro"
-        element={(user && user.id) ? <Dashboard /> : <Navigate to="/login" />}
+        element={user ? <Dashboard /> : <Navigate to="/login" />}
       />
       {/* Redirect any other routes to the root */}
       <Route path="*" element={<Navigate to="/" />} />
@@ -52,17 +53,18 @@ function AppRoutes() {
   );
 }
 
+// Main App component with proper provider order
 function App() {
   return (
-    <div className="min-h-screen bg-zen-beige">
-      <Router>
+    <Router>
+      <div className="min-h-screen bg-zen-beige">
         <AuthProvider>
           <TasksProvider>
             <AppRoutes />
           </TasksProvider>
         </AuthProvider>
-      </Router>
-    </div>
+      </div>
+    </Router>
   );
 }
 

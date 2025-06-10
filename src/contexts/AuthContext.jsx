@@ -17,6 +17,11 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const fetchUser = useCallback(async (token) => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch('/api/auth/me', {
@@ -24,6 +29,7 @@ export const AuthProvider = ({ children }) => {
           'Authorization': `Bearer ${token}`
         }
       });
+
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -50,11 +56,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      fetchUser(token);
-    } else {
-      setLoading(false);
-    }
+    fetchUser(token);
   }, [fetchUser]);
 
   const login = useCallback(async (username, password) => {
@@ -71,14 +73,14 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
+        setUser(data.user);
         navigate('/tasks');
         return { success: true };
       } else {
         return { success: false, error: data.error };
       }
     } catch (error) {
-      console.error('Error during login API call:', error);
+      console.error('Error during login:', error);
       return { success: false, error: 'Server error' };
     }
   }, [navigate]);
@@ -97,29 +99,29 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
+        setUser(data.user);
         navigate('/tasks');
         return { success: true };
       } else {
         return { success: false, error: data.error };
       }
     } catch (error) {
+      console.error('Error during registration:', error);
       return { success: false, error: 'Server error' };
     }
   }, [navigate]);
 
-  const authContextValue = useMemo(() => ({
+  const value = useMemo(() => ({
     user,
-    setUser,
     loading,
-    fetchUser,
-    logout,
     login,
-    register
-  }), [user, loading, fetchUser, logout, login, register]);
+    logout,
+    register,
+    fetchUser
+  }), [user, loading, login, logout, register, fetchUser]);
 
   return (
-    <AuthContext.Provider value={authContextValue}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
