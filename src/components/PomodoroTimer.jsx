@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTasks } from '../contexts/TasksContext';
 import { FaPlay, FaPause, FaRedo, FaLeaf } from 'react-icons/fa';
+import RewardModal from './RewardModal';
+import PunishmentModal from './PunishmentModal';
 
 function PomodoroTimer({ onPomodoroEnd }) {
   const [focusDuration, setFocusDuration] = useState(25); // in minutes
@@ -9,9 +11,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
-  const [showReward, setShowReward] = useState(false);
+  const [showRewardModal, setShowRewardModal] = useState(false);
   const [currentReward, setCurrentReward] = useState(''); // To store the reward
-  const [showPunishment, setShowPunishment] = useState(false);
+  const [showPunishmentModal, setShowPunishmentModal] = useState(false);
   const [currentPunishment, setCurrentPunishment] = useState(''); // To store the punishment
   const [selectedTask, setSelectedTask] = useState('');
   const { user, fetchUser } = useAuth();
@@ -24,9 +26,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
   console.log('Initial timeLeft:', timeLeft);
   console.log('Initial isRunning:', isRunning);
   console.log('Initial isBreak:', isBreak);
-  console.log('Initial showReward:', showReward);
+  console.log('Initial showRewardModal:', showRewardModal);
   console.log('Initial currentReward:', currentReward);
-  console.log('Initial showPunishment:', showPunishment);
+  console.log('Initial showPunishmentModal:', showPunishmentModal);
   console.log('Initial currentPunishment:', currentPunishment);
   console.log('Initial selectedTask:', selectedTask);
   console.log('User from useAuth:', user);
@@ -107,7 +109,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         if (user && user.rewards && user.rewards.length > 0) {
           randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
           setCurrentReward(randomReward);
-          setShowReward(true);
+          setShowRewardModal(true);
         }
 
         const token = localStorage.getItem('token');
@@ -154,7 +156,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         if (user && user.punishments && user.punishments.length > 0) {
           randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
           setCurrentPunishment(randomPunishment);
-          setShowPunishment(true);
+          setShowPunishmentModal(true);
         }
 
         const token = localStorage.getItem('token');
@@ -286,42 +288,18 @@ function PomodoroTimer({ onPomodoroEnd }) {
       )}
 
       {/* Reward Modal */}
-      {showReward && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h3 className="text-2xl font-bold text-zen-green mb-4">Great job! 🎉</h3>
-            <p className="text-gray-700 mb-6">Your reward:</p>
-            <p className="text-xl font-semibold text-zen-green mb-6">
-              {currentReward}
-            </p>
-            <button
-              onClick={() => setShowReward(false)}
-              className="w-full px-4 py-2 bg-zen-green text-white rounded-md hover:bg-opacity-90 transition-colors"
-            >
-              Continue
-            </button>
-          </div>
-        </div>
-      )}
+      <RewardModal
+        show={showRewardModal}
+        onClose={() => setShowRewardModal(false)}
+        reward={currentReward}
+      />
 
       {/* Punishment Modal */}
-      {showPunishment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
-            <h3 className="text-2xl font-bold text-red-500 mb-4">Oops! ��</h3>
-            <p className="text-gray-700 mb-6">Your punishment:</p>
-            <p className="text-xl font-semibold text-red-500 mb-6">
-              {currentPunishment}
-            </p>
-            <button
-              onClick={() => setShowPunishment(false)}
-              className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-opacity-90 transition-colors"
-            >
-              I'll do it!
-            </button>
-          </div>
-        </div>
-      )}
+      <PunishmentModal
+        show={showPunishmentModal}
+        onClose={() => setShowPunishmentModal(false)}
+        punishment={currentPunishment}
+      />
     </div>
   );
 }
