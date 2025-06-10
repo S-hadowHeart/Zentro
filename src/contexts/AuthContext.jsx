@@ -35,15 +35,14 @@ export const AuthProvider = ({ children }) => {
       console.error('Error fetching user:', error);
       setUser({});
       return null;
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      fetchUser(token);
+      setLoading(true);
+      fetchUser(token).finally(() => setLoading(false));
     } else {
       setUser({});
       setLoading(false);
@@ -64,13 +63,17 @@ export const AuthProvider = ({ children }) => {
       
       if (response.ok) {
         localStorage.setItem('token', data.token);
+        console.log('Login successful, received user data:', data.user);
         setUser({ ...data.user, rewards: data.user.rewards || [], punishments: data.user.punishments || [] });
+        console.log('User state after setting:', data.user);
         window.location.href = '/tasks';
         return { success: true };
       } else {
+        console.log('Login failed, server response:', data.error);
         return { success: false, error: data.error };
       }
     } catch (error) {
+      console.error('Error during login API call:', error);
       return { success: false, error: 'Server error' };
     }
   };
