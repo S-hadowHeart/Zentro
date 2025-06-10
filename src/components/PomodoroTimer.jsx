@@ -191,19 +191,30 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   const handlePause = useCallback(() => {
     if (isRunning) {
+      // If timer is running, pause it and show punishment
       setIsRunning(false);
+      if (!isBreak) {
+        handlePomodoroInterrupt(focusDurationRef.current);
+        onPomodoroEndRef.current?.('interrupted', focusDurationRef.current, user?.rewards, user?.punishments);
+      }
     } else {
+      // Resume from where we left off
       setIsRunning(true);
     }
-  }, [isRunning]);
+  }, [isRunning, isBreak, handlePomodoroInterrupt, user, onPomodoroEndRef]);
 
   const handleReset = useCallback(() => {
     // Stop the timer
     setIsRunning(false);
+    // Show punishment if not in break mode
+    if (!isBreak) {
+      handlePomodoroInterrupt(focusDurationRef.current);
+      onPomodoroEndRef.current?.('interrupted', focusDurationRef.current, user?.rewards, user?.punishments);
+    }
     // Reset to initial state
     setIsBreak(false);
     setTimeLeft(focusDuration * 60);
-  }, [focusDuration]);
+  }, [focusDuration, isBreak, handlePomodoroInterrupt, user, onPomodoroEndRef]);
 
   const currentDuration = isBreak ? breakDuration : focusDuration;
   const progress = ((currentDuration * 60 - timeLeft) / (currentDuration * 60)) * 100;
