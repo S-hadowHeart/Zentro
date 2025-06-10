@@ -123,11 +123,10 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 onPomodoroEndRef.current?.('completed', focusDurationRef.current, user?.rewards, user?.punishments);
               });
             } else {
-              // Break session ended
-              onPomodoroEndRef.current?.('break_ended');
-              setIsBreak(false);
-              setTimeLeft(focusDurationRef.current * 60);
+              // Break session ended - just stop the timer
               setIsRunning(false);
+              setIsBreak(false);
+              // Don't reset timeLeft here, let the user start a new session
             }
             return 0;
           }
@@ -143,13 +142,12 @@ function PomodoroTimer({ onPomodoroEnd }) {
     };
   }, [isRunning, handlePomodoroComplete, user, onPomodoroEndRef]);
 
-  // Remove the effect that was resetting the timer
   // Effect to update time left when durations change
   useEffect(() => {
     if (!isRunning && !isBreak) {
       setTimeLeft(focusDuration * 60);
     }
-  }, [focusDuration]);
+  }, [focusDuration, isRunning, isBreak]);
 
   const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
