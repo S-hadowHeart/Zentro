@@ -12,7 +12,7 @@ function LandingPage() {
         <div className="absolute bottom-10 left-1/2 w-32 h-32 bg-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="max-w-4xl w-full space-y-12 bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8 sm:p-10 border border-emerald-200 transform transition-all duration-300 hover:scale-[1.02]">
+      <div className="max-w-4xl w-full space-y-12 bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 sm:p-10 border border-emerald-200 transform transition-all duration-300 hover:scale-[1.02]">
         <div className="text-center">
           <FaSeedling className="mx-auto h-20 w-20 text-emerald-600 mb-4 animate-bounce-slow" />
           <h1 className="text-4xl font-extrabold text-gray-900 bg-gradient-to-r from-emerald-600 to-green-800 bg-clip-text text-transparent mb-4">

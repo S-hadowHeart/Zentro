@@ -148,7 +148,7 @@ function Dashboard() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white/50 rounded-2xl shadow-md border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg relative">
+        <div className="bg-white/50 rounded-2xl shadow-md border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg relative backdrop-blur-lg">
           <div className={`transition-all duration-300 ease-in-out ${activeTab === 'pomodoro' ? 'opacity-100 visible relative' : 'opacity-0 invisible absolute top-0 left-0 w-full'}`}>
             <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
           </div>
