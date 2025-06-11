@@ -60,7 +60,7 @@ function TaskList() {
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Plant a new seed..."
+            placeholder="   Plant a new seed..."
             className="w-full px-3 py-2 sm:px-4 sm:py-3 pl-12 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out bg-white/50 backdrop-blur-sm"
           />
           <FaSeedling className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-500" />
