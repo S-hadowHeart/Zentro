@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import EnterTheGarden from './components/auth/Login';
 import CultivatePath from './components/auth/Register';
 import Dashboard from './components/Dashboard';
+import LandingPage from './components/auth/LandingPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TasksProvider, useTasks } from './contexts/TasksContext';
 
@@ -34,14 +35,15 @@ function AuthenticatedRoutes() {
       />
       <Route
         path="/"
-        element={user ? <Navigate to="/pomodoro" replace /> : <Navigate to="/login" replace />}
+        element={user ? <Navigate to="/pomodoro" replace /> : <LandingPage />}
       />
       {/* All authenticated routes */}
-      <Route path="/tasks" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
-      <Route path="/settings" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
-      <Route path="/report" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
-      <Route path="/pomodoro" element={user ? <Dashboard /> : <Navigate to="/login" replace />} />
-      <Route path="*" element={<Navigate to="/pomodoro" replace />} />
+      <Route path="/tasks" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
+      <Route path="/settings" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
+      <Route path="/report" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
+      <Route path="/pomodoro" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
+      {/* Redirect any unmatched routes to the appropriate landing or dashboard page */}
+      <Route path="*" element={user ? <Navigate to="/pomodoro" replace /> : <Navigate to="/" replace />} />
     </Routes>
   );
 }
