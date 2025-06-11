@@ -112,13 +112,16 @@ function Dashboard() {
             <FaLeaf className="w-8 h-8 text-emerald-600 animate-pulse" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">Zen Garden</h1>
           </div>
-          <button
-            onClick={logout}
-            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors bg-white/50 backdrop-blur-sm rounded-lg hover:bg-white/80"
-          >
-            <FaSignOutAlt />
-            <span>Leave Garden</span>
-          </button>
+          <div className="flex items-center space-x-4">
+            {user && <span className="text-gray-600 italic">Greetings, {user.username}! 🪴</span>}
+            <button
+              onClick={logout}
+              className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors bg-white/50 backdrop-blur-sm rounded-lg hover:bg-white/80"
+            >
+              <FaSignOutAlt />
+              <span>Leave Garden</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex space-x-4 mb-6">
