@@ -61,15 +61,39 @@ export const AuthProvider = ({ children }) => {
   }, [navigate]);
 
   const updateUser = useCallback((updatedUserData) => {
-    setUser(prevUser => ({
-      ...prevUser,
-      ...updatedUserData
-    }));
+    setUser(prevUser => {
+      const newUser = {
+        ...prevUser,
+        ...updatedUserData
+      };
+      // Persist the entire updated user object to localStorage
+      // Note: Make sure updatedUserData from backend includes rewards and punishments
+      localStorage.setItem('user', JSON.stringify(newUser)); 
+      return newUser;
+    });
   }, []);
 
   useEffect(() => {
+    const localUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    fetchUser(token);
+
+    if (localUser) {
+      try {
+        setUser(JSON.parse(localUser));
+      } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+        setUser(null);
+        localStorage.removeItem('user');
+      }
+    }
+
+    // Always attempt to fetch user from API to ensure data is fresh
+    // This will also handle cases where only a token exists but no user in localStorage
+    if (token) {
+      fetchUser(token);
+    } else if (!localUser) {
+      setLoading(false); // If no token and no local user, auth loading is complete
+    }
   }, [fetchUser]);
 
   const login = useCallback(async (username, password) => {
