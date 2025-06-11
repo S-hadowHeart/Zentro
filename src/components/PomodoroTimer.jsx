@@ -310,7 +310,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
               className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-amber-300"
             >
               <FaPause className="text-xl" />
-              <span>Pause Meditation</span>
+              <span>Pause</span>
             </button>
           )}
           <button

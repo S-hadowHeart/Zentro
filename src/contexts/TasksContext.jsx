@@ -4,24 +4,46 @@ import { useAuth } from './AuthContext';
 const TasksContext = createContext(null);
 
 export function TasksProvider({ children }) {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [tasks, setTasks] = useState(() => {
+    try {
+      const savedTasks = localStorage.getItem('tasks');
+      return savedTasks ? JSON.parse(savedTasks) : [];
+    } catch (error) {
+      console.error("Error parsing tasks from localStorage:", error);
+      return [];
+    }
+  });
+
+  const [isLoadingApi, setIsLoadingApi] = useState(false);
   const { user, loading: authLoading } = useAuth();
   const fetchTasksRef = useRef(null);
+  const hasFetchedInitialTasksRef = useRef(false); // Ref to ensure fetch is only triggered once per session
+
+  // Overall loading state: true if auth is loading OR (API is loading AND no tasks are yet displayed)
+  const loading = authLoading || (isLoadingApi && tasks.length === 0);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    } catch (error) {
+      console.error("Error saving tasks to localStorage:", error);
+    }
+  }, [tasks]);
 
   const fetchTasks = useCallback(async (currentUserId) => {
     if (!currentUserId) {
       setTasks([]);
-      setLoading(false);
+      setIsLoadingApi(false); // No user, so not loading from API
       return;
     }
 
-    setLoading(true);
+    setIsLoadingApi(true); // Start API loading
+
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         setTasks([]);
-        setLoading(false);
+        setIsLoadingApi(false);
         return;
       }
 
@@ -34,7 +56,7 @@ export function TasksProvider({ children }) {
       
       if (response.ok) {
         const data = await response.json();
-        setTasks(data);
+        setTasks(data); // This will also save to localStorage via the useEffect above
       } else {
         setTasks([]);
       }
@@ -42,7 +64,7 @@ export function TasksProvider({ children }) {
       console.error('Error fetching tasks:', error);
       setTasks([]);
     } finally {
-      setLoading(false);
+      setIsLoadingApi(false); // API fetch completed
     }
   }, []);
 
@@ -56,13 +78,23 @@ export function TasksProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && user) {
-      fetchTasksRef.current?.(user._id);
-    } else if (!authLoading && !user) {
-      setTasks([]);
-      setLoading(false);
+    if (!authLoading) { // Once auth loading is complete
+      if (user) {
+        // Trigger initial fetch of tasks only if not already fetched for this session
+        if (!hasFetchedInitialTasksRef.current) {
+          // Call fetchTasks and ensure hasFetchedInitialTasksRef is set after it completes
+          fetchTasksRef.current?.(user._id).finally(() => {
+            hasFetchedInitialTasksRef.current = true;
+          });
+        }
+      } else {
+        // If no user (e.g., logged out or failed auth), clear tasks and reset fetch flag
+        setTasks([]);
+        setIsLoadingApi(false);
+        hasFetchedInitialTasksRef.current = false; // Reset for next login
+      }
     }
-  }, [authLoading, user?._id]);
+  }, [authLoading, user]); // Re-run when auth status or user changes
 
   const addTask = useCallback(async (title) => {
     try {

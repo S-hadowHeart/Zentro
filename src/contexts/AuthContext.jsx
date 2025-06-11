@@ -13,17 +13,17 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Keep true initially to show auth loading
   const navigate = useNavigate();
 
   const fetchUser = useCallback(async (token) => {
     if (!token) {
       setUser(null); // Ensure user is null if no token
-      setLoading(false);
+      setLoading(false); // Auth loading is done if no token
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Start loading when token exists
     try {
       const response = await fetch('/api/auth/me', {
         headers: {

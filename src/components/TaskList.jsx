@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTasks } from '../contexts/TasksContext';
-import { FaPlus, FaTrash, FaCheck, FaLeaf, FaSeedling, FaSun, FaMoon } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaCheck, FaLeaf, FaSeedling, FaSun, FaMoon, FaSpinner } from 'react-icons/fa';
 
 function TaskList() {
-  const { tasks, addTask, deleteTask, toggleTask } = useTasks();
+  const { tasks, addTask, deleteTask, toggleTask, loading } = useTasks();
   const [newTask, setNewTask] = useState('');
   const [filter, setFilter] = useState('all');
 
@@ -75,7 +75,12 @@ function TaskList() {
       </form>
 
       <div className="space-y-4">
-        {filteredTasks.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-12 bg-white/50 backdrop-blur-sm rounded-xl border border-emerald-100 shadow-sm flex items-center justify-center space-x-2">
+            <FaSpinner className="w-6 h-6 animate-spin text-emerald-500" />
+            <p className="text-gray-600 text-lg">Cultivating tasks...</p>
+          </div>
+        ) : filteredTasks.length === 0 ? (
           <div className="text-center py-12 bg-white/50 backdrop-blur-sm rounded-xl border border-emerald-100 shadow-sm">
             <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <FaLeaf className="w-8 h-8 text-emerald-400" />
