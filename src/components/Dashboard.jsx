@@ -47,25 +47,44 @@ function Dashboard() {
         if (rewards && rewards.length > 0) {
           const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
           console.log('Showing reward:', randomReward); // Debug log
-          setTimeout(() => {
-            setCurrentReward(randomReward);
-            setShowRewardModal(true);
-          }, 0);
+          setCurrentReward(randomReward);
+        } else {
+          setCurrentReward(''); // Clear reward if no reward is found
         }
       } else if (eventType === 'interrupted') {
         if (punishments && punishments.length > 0) {
           const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
           console.log('Showing punishment:', randomPunishment); // Debug log
-          setTimeout(() => {
-            setCurrentPunishment(randomPunishment);
-            setShowPunishmentModal(true);
-          }, 0);
+          setCurrentPunishment(randomPunishment);
+        } else {
+          setCurrentPunishment(''); // Clear punishment if no punishment is found
         }
+      } else { // Handle other event types, explicitly clearing modals if not completed or interrupted
+        setCurrentReward('');
+        setCurrentPunishment('');
       }
     } catch (error) {
       console.error('Error in handlePomodoroEnd:', error);
     }
-  }, []);
+  }, [setReportRefreshKey, setCurrentReward, setCurrentPunishment]);
+
+  // useEffect to manage reward modal visibility based on currentReward
+  useEffect(() => {
+    if (currentReward) {
+      setShowRewardModal(true);
+    } else {
+      setShowRewardModal(false);
+    }
+  }, [currentReward]);
+
+  // useEffect to manage punishment modal visibility based on currentPunishment
+  useEffect(() => {
+    if (currentPunishment) {
+      setShowPunishmentModal(true);
+    } else {
+      setShowPunishmentModal(false);
+    }
+  }, [currentPunishment]);
 
   // Debug effect to monitor modal states
   useEffect(() => {
@@ -133,12 +152,18 @@ function Dashboard() {
       {/* Modals */}
       <RewardModal
         show={showRewardModal}
-        onClose={() => setShowRewardModal(false)}
+        onClose={() => {
+          setShowRewardModal(false);
+          setCurrentReward(''); // Clear reward when closing
+        }}
         reward={currentReward}
       />
       <PunishmentModal
         show={showPunishmentModal}
-        onClose={() => setShowPunishmentModal(false)}
+        onClose={() => {
+          setShowPunishmentModal(false);
+          setCurrentPunishment(''); // Clear punishment when closing
+        }}
         punishment={currentPunishment}
       />
     </div>

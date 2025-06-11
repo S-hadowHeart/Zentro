@@ -227,7 +227,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   return (
     <div className="space-y-8">
-      {/* Simple Notification */}
+      {/* Simple Notification
       {notification && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setNotification(null)}></div>
@@ -248,7 +248,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Main Timer Display */}
       <div className={`relative w-64 h-64 mx-auto rounded-full flex items-center justify-center shadow-xl
