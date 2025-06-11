@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }) => {
       // Persist the entire updated user object to localStorage
       // Note: Make sure updatedUserData from backend includes rewards and punishments
       localStorage.setItem('user', JSON.stringify(newUser)); 
+      console.log('Saving user to localStorage:', newUser); // Debugging line
       return newUser;
     });
   }, []);

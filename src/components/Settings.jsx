@@ -73,8 +73,9 @@ function Settings() {
         throw new Error(data.error || 'Server error');
       }
 
-      setMessage(successMessage);
       const updatedUserData = await response.json();
+      console.log('Updated user data from backend:', updatedUserData);
+      setMessage(successMessage);
       updateUser(updatedUserData.user);
 
     } catch (error) {
