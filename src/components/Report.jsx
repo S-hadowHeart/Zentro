@@ -86,7 +86,7 @@ function Report() {
         {statCards.map((stat, index) => (
           <div
             key={index}
-            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl border border-emerald-100"
+            className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg border border-emerald-100"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-700">{stat.title}</h3>
@@ -99,10 +99,10 @@ function Report() {
         ))}
       </div>
 
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-emerald-100">
+      <div className="bg-white/50 rounded-xl shadow-md p-6 border border-emerald-100">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Growth Insights</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-emerald-50/80 backdrop-blur-sm rounded-lg border border-emerald-100">
+          <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-lg border border-emerald-100">
             <div>
               <p className="text-emerald-700 font-medium">Daily Cultivation Progress</p>
               <p className="text-sm text-emerald-600">
@@ -132,7 +132,7 @@ function Report() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-emerald-50/80 backdrop-blur-sm rounded-lg border border-emerald-100">
+          <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-lg border border-emerald-100">
             <div>
               <p className="text-emerald-700 font-medium">Weekly Average</p>
               <p className="text-sm text-emerald-600">
@@ -142,7 +142,7 @@ function Report() {
             <FaChartLine className="w-8 h-8 text-emerald-500" />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-emerald-50/80 backdrop-blur-sm rounded-lg border border-emerald-100">
+          <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-lg border border-emerald-100">
             <div>
               <p className="text-emerald-700 font-medium">Current Streak</p>
               <p className="text-sm text-emerald-600">

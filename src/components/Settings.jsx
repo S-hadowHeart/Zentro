@@ -160,7 +160,7 @@ function Settings() {
       )}
 
       {/* Daily Goal Section */}
-      <form onSubmit={handleGoalSubmit} className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+      <form onSubmit={handleGoalSubmit} className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
         <div className="flex items-center space-x-3 mb-4">
           <FaSeedling className="w-5 h-5 text-emerald-600" />
           <label htmlFor="dailyGoal" className="text-lg font-semibold text-gray-800">Daily Cultivation Goal (minutes)</label>
@@ -197,7 +197,7 @@ function Settings() {
       </form>
 
       {/* Pomodoro and Break Duration Settings */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+      <div className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
         <div className="flex items-center space-x-3 mb-4">
           <FaClock className="w-5 h-5 text-emerald-600" />
           <h3 className="text-lg font-semibold text-gray-800">Rhythm Adjustments</h3>
@@ -248,7 +248,7 @@ function Settings() {
       </div>
 
       {/* Custom Rewards Section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+      <div className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
         <div className="flex items-center space-x-3 mb-4">
           <FaSun className="w-5 h-5 text-emerald-600" />
           <h3 className="text-lg font-semibold text-gray-800">Seeds of Joy</h3>
@@ -274,7 +274,7 @@ function Settings() {
         </div>
         <ul className="space-y-3">
           {rewards.map((reward, index) => (
-            <li key={index} className="group flex justify-between items-center bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-emerald-100 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
+            <li key={index} className="group flex justify-between items-center bg-white/50 p-4 rounded-lg border border-emerald-100 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
               <span className="text-gray-700">{reward}</span>
               <button
                 onClick={() => handleRemoveReward(index)}
@@ -307,10 +307,10 @@ function Settings() {
       </div>
 
       {/* Custom Punishments Section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+      <div className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
         <div className="flex items-center space-x-3 mb-4">
-          <FaMoon className="w-5 h-5 text-emerald-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Weeds to Uproot</h3>
+          <FaMoon className="w-5 h-5 text-gray-600" />
+          <h3 className="text-lg font-semibold text-gray-800">Weeds to Clear</h3>
         </div>
         <div className="flex gap-3 mb-4">
           <div className="flex-1 relative">
@@ -318,22 +318,22 @@ function Settings() {
               type="text"
               value={newPunishment}
               onChange={(e) => setNewPunishment(e.target.value)}
-              className="w-full px-4 py-3 pl-12 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+              className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
               placeholder="Identify a weed to uproot..."
             />
-            <FaLeaf className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-500" />
+            <FaLeaf className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
           </div>
           <button
             onClick={handleAddPunishment}
             className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
           >
             <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
-            <span>Identify</span>
+            <span>Uproot</span>
           </button>
         </div>
         <ul className="space-y-3">
           {punishments.map((punishment, index) => (
-            <li key={index} className="group flex justify-between items-center bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-emerald-100 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
+            <li key={index} className="group flex justify-between items-center bg-white/50 p-4 rounded-lg border border-red-100 shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
               <span className="text-gray-700">{punishment}</span>
               <button
                 onClick={() => handleRemovePunishment(index)}
