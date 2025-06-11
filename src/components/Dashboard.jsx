@@ -105,16 +105,16 @@ function Dashboard() {
   }, [activeTab, reportRefreshKey]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200">
       <main className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
-            <FaLeaf className="w-8 h-8 text-emerald-600" />
-            <h1 className="text-2xl font-bold text-gray-800">Zen Garden</h1>
+            <FaLeaf className="w-8 h-8 text-emerald-600 animate-pulse" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">Zen Garden</h1>
           </div>
           <button
             onClick={logout}
-            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors"
+            className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors bg-white/50 backdrop-blur-sm rounded-lg hover:bg-white/80"
           >
             <FaSignOutAlt />
             <span>Leave Garden</span>
@@ -129,7 +129,7 @@ function Dashboard() {
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 ${
                 activeTab === tab.id
                   ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-emerald-50'
+                  : 'text-gray-600 hover:bg-white/50 backdrop-blur-sm'
               }`}
             >
               <tab.icon className="w-5 h-5" />
@@ -154,7 +154,7 @@ function Dashboard() {
         show={showRewardModal}
         onClose={() => {
           setShowRewardModal(false);
-          setCurrentReward(''); // Clear reward when closing
+          setCurrentReward('');
         }}
         reward={currentReward}
       />
@@ -162,7 +162,7 @@ function Dashboard() {
         show={showPunishmentModal}
         onClose={() => {
           setShowPunishmentModal(false);
-          setCurrentPunishment(''); // Clear punishment when closing
+          setCurrentPunishment('');
         }}
         punishment={currentPunishment}
       />

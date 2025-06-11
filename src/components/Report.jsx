@@ -57,19 +57,19 @@ function Report() {
       title: "Weekly Growth",
       value: `${Math.floor(stats.week / 60)}h ${stats.week % 60}m`,
       icon: FaChartLine,
-      color: "from-blue-500 to-blue-600"
+      color: "from-emerald-400 to-emerald-500"
     },
     {
       title: "Monthly Journey",
       value: `${Math.floor(stats.month / 60)}h ${stats.month % 60}m`,
       icon: FaLeaf,
-      color: "from-green-500 to-green-600"
+      color: "from-emerald-300 to-emerald-400"
     },
     {
       title: "Current Flow",
       value: `${stats.streak} days`,
       icon: FaFire,
-      color: "from-orange-500 to-orange-600"
+      color: "from-amber-500 to-amber-600"
     }
   ];
 
@@ -86,27 +86,27 @@ function Report() {
         {statCards.map((stat, index) => (
           <div
             key={index}
-            className="bg-white rounded-xl shadow-lg p-6 transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl border border-gray-100"
+            className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl border border-emerald-100"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-700">{stat.title}</h3>
               <stat.icon className={`w-6 h-6 text-${stat.color.split('-')[1]}-500`} />
             </div>
-            <p className="text-3xl font-bold text-gray-800">
+            <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
               {stat.value}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-emerald-100">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Growth Insights</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+          <div className="flex items-center justify-between p-4 bg-emerald-50/80 backdrop-blur-sm rounded-lg border border-emerald-100">
             <div>
-              <p className="text-emerald-700 font-medium">Daily Goal Progress</p>
+              <p className="text-emerald-700 font-medium">Daily Cultivation Progress</p>
               <p className="text-sm text-emerald-600">
-                {Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}% of your daily goal
+                {Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}% of your daily cultivation goal
               </p>
             </div>
             <div className="w-16 h-16 relative">
@@ -132,24 +132,24 @@ function Report() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <div className="flex items-center justify-between p-4 bg-emerald-50/80 backdrop-blur-sm rounded-lg border border-emerald-100">
             <div>
-              <p className="text-blue-700 font-medium">Weekly Average</p>
-              <p className="text-sm text-blue-600">
+              <p className="text-emerald-700 font-medium">Weekly Average</p>
+              <p className="text-sm text-emerald-600">
                 {Math.floor(stats.week / 7)} minutes per day
               </p>
             </div>
-            <FaChartLine className="w-8 h-8 text-blue-500" />
+            <FaChartLine className="w-8 h-8 text-emerald-500" />
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100">
+          <div className="flex items-center justify-between p-4 bg-emerald-50/80 backdrop-blur-sm rounded-lg border border-emerald-100">
             <div>
-              <p className="text-orange-700 font-medium">Current Streak</p>
-              <p className="text-sm text-orange-600">
+              <p className="text-emerald-700 font-medium">Current Streak</p>
+              <p className="text-sm text-emerald-600">
                 {stats.streak} days of consistent cultivation
               </p>
             </div>
-            <FaFire className="w-8 h-8 text-orange-500" />
+            <FaFire className="w-8 h-8 text-emerald-500" />
           </div>
         </div>
       </div>
