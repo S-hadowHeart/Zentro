@@ -6,7 +6,7 @@ import Settings from './Settings';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 import Report from './Report';
-import { FaTasks, FaCog, FaChartBar, FaClock, FaLeaf, FaSignOutAlt } from 'react-icons/fa';
+import { FaTasks, FaCog, FaChartBar, FaClock, FaLeaf, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 import { useLocation, Link } from 'react-router-dom';
 
 function Dashboard() {
@@ -18,6 +18,7 @@ function Dashboard() {
   const [currentReward, setCurrentReward] = useState('');
   const [currentPunishment, setCurrentPunishment] = useState('');
   const [reportRefreshKey, setReportRefreshKey] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const tabs = useMemo(() => [
     { id: 'pomodoro', label: 'Zen Focus Session', icon: FaClock },
@@ -34,6 +35,7 @@ function Dashboard() {
     } else {
       setActiveTab('pomodoro');
     }
+    setIsMobileMenuOpen(false);
   }, [location.pathname, tabs]);
 
   const handlePomodoroEnd = useCallback(async (eventType, duration, rewards, punishments) => {
@@ -113,12 +115,15 @@ function Dashboard() {
         <div className="absolute bottom-10 left-1/2 w-32 h-32 bg-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
       <main className="container mx-auto px-4 py-8 relative z-10">
+        {/* Header/Navbar */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
             <FaLeaf className="w-8 h-8 text-emerald-600 animate-pulse" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">Zen Garden</h1>
           </div>
-          <div className="flex items-center space-x-4">
+
+          {/* Desktop Nav and User Info */}
+          <div className="hidden md:flex items-center space-x-4">
             {user && <span className="text-gray-600 italic">Greetings, {user.username}! 🌱</span>}
             <button
               onClick={logout}
@@ -128,9 +133,17 @@ function Dashboard() {
               <span>Leave Garden</span>
             </button>
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center">
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 hover:text-emerald-600 focus:outline-none">
+              {isMobileMenuOpen ? <FaTimes className="w-6 h-6" /> : <FaBars className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
-        <div className="flex space-x-4 mb-6">
+        {/* Main Tab Navigation (Desktop) */}
+        <div className="hidden md:flex space-x-4 mb-6">
           {tabs.map(tab => (
             <Link
               key={tab.id}
@@ -145,6 +158,39 @@ function Dashboard() {
               <span>{tab.label}</span>
             </Link>
           ))}
+        </div>
+
+        {/* Mobile Navigation Drawer */}
+        <div className={`fixed inset-0 z-40 bg-white/90 backdrop-blur-lg transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out md:hidden`}>
+          <div className="flex justify-end p-4">
+            <button onClick={() => setIsMobileMenuOpen(false)} className="text-gray-600 hover:text-emerald-600 focus:outline-none">
+              <FaTimes className="w-8 h-8" />
+            </button>
+          </div>
+          <nav className="flex flex-col items-center space-y-6 pt-8">
+            {tabs.map(tab => (
+              <Link
+                key={tab.id}
+                to={`/${tab.id}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`text-2xl font-semibold flex items-center space-x-3 px-6 py-3 rounded-xl transition-all duration-300 ease-in-out ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg'
+                    : 'text-gray-700 hover:bg-emerald-50 hover:text-emerald-700'
+                }`}
+              >
+                <tab.icon className="w-7 h-7" />
+                <span>{tab.label}</span>
+              </Link>
+            ))}
+            <button
+              onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+              className="text-2xl font-semibold flex items-center space-x-3 px-6 py-3 rounded-xl transition-all duration-300 ease-in-out text-gray-700 hover:bg-red-50 hover:text-red-600"
+            >
+              <FaSignOutAlt className="w-7 h-7" />
+              <span>Leave Garden</span>
+            </button>
+          </nav>
         </div>
 
         {/* Tab Content */}

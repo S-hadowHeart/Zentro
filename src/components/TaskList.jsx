@@ -32,7 +32,7 @@ function TaskList() {
             Cultivations
           </h2>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:space-x-2">
           {[
             { type: 'all', icon: FaLeaf, label: 'All Cultivations' },
             { type: 'active', icon: FaSun, label: 'Flourishing' },
@@ -54,20 +54,20 @@ function TaskList() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
           <input
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             placeholder="Plant a new seed..."
-            className="w-full px-4 py-3 pl-12 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out bg-white/50 backdrop-blur-sm"
+            className="w-full px-3 py-2 sm:px-4 sm:py-3 pl-12 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out bg-white/50 backdrop-blur-sm"
           />
           <FaSeedling className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-500" />
         </div>
         <button
           type="submit"
-          className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
+          className="px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
         >
           <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
           <span>Plant</span>

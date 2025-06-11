@@ -228,7 +228,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     : ((currentFocusDuration * 60 - timeLeft) / (currentFocusDuration * 60)) * 100;
 
   return (
-    <div className="space-y-8 flex flex-col items-center">
+    <div className="space-y-4 sm:space-y-8 flex flex-col items-center">
       {notification && (
         <div className={`fixed top-8 left-8 p-4 rounded-lg shadow-xl flex items-center space-x-3 z-50 transition-all duration-300 ease-out transform
           ${notification.type === 'reward' ? 'bg-emerald-500 text-white' : notification.type === 'punishment' ? 'bg-amber-500 text-white' : 'bg-emerald-400 text-white'}`}>
@@ -238,9 +238,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
           </button>
         </div>
       )}
-      <div className="bg-white/50 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-emerald-100 space-y-6 flex flex-col items-center">
+      <div className="bg-white/50 backdrop-blur-sm p-4 sm:p-8 rounded-3xl shadow-2xl border border-emerald-100 space-y-6 flex flex-col items-center">
         {/* Main Timer Display */}
-        <div className={`relative w-72 h-72 mx-auto rounded-full flex items-center justify-center shadow-xl transition-all duration-500 ease-in-out
+        <div className={`relative w-64 h-64 sm:w-72 sm:h-72 mx-auto rounded-full flex items-center justify-center shadow-xl transition-all duration-500 ease-in-out
           ${isBreak ? 'bg-lime-100/70 border-lime-300 ring-4 ring-lime-200' : 'bg-emerald-100/70 border-emerald-300 ring-4 ring-emerald-200'} border-4 
           `}>
           <svg className="w-full h-full absolute top-0 left-0" viewBox="0 0 100 100">
@@ -282,17 +282,17 @@ function PomodoroTimer({ onPomodoroEnd }) {
               timeLeft === currentBreakDuration * 60 ? (
                 <button
                   onClick={handleStart}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-lime-300"
+                  className="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-lime-300"
                 >
-                  <FaPlay className="text-xl" />
+                  <FaPlay className="text-lg sm:text-xl" />
                   <span>Begin Rejuvenation</span>
                 </button>
               ) : (
                 <button
                   onClick={toggleTimer}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-lime-300"
+                  className="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-lime-300"
                 >
-                  <FaPlay className="text-xl" />
+                  <FaPlay className="text-lg sm:text-xl" />
                   <span>Resume Rejuvenation</span>
                 </button>
               )
@@ -300,17 +300,17 @@ function PomodoroTimer({ onPomodoroEnd }) {
               timeLeft === currentFocusDuration * 60 ? (
                 <button
                   onClick={handleStart}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-emerald-300"
+                  className="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-emerald-300"
                 >
-                  <FaPlay className="text-xl" />
+                  <FaPlay className="text-lg sm:text-xl" />
                   <span>Begin Cultivation</span>
                 </button>
               ) : (
                 <button
                   onClick={toggleTimer}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-emerald-300"
+                  className="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-emerald-300"
                 >
-                  <FaPlay className="text-xl" />
+                  <FaPlay className="text-lg sm:text-xl" />
                   <span>Resume Cultivation</span>
                 </button>
               )
@@ -318,17 +318,17 @@ function PomodoroTimer({ onPomodoroEnd }) {
           ) : (
             <button
               onClick={toggleTimer}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-amber-300"
+              className="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-amber-300"
             >
-              <FaPause className="text-xl" />
+              <FaPause className="text-lg sm:text-xl" />
               <span>Pause</span>
             </button>
           )}
           <button
             onClick={handleReset}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-stone-400 to-stone-500 hover:from-stone-500 hover:to-stone-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-stone-300"
+            className="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-stone-400 to-stone-500 hover:from-stone-500 hover:to-stone-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-stone-300"
           >
-            <FaRedo className="text-xl" />
+            <FaRedo className="text-lg sm:text-xl" />
             <span>Reset Cycle</span>
           </button>
         </div>

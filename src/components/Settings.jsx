@@ -160,7 +160,7 @@ function Settings() {
       )}
 
       {/* Daily Goal Section */}
-      <form onSubmit={handleGoalSubmit} className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
+      <form onSubmit={handleGoalSubmit} className="bg-white/50 rounded-xl shadow-md p-4 sm:p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
         <div className="flex items-center space-x-3 mb-4">
           <FaSeedling className="w-5 h-5 text-emerald-600" />
           <label htmlFor="dailyGoal" className="text-lg font-semibold text-gray-800">Daily Cultivation Goal (minutes)</label>
@@ -180,7 +180,7 @@ function Settings() {
         <button
           type="submit"
           disabled={isUpdating}
-          className="mt-4 w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="mt-4 w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-2 px-4 sm:py-3 sm:px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {isUpdating ? (
             <>
@@ -197,7 +197,7 @@ function Settings() {
       </form>
 
       {/* Pomodoro and Break Duration Settings */}
-      <div className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
+      <div className="bg-white/50 rounded-xl shadow-md p-4 sm:p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
         <div className="flex items-center space-x-3 mb-4">
           <FaClock className="w-5 h-5 text-emerald-600" />
           <h3 className="text-lg font-semibold text-gray-800">Rhythm Adjustments</h3>
@@ -230,7 +230,7 @@ function Settings() {
           <button
             onClick={() => handleUpdate('settings')}
             disabled={isUpdating}
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-2 px-4 sm:py-3 sm:px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isUpdating && updateType === 'settings' ? (
               <>

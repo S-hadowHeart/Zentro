@@ -82,11 +82,11 @@ function Report() {
         <p className="text-gray-600">Track your journey of mindful cultivation</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
           <div
             key={index}
-            className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg border border-emerald-100"
+            className="bg-white/50 rounded-xl shadow-md p-4 sm:p-6 transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg border border-emerald-100"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-700">{stat.title}</h3>

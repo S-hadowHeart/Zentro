@@ -45,7 +45,7 @@ function CultivatePath() {
         <div className="absolute bottom-10 left-1/2 w-32 h-32 bg-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-emerald-100 transform transition-all duration-300 hover:scale-[1.02]">
+      <div className="max-w-md w-full space-y-8 bg-white/80 backdrop-blur-lg p-4 sm:p-8 rounded-2xl shadow-2xl border border-emerald-100 transform transition-all duration-300 hover:scale-[1.02]">
         <div className="text-center">
           <div className="inline-block p-3 rounded-full bg-emerald-50 mb-4">
             <FaLeaf className="w-8 h-8 text-emerald-600" />
