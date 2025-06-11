@@ -12,8 +12,8 @@ function Settings() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateType, setUpdateType] = useState(null);
   const [dailyGoal, setDailyGoal] = useState(25);
-  const [pomodoroDurationSetting, setPomodoroDurationSetting] = useState(user?.settings?.pomodoroDuration || 25);
-  const [breakDurationSetting, setBreakDurationSetting] = useState(user?.settings?.breakDuration || 5);
+  const [pomodoroDurationSetting, setPomodoroDurationSetting] = useState(25);
+  const [breakDurationSetting, setBreakDurationSetting] = useState(5);
 
   useEffect(() => {
     if (user) {

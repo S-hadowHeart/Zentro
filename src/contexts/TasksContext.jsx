@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from './AuthContext';
 
 const TasksContext = createContext(null);
@@ -7,6 +7,7 @@ export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
+  const fetchTasksRef = useRef(null);
 
   const fetchTasks = useCallback(async (currentUserId) => {
     if (!currentUserId) {
@@ -45,18 +46,23 @@ export function TasksProvider({ children }) {
     }
   }, []);
 
+  // Store the latest fetchTasks function in a ref
+  useEffect(() => {
+    fetchTasksRef.current = fetchTasks;
+  }, [fetchTasks]);
+
   const updateTasks = useCallback((updatedTaskData) => {
     setTasks(updatedTaskData);
   }, []);
 
   useEffect(() => {
     if (!authLoading && user) {
-      fetchTasks(user._id);
+      fetchTasksRef.current?.(user._id);
     } else if (!authLoading && !user) {
       setTasks([]);
       setLoading(false);
     }
-  }, [authLoading, user?._id, fetchTasks]);
+  }, [authLoading, user?._id]);
 
   const addTask = useCallback(async (title) => {
     try {
