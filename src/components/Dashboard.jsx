@@ -46,6 +46,7 @@ function Dashboard() {
       if (eventType === 'completed') {
         if (rewards && rewards.length > 0) {
           const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
+          alert("hahahhahahahah");
           console.log('Showing reward:', randomReward); // Debug log
           setCurrentReward(randomReward);
           setShowRewardModal(true);
