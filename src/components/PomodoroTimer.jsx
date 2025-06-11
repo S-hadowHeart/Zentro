@@ -226,105 +226,105 @@ function PomodoroTimer({ onPomodoroEnd }) {
     : ((currentFocusDuration * 60 - timeLeft) / (currentFocusDuration * 60)) * 100;
 
   return (
-    <div className="space-y-8">
-      {}
+    <div className="space-y-8 flex flex-col items-center">
+      <div className="bg-white/50 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-emerald-100 space-y-6 flex flex-col items-center">
+        {/* Main Timer Display */}
+        <div className={`relative w-72 h-72 mx-auto rounded-full flex items-center justify-center shadow-xl transition-all duration-500 ease-in-out
+          ${isBreak ? 'bg-lime-100/70 border-lime-300 ring-4 ring-lime-200' : 'bg-emerald-100/70 border-emerald-300 ring-4 ring-emerald-200'} border-4 
+          `}>
+          <svg className="w-full h-full absolute top-0 left-0" viewBox="0 0 100 100">
+            <circle
+              className={`${isBreak ? 'text-lime-200' : 'text-emerald-200'}`}
+              strokeWidth="6"
+              stroke="currentColor"
+              fill="transparent"
+              r="45"
+              cx="50"
+              cy="50"
+            />
+            <circle
+              className={`${isBreak ? 'text-lime-500' : 'text-emerald-500'} transition-all duration-700 ease-out`}
+              strokeWidth="6"
+              strokeDasharray={2 * Math.PI * 45}
+              strokeDashoffset={2 * Math.PI * 45 * (100 - progress) / 100}
+              strokeLinecap="round"
+              stroke="currentColor"
+              fill="transparent"
+              r="45"
+              cx="50"
+              cy="50"
+              transform="rotate(-90 50 50)"
+            />
+          </svg>
+          <div className={`absolute text-6xl font-extrabold ${isBreak ? 'text-lime-700' : 'text-emerald-700'}`}>
+            {formatTime(timeLeft)}
+          </div>
+        </div>
 
-      {/* Main Timer Display */}
-      <div className={`relative w-64 h-64 mx-auto rounded-full flex items-center justify-center shadow-xl
-        ${isBreak ? 'bg-lime-100' : 'bg-emerald-100'} border-4 
-        ${isBreak ? 'border-lime-300' : 'border-emerald-300'}`}>
-        <svg className="w-full h-full absolute top-0 left-0" viewBox="0 0 100 100">
-          <circle
-            className={`${isBreak ? 'text-lime-200' : 'text-emerald-200'}`}
-            strokeWidth="6"
-            stroke="currentColor"
-            fill="transparent"
-            r="45"
-            cx="50"
-            cy="50"
-          />
-          <circle
-            className={`${isBreak ? 'text-lime-500' : 'text-emerald-500'} transition-all duration-700 ease-out`}
-            strokeWidth="6"
-            strokeDasharray={2 * Math.PI * 45}
-            strokeDashoffset={2 * Math.PI * 45 * (100 - progress) / 100}
-            strokeLinecap="round"
-            stroke="currentColor"
-            fill="transparent"
-            r="45"
-            cx="50"
-            cy="50"
-            transform="rotate(-90 50 50)"
-          />
-        </svg>
-        <div className={`absolute text-5xl font-bold ${isBreak ? 'text-lime-700' : 'text-emerald-700'}`}>
-          {formatTime(timeLeft)}
+        <div className="text-center text-gray-700 text-xl font-medium animate-fade-in">
+          {isBreak ? 'Take a moment to breathe and rejuvenate your spirit' : selectedTask ? `Cultivating focus on: ${tasks.find(task => task._id === selectedTask)?.title || ''}` : 'Select a cultivation to begin your mindful journey'}
+        </div>
+
+        <div className="flex space-x-6 w-full max-w-md">
+          {!isRunning ? (
+            isBreak ? (
+              timeLeft === currentBreakDuration * 60 ? (
+                <button
+                  onClick={handleStart}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-lime-300"
+                >
+                  <FaPlay className="text-xl" />
+                  <span>Begin Rejuvenation</span>
+                </button>
+              ) : (
+                <button
+                  onClick={toggleTimer}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-lime-300"
+                >
+                  <FaPlay className="text-xl" />
+                  <span>Resume Rejuvenation</span>
+                </button>
+              )
+            ) : (
+              timeLeft === currentFocusDuration * 60 ? (
+                <button
+                  onClick={handleStart}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-emerald-300"
+                >
+                  <FaPlay className="text-xl" />
+                  <span>Begin Cultivation</span>
+                </button>
+              ) : (
+                <button
+                  onClick={toggleTimer}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-emerald-300"
+                >
+                  <FaPlay className="text-xl" />
+                  <span>Resume Cultivation</span>
+                </button>
+              )
+            )
+          ) : (
+            <button
+              onClick={toggleTimer}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-amber-300"
+            >
+              <FaPause className="text-xl" />
+              <span>Pause Meditation</span>
+            </button>
+          )}
+          <button
+            onClick={handleReset}
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-stone-400 to-stone-500 hover:from-stone-500 hover:to-stone-600 text-white font-bold rounded-full shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-stone-300"
+          >
+            <FaRedo className="text-xl" />
+            <span>Reset Cycle</span>
+          </button>
         </div>
       </div>
 
-      <div className="text-center text-gray-600 text-lg">
-        {isBreak ? 'Take a moment to breathe and restore your energy' : selectedTask ? `Focusing on: ${tasks.find(task => task._id === selectedTask)?.title || ''}` : 'Select a cultivation to begin'}
-      </div>
-
-      <div className="flex space-x-4">
-        {!isRunning ? (
-          isBreak ? (
-            timeLeft === currentBreakDuration * 60 ? (
-              <button
-                onClick={handleStart}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-0.5"
-              >
-                <FaPlay className="text-xl" />
-                <span>Begin Rejuvenation</span>
-              </button>
-            ) : (
-              <button
-                onClick={toggleTimer}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-lime-400 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-0.5"
-              >
-                <FaPlay className="text-xl" />
-                <span>Resume Rejuvenation</span>
-              </button>
-            )
-          ) : (
-            timeLeft === currentFocusDuration * 60 ? (
-              <button
-                onClick={handleStart}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-0.5"
-              >
-                <FaPlay className="text-xl" />
-                <span>Begin Cultivation</span>
-              </button>
-            ) : (
-              <button
-                onClick={toggleTimer}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-400 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-0.5"
-              >
-                <FaPlay className="text-xl" />
-                <span>Resume Cultivation</span>
-              </button>
-            )
-          )
-        ) : (
-          <button
-            onClick={toggleTimer}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-0.5"
-          >
-            <FaPause className="text-xl" />
-            <span>Pause Meditation</span>
-          </button>
-        )}
-        <button
-          onClick={handleReset}
-          className="flex-1 px-6 py-3 bg-gradient-to-r from-stone-400 to-stone-500 hover:from-stone-500 hover:to-stone-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2 hover:-translate-y-0.5"
-        >
-          <FaRedo className="text-xl" />
-          <span>Reset Cycle</span>
-        </button>
-      </div>
-
       {/* Task Selection */}
-      <div className="rounded-xl shadow-lg border border-emerald-100 p-6">
+      <div className="rounded-xl shadow-lg border border-emerald-100 p-6 w-full max-w-md">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Select Your Path</h3>
         
         <div>
