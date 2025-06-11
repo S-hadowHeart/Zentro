@@ -222,8 +222,10 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setTimeLeft(currentFocusDuration * 60); // Use currentFocusDuration
   }, [isRunning, isBreak, timeLeft, currentFocusDuration, handlePomodoroInterrupt, userRef.current.rewards, userRef.current.punishments]);
 
-  const progress = ((currentFocusDuration * 60 - timeLeft) / (currentFocusDuration * 60)) * 100;
-  const initialPomodoroTimeInSeconds = currentFocusDuration * 60; // Use currentFocusDuration for this
+  // Calculate progress based on current mode (focus or break)
+  const progress = isBreak 
+    ? ((currentBreakDuration * 60 - timeLeft) / (currentBreakDuration * 60)) * 100
+    : ((currentFocusDuration * 60 - timeLeft) / (currentFocusDuration * 60)) * 100;
 
   return (
     <div className="space-y-8">
@@ -240,10 +242,10 @@ function PomodoroTimer({ onPomodoroEnd }) {
               </h3>
               <p className="text-xl mb-6">{notification.message}</p>
               <button 
-                onClick={() => setNotification(null)}
+                onClick={handleNotificationClose}
                 className="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg font-semibold transition-all duration-300"
               >
-                Continue
+                Cherish
               </button>
             </div>
           </div>
@@ -292,7 +294,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         </div>
 
         <div className="flex space-x-4">
-          {!isRunning && timeLeft === initialPomodoroTimeInSeconds ? (
+          {!isRunning && timeLeft === currentFocusDuration * 60 ? (
             <button
               onClick={handleStart}
               className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 transition duration-300"
@@ -300,7 +302,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
               <FaPlay />
               <span>Begin Cultivation</span>
             </button>
-          ) : !isRunning && timeLeft < initialPomodoroTimeInSeconds ? (
+          ) : !isRunning && timeLeft < currentFocusDuration * 60 ? (
             <button
               onClick={toggleTimer}
               className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 transition duration-300"
