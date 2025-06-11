@@ -76,7 +76,7 @@ function Settings() {
       const updatedUserData = await response.json();
       console.log('Updated user data from backend:', updatedUserData);
       setMessage(successMessage);
-      updateUser(updatedUserData.user);
+      updateUser(updatedUserData);
 
     } catch (error) {
       setMessage(`Error updating ${type}: ${error.message || 'Server unreachable. Please check if the server is running.'}`);
