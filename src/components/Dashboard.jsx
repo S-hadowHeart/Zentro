@@ -105,8 +105,14 @@ function Dashboard() {
   }, [activeTab, reportRefreshKey]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200">
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen w-full bg-gradient-to-br from-emerald-50 via-white to-emerald-100">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-32 h-32 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute top-40 right-10 w-32 h-32 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-10 left-1/2 w-32 h-32 bg-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
             <FaLeaf className="w-8 h-8 text-emerald-600 animate-pulse" />
