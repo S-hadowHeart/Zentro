@@ -227,15 +227,13 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   return (
     <div className="space-y-8">
-      
-
       {/* Main Timer Display */}
-      <div className={`relative w-64 h-64 mx-auto rounded-full flex items-center justify-center shadow-xl
-        ${isBreak ? 'bg-lime-100' : 'bg-emerald-100'} border-4 
-        ${isBreak ? 'border-lime-300' : 'border-emerald-300'}`}>
+      <div className={`relative w-72 h-72 mx-auto rounded-full flex items-center justify-center shadow-2xl
+        ${isBreak ? 'bg-zen-secondary' : 'bg-zen-primary/10'} border-4 
+        ${isBreak ? 'border-zen-secondary/30' : 'border-zen-primary/30'} transform transition-all duration-500 ease-in-out hover:scale-105`}>
         <svg className="w-full h-full absolute top-0 left-0" viewBox="0 0 100 100">
           <circle
-            className={`${isBreak ? 'text-lime-200' : 'text-emerald-200'}`}
+            className={`${isBreak ? 'text-zen-secondary/20' : 'text-zen-primary/20'}`}
             strokeWidth="6"
             stroke="currentColor"
             fill="transparent"
@@ -244,7 +242,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
             cy="50"
           />
           <circle
-            className={`${isBreak ? 'text-lime-500' : 'text-emerald-500'} transition-all duration-700 ease-out`}
+            className={`${isBreak ? 'text-zen-secondary' : 'text-zen-primary'} transition-all duration-700 ease-out`}
             strokeWidth="6"
             strokeDasharray={2 * Math.PI * 45}
             strokeDashoffset={2 * Math.PI * 45 * (100 - progress) / 100}
@@ -257,84 +255,55 @@ function PomodoroTimer({ onPomodoroEnd }) {
             transform="rotate(-90 50 50)"
           />
         </svg>
-        <div className={`absolute text-5xl font-bold ${isBreak ? 'text-lime-700' : 'text-emerald-700'}`}>
+        <div className={`absolute text-6xl font-bold ${isBreak ? 'text-zen-secondary/80' : 'text-zen-primary'}`}>
           {formatTime(timeLeft)}
         </div>
       </div>
 
-      <div className="text-center text-gray-600 text-lg">
-        {isBreak ? 'Embrace Serenity and Restore Your Essence' : selectedTask ? `Embracing the Path of: ${tasks.find(task => task._id === selectedTask)?.title || ''}` : 'Choose a Path to Cultivate'}
+      <div className="text-center text-zen-text text-xl font-medium">
+        {isBreak ? 'Embrace Serenity and Restore Your Essence' : selectedTask ? `Cultivating: ${tasks.find(task => task._id === selectedTask)?.title || ''}` : 'Choose Your Path of Cultivation'}
       </div>
 
-      <div className="flex space-x-4">
+      {/* Control Buttons */}
+      <div className="flex space-x-4 justify-center">
         {!isRunning ? (
-          isBreak ? (
-            timeLeft === currentBreakDuration * 60 ? (
-              <button
-                onClick={handleStart}
-                className="flex-1 px-8 py-4 bg-lime-500 hover:bg-lime-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
-              >
-                <FaPlay className="text-xl" />
-                <span>Begin Rejuvenation</span>
-              </button>
-            ) : (
-              <button
-                onClick={toggleTimer}
-                className="flex-1 px-8 py-4 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
-              >
-                <FaPlay className="text-xl" />
-                <span>Resume Rejuvenation</span>
-              </button>
-            )
-          ) : (
-            timeLeft === currentFocusDuration * 60 ? (
-              <button
-                onClick={handleStart}
-                className="flex-1 px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
-              >
-                <FaPlay className="text-xl" />
-                <span>Begin Cultivation</span>
-              </button>
-            ) : (
-              <button
-                onClick={toggleTimer}
-                className="flex-1 px-8 py-4 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
-              >
-                <FaPlay className="text-xl" />
-                <span>Resume Cultivation</span>
-              </button>
-            )
-          )
+          <button
+            onClick={toggleTimer}
+            className="flex-1 px-8 py-4 bg-zen-primary hover:bg-zen-primary/90 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+          >
+            <FaPlay className="text-xl" />
+            <span>Begin Cultivation</span>
+          </button>
         ) : (
           <button
             onClick={toggleTimer}
-            className="flex-1 px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+            className="flex-1 px-8 py-4 bg-zen-secondary hover:bg-zen-secondary/90 text-zen-text font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
           >
             <FaPause className="text-xl" />
-            <span>Pause Rhythm</span>
+            <span>Pause Cultivation</span>
           </button>
         )}
         <button
           onClick={handleReset}
-          className="flex-1 px-8 py-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+          className="flex-1 px-8 py-4 bg-zen-accent hover:bg-zen-accent/90 text-zen-text font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
         >
           <FaRedo className="text-xl" />
-          <span>Reset Cycle</span>
+          <span>Reset Garden</span>
         </button>
       </div>
 
       {/* Task Selection */}
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Adjust Rhythm</h3>
+      <div className="card p-6">
+        <h3 className="text-xl font-semibold text-zen-text mb-4">Select Your Path</h3>
         
         <div>
-          <label htmlFor="selectTask" className="block text-sm font-medium text-gray-700 mb-1">Select Cultivation:</label>
+          <label htmlFor="selectTask" className="block text-sm font-medium text-zen-text mb-1">Select Cultivation:</label>
           <div className="relative">
             <select
               id="selectTask"
               value={selectedTask}
               onChange={(e) => setSelectedTask(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white pr-8"
+              className="block w-full p-2 border border-zen-text rounded-md shadow-sm focus:ring-zen-primary focus:border-zen-primary appearance-none bg-white pr-8"
             >
               {tasks.filter(task => !task.completed).length === 0 && (
                 <option value="">No unharvested cultivations</option>
@@ -345,16 +314,16 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zen-text">
               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                 <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
               </svg>
             </div>
           </div>
           {tasks.filter(task => !task.completed).length === 0 && (
-            <p className="mt-2 text-sm text-gray-500 flex items-center space-x-1">
+            <p className="mt-2 text-sm text-zen-text flex items-center space-x-1">
               <span>All cultivations harvested.</span>
-              <Link to="/tasks" className="text-emerald-600 hover:underline flex items-center space-x-1">
+              <Link to="/tasks" className="text-zen-primary hover:underline flex items-center space-x-1">
                 <FaPlusCircle className="w-4 h-4" />
                 <span>Plant a new seed</span>
               </Link>

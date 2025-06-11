@@ -136,11 +136,11 @@ function Settings() {
   return (
     <div className="space-y-8">
       <div className="flex items-center space-x-3">
-        <div className="p-2 rounded-full bg-emerald-50">
-          <FaCog className="w-6 h-6 text-emerald-600" />
+        <div className="p-2 rounded-full bg-zen-primary/10">
+          <FaCog className="w-6 h-6 text-zen-primary" />
         </div>
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
-          Arrangements
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-zen-primary to-zen-primary/80 bg-clip-text text-transparent">
+          Garden Arrangements
         </h2>
       </div>
 
@@ -148,7 +148,7 @@ function Settings() {
         <div className={`p-4 rounded-xl text-sm flex items-center space-x-2 ${
           message.includes('Error') 
             ? 'bg-red-50 text-red-500 border border-red-100' 
-            : 'bg-emerald-50 text-emerald-500 border border-emerald-100'
+            : 'bg-zen-primary/10 text-zen-primary border border-zen-primary/20'
         }`}>
           {message.includes('Error') ? (
             <FaMoon className="w-5 h-5" />
@@ -197,14 +197,14 @@ function Settings() {
       </form>
 
       {/* Pomodoro and Break Duration Settings */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+      <div className="card p-6">
         <div className="flex items-center space-x-3 mb-4">
-          <FaClock className="w-5 h-5 text-emerald-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Rhythm Adjustments</h3>
+          <FaClock className="w-5 h-5 text-zen-primary" />
+          <h3 className="text-lg font-semibold text-zen-text">Rhythm Adjustments</h3>
         </div>
         <div className="space-y-4">
           <div>
-            <label htmlFor="pomodoroDurationSetting" className="block text-sm font-medium text-gray-700 mb-1">Cultivation Duration (minutes):</label>
+            <label htmlFor="pomodoroDurationSetting" className="block text-sm font-medium text-zen-text mb-1">Cultivation Duration (minutes):</label>
             <input
               type="number"
               id="pomodoroDurationSetting"
@@ -212,11 +212,11 @@ function Settings() {
               onChange={(e) => setPomodoroDurationSetting(Math.max(1, parseInt(e.target.value) || 0))}
               min="1"
               max="60"
-              className="w-full px-4 py-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+              className="w-full px-4 py-3 border border-zen-primary/20 rounded-lg focus:ring-2 focus:ring-zen-primary focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
             />
           </div>
           <div>
-            <label htmlFor="breakDurationSetting" className="block text-sm font-medium text-gray-700 mb-1">Rejuvenation Duration (minutes):</label>
+            <label htmlFor="breakDurationSetting" className="block text-sm font-medium text-zen-text mb-1">Rejuvenation Duration (minutes):</label>
             <input
               type="number"
               id="breakDurationSetting"
@@ -224,13 +224,13 @@ function Settings() {
               onChange={(e) => setBreakDurationSetting(Math.max(1, parseInt(e.target.value) || 0))}
               min="1"
               max="30"
-              className="w-full px-4 py-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+              className="w-full px-4 py-3 border border-zen-primary/20 rounded-lg focus:ring-2 focus:ring-zen-primary focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
             />
           </div>
           <button
             onClick={() => handleUpdate('settings')}
             disabled={isUpdating}
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-zen-primary hover:bg-zen-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isUpdating && updateType === 'settings' ? (
               <>
@@ -248,10 +248,10 @@ function Settings() {
       </div>
 
       {/* Custom Rewards Section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border border-emerald-100 p-6 transform transition-all duration-300 ease-in-out hover:shadow-2xl">
+      <div className="card p-6">
         <div className="flex items-center space-x-3 mb-4">
-          <FaLeaf className="w-5 h-5 text-emerald-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Seeds of Joy (Custom Rewards)</h3>
+          <FaLeaf className="w-5 h-5 text-zen-primary" />
+          <h3 className="text-lg font-semibold text-zen-text">Seeds of Joy</h3>
         </div>
         <div className="flex gap-3 mb-4">
           <input
@@ -259,11 +259,11 @@ function Settings() {
             value={newReward}
             onChange={(e) => setNewReward(e.target.value)}
             placeholder="Sow a new seed of joy..."
-            className="flex-1 px-4 py-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
+            className="flex-1 px-4 py-3 border border-zen-primary/20 rounded-lg focus:ring-2 focus:ring-zen-primary focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
           />
           <button
             onClick={handleAddReward}
-            className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
+            className="px-6 py-3 bg-zen-primary hover:bg-zen-primary/90 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
           >
             <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
             <span>Sow</span>
@@ -271,11 +271,11 @@ function Settings() {
         </div>
         <div className="space-y-2 mb-4">
           {rewards.map((reward, index) => (
-            <div key={index} className="flex items-center justify-between bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100 shadow-sm">
-              <span className="text-emerald-800">{reward}</span>
+            <div key={index} className="flex items-center justify-between bg-zen-primary/5 px-4 py-2 rounded-lg border border-zen-primary/10 shadow-sm">
+              <span className="text-zen-text">{reward}</span>
               <button
                 onClick={() => handleRemoveReward(index)}
-                className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-50 transition-all duration-300"
+                className="text-zen-primary/50 hover:text-zen-primary p-1 rounded-full hover:bg-zen-primary/10 transition-all duration-300"
               >
                 <FaTrash className="w-4 h-4" />
               </button>
@@ -285,7 +285,7 @@ function Settings() {
         <button
           onClick={handleSaveRewards}
           disabled={isUpdating}
-          className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full bg-zen-primary hover:bg-zen-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {isUpdating && updateType === 'rewards' ? (
             <>
