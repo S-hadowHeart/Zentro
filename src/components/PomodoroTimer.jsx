@@ -8,6 +8,8 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const { user, fetchUser, updateUser } = useAuth();
   const { tasks, fetchTasks, incrementPomodorosForTask } = useTasks();
   const [notification, setNotification] = useState(null);
+  
+  console.log('Current notification state:', notification); // Debugging line
 
   // Calculate initial timeLeft based on current user settings (now handled by useEffect)
   // const initialUserPomodoroDuration = user?.settings?.pomodoroDuration || 25;
@@ -227,6 +229,15 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   return (
     <div className="space-y-8 flex flex-col items-center">
+      {notification && (
+        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-xl flex items-center space-x-3 z-50 transition-all duration-300 ease-out transform
+          ${notification.type === 'reward' ? 'bg-emerald-500 text-white' : notification.type === 'punishment' ? 'bg-amber-500 text-white' : 'bg-blue-500 text-white'}`}>
+          <span>{notification.message}</span>
+          <button onClick={handleNotificationClose} className="ml-2 text-white/80 hover:text-white focus:outline-none">
+            <FaTimes className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       <div className="bg-white/50 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-emerald-100 space-y-6 flex flex-col items-center">
         {/* Main Timer Display */}
         <div className={`relative w-72 h-72 mx-auto rounded-full flex items-center justify-center shadow-xl transition-all duration-500 ease-in-out
