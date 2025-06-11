@@ -190,7 +190,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   const handleStart = useCallback(() => {
     if (!selectedTask && !isBreak) {
-      alert('Please select a cultivation to focus on');
+      alert('Please choose a Path to Cultivate');
       return;
     }
     // This function is strictly for starting a *new* session from full time.
@@ -227,28 +227,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   return (
     <div className="space-y-8">
-      {/* Simple Notification
-      {notification && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setNotification(null)}></div>
-          <div className={`relative p-8 rounded-xl shadow-2xl transform transition-all duration-300 ease-in-out ${
-            notification.type === 'reward' ? 'bg-emerald-500' : 'bg-red-500'
-          } text-white max-w-md w-full mx-4`}>
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-4">
-                {notification.type === 'reward' ? '🎉 Achievement Unlocked!' : 'Time for Reflection'}
-              </h3>
-              <p className="text-xl mb-6">{notification.message}</p>
-              <button 
-                onClick={handleNotificationClose}
-                className="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg font-semibold transition-all duration-300"
-              >
-                Cherish
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
+      
 
       {/* Main Timer Display */}
       <div className={`relative w-64 h-64 mx-auto rounded-full flex items-center justify-center shadow-xl
@@ -284,7 +263,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
       </div>
 
       <div className="text-center text-gray-600 text-lg">
-        {isBreak ? 'Take a moment to breathe and restore your energy' : selectedTask ? `Focusing on: ${tasks.find(task => task._id === selectedTask)?.title || ''}` : 'Select a cultivation to begin'}
+        {isBreak ? 'Embrace Serenity and Restore Your Essence' : selectedTask ? `Embracing the Path of: ${tasks.find(task => task._id === selectedTask)?.title || ''}` : 'Choose a Path to Cultivate'}
       </div>
 
       <div className="flex space-x-4">
@@ -332,7 +311,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
             className="flex-1 px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
           >
             <FaPause className="text-xl" />
-            <span>Pause</span>
+            <span>Pause Rhythm</span>
           </button>
         )}
         <button

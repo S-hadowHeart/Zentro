@@ -77,9 +77,9 @@ function Report() {
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent mb-2">
-          Your Growth Journal
+          Your Garden's Growth Journal
         </h2>
-        <p className="text-gray-600">Track your journey of mindful cultivation</p>
+        <p className="text-gray-600">Observe the blossoming of your mindful cultivation</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -100,13 +100,13 @@ function Report() {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Growth Insights</h3>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Insights from the Garden</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-lg border border-emerald-100">
             <div>
-              <p className="text-emerald-700 font-medium">Daily Goal Progress</p>
+              <p className="text-emerald-700 font-medium">Daily Cultivation Progress</p>
               <p className="text-sm text-emerald-600">
-                {Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}% of your daily goal
+                {Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}% of your daily path
               </p>
             </div>
             <div className="w-16 h-16 relative">
@@ -134,9 +134,9 @@ function Report() {
 
           <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-100">
             <div>
-              <p className="text-blue-700 font-medium">Weekly Average</p>
+              <p className="text-blue-700 font-medium">Weekly Cultivation</p>
               <p className="text-sm text-blue-600">
-                {Math.floor(stats.week / 7)} minutes per day
+                {Math.floor(stats.week / 60)} hours {stats.week % 60} minutes of deep work
               </p>
             </div>
             <FaChartLine className="w-8 h-8 text-blue-500" />
@@ -144,12 +144,22 @@ function Report() {
 
           <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-100">
             <div>
-              <p className="text-orange-700 font-medium">Current Streak</p>
+              <p className="text-orange-700 font-medium">Monthly Cultivation</p>
               <p className="text-sm text-orange-600">
-                {stats.streak} days of consistent cultivation
+                {Math.floor(stats.month / 60)} hours {stats.month % 60} minutes of focused effort
               </p>
             </div>
-            <FaFire className="w-8 h-8 text-orange-500" />
+            <FaLeaf className="w-8 h-8 text-green-500" />
+          </div>
+
+          <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-100">
+            <div>
+              <p className="text-purple-700 font-medium">Unbroken Flow</p>
+              <p className="text-sm text-purple-600">
+                {stats.streak} days of consistent practice
+              </p>
+            </div>
+            <FaFire className="w-8 h-8 text-purple-500" />
           </div>
         </div>
       </div>

@@ -60,7 +60,7 @@ function TaskList() {
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Plant a new seed..."
+            placeholder="Sow a new intention..."
             className="w-full px-4 py-3 pl-12 rounded-lg border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm transition-all duration-300 ease-in-out bg-white/50 backdrop-blur-sm"
           />
           <FaSeedling className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-500" />
@@ -70,7 +70,7 @@ function TaskList() {
           className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
         >
           <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
-          <span>Plant</span>
+          <span>Sow</span>
         </button>
       </form>
 
@@ -82,10 +82,10 @@ function TaskList() {
             </div>
             <p className="text-gray-600 text-lg">
               {filter === 'all'
-                ? 'Your garden is empty. Plant your first seed of growth.'
+                ? 'Your garden awaits cultivation. Sow your first intention to begin your journey.'
                 : filter === 'active'
-                ? 'No cultivations are currently flourishing.'
-                : 'No cultivations have been harvested yet.'}
+                ? 'No intentions are currently blossoming.'
+                : 'No intentions have been harvested yet.'}
             </p>
           </div>
         ) : (

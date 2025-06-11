@@ -117,7 +117,7 @@ function Dashboard() {
             className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-emerald-600 transition-colors"
           >
             <FaSignOutAlt />
-            <span>Leave Garden</span>
+            <span>Depart the Garden</span>
           </button>
         </div>
 

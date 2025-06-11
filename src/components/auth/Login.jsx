@@ -60,7 +60,7 @@ function EnterTheGarden() {
           <div className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Username
+                Cultivator's Name
               </label>
               <input
                 id="username"
@@ -68,14 +68,14 @@ function EnterTheGarden() {
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border border-emerald-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
-                placeholder="Enter your username"
+                placeholder="Your unique garden alias"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                Secret Grove Passkey
               </label>
               <input
                 id="password"
@@ -83,7 +83,7 @@ function EnterTheGarden() {
                 type="password"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border border-emerald-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
-                placeholder="Enter your password"
+                placeholder="Your sacred key to the garden"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

@@ -71,7 +71,7 @@ function CultivatePath() {
           <div className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Username
+                Cultivator's Name
               </label>
               <input
                 id="username"
@@ -79,14 +79,14 @@ function CultivatePath() {
                 type="text"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border border-emerald-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
-                placeholder="Choose your username"
+                placeholder="Choose your garden alias"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                Sacred Passkey
               </label>
               <input
                 id="password"
@@ -94,14 +94,14 @@ function CultivatePath() {
                 type="password"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border border-emerald-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
-                placeholder="Create your password"
+                placeholder="Forge your sacred key"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
+                Confirm Passkey
               </label>
               <input
                 id="confirm-password"
@@ -109,7 +109,7 @@ function CultivatePath() {
                 type="password"
                 required
                 className="appearance-none relative block w-full px-4 py-3 border border-emerald-200 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
-                placeholder="Confirm your password"
+                placeholder="Re-enter your sacred key"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
@@ -134,7 +134,7 @@ function CultivatePath() {
               to="/login" 
               className="font-medium text-emerald-600 hover:text-emerald-700 transition-colors duration-200"
             >
-              Already in the Garden? Enter
+              Already in the Garden? Enter the Garden
             </Link>
           </div>
         </form>
