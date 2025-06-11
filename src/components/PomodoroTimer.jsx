@@ -138,18 +138,14 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 const randomReward = userRef.current.rewards[Math.floor(Math.random() * userRef.current.rewards.length)];
                 showNotification(randomReward, 'reward');
                 // Don't start break timer yet - it will start when notification is closed
-                setTimeout(() => {
-                  setIsBreak(true);
-                  setTimeLeft(breakDurationRef.current * 60);
-                  setIsRunning(false);
-                }, 0);
+                setIsBreak(true);
+                setTimeLeft(breakDurationRef.current * 60);
+                setIsRunning(false); // Ensure break doesn't start until Cherish click
               } else {
-                // No rewards, switch to break immediately
-                setTimeout(() => {
-                  setIsBreak(true);
-                  setTimeLeft(breakDurationRef.current * 60);
-                  setIsRunning(true);
-                }, 0);
+                // No rewards, switch to break, but still wait for Cherish click
+                setIsBreak(true);
+                setTimeLeft(breakDurationRef.current * 60);
+                setIsRunning(false); // Ensure break doesn't start until Cherish click
               }
               
               // Update stats in background
@@ -158,11 +154,9 @@ function PomodoroTimer({ onPomodoroEnd }) {
               onPomodoroEndRef.current('completed', focusDurationRef.current, userRef.current.rewards, userRef.current.punishments);
             } else {
               // Break session ended
-              setTimeout(() => {
-                setIsBreak(false);
-                setTimeLeft(focusDurationRef.current * 60);
-                setIsRunning(false);
-              }, 0);
+              setIsBreak(false);
+              setTimeLeft(focusDurationRef.current * 60);
+              setIsRunning(false);
               // Call onPomodoroEnd for break session end if needed, though usually not for rewards/punishments
               onPomodoroEndRef.current('breakEnded', breakDurationRef.current);
             }
@@ -183,10 +177,10 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const handleNotificationClose = useCallback(() => {
     setNotification(null);
     // Start the break timer after notification is closed
-    if (isBreakRef.current) {
+    if (isBreak) {
       setIsRunning(true);
     }
-  }, []);
+  }, [isBreak]);
 
   const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -195,14 +189,18 @@ function PomodoroTimer({ onPomodoroEnd }) {
   }, []);
 
   const handleStart = useCallback(() => {
-    if (!selectedTask) {
+    if (!selectedTask && !isBreak) {
       alert('Please select a cultivation to focus on');
       return;
     }
     // This function is strictly for starting a *new* session from full time.
-    setTimeLeft(currentFocusDuration * 60); // Reset to full duration
+    if (!isBreak) {
+      setTimeLeft(currentFocusDuration * 60); // Reset to full duration for cultivation
+    } else {
+      setTimeLeft(currentBreakDuration * 60); // Reset to full duration for rejuvenation
+    }
     setIsRunning(true);
-  }, [selectedTask, currentFocusDuration]);
+  }, [selectedTask, currentFocusDuration, currentBreakDuration, isBreak]);
 
   const toggleTimer = useCallback(() => {
     setIsRunning(prev => !prev);
@@ -219,7 +217,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setIsRunning(false);
     // Reset to initial state, reflecting current settings
     setIsBreak(false);
-    setTimeLeft(currentFocusDuration * 60); // Use currentFocusDuration
+    setTimeLeft(currentFocusDuration * 60); // Reset to focus duration
   }, [isRunning, isBreak, timeLeft, currentFocusDuration, handlePomodoroInterrupt, userRef.current.rewards, userRef.current.punishments]);
 
   // Calculate progress based on current mode (focus or break)
@@ -252,119 +250,137 @@ function PomodoroTimer({ onPomodoroEnd }) {
         </div>
       )}
 
-      <div className="text-center">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent mb-2">
-          {isBreak ? 'Rejuvenation Time' : 'Cultivation Session'}
-        </h2>
-        <p className="text-gray-600">
-          {isBreak ? 'Take a moment to breathe and restore your energy' : 'Stay focused and cultivate your garden'}
-        </p>
+      {/* Main Timer Display */}
+      <div className={`relative w-64 h-64 mx-auto rounded-full flex items-center justify-center shadow-xl
+        ${isBreak ? 'bg-lime-100' : 'bg-emerald-100'} border-4 
+        ${isBreak ? 'border-lime-300' : 'border-emerald-300'}`}>
+        <svg className="w-full h-full absolute top-0 left-0" viewBox="0 0 100 100">
+          <circle
+            className={`${isBreak ? 'text-lime-200' : 'text-emerald-200'}`}
+            strokeWidth="6"
+            stroke="currentColor"
+            fill="transparent"
+            r="45"
+            cx="50"
+            cy="50"
+          />
+          <circle
+            className={`${isBreak ? 'text-lime-500' : 'text-emerald-500'} transition-all duration-700 ease-out`}
+            strokeWidth="6"
+            strokeDasharray={2 * Math.PI * 45}
+            strokeDashoffset={2 * Math.PI * 45 * (100 - progress) / 100}
+            strokeLinecap="round"
+            stroke="currentColor"
+            fill="transparent"
+            r="45"
+            cx="50"
+            cy="50"
+            transform="rotate(-90 50 50)"
+          />
+        </svg>
+        <div className={`absolute text-5xl font-bold ${isBreak ? 'text-lime-700' : 'text-emerald-700'}`}>
+          {formatTime(timeLeft)}
+        </div>
       </div>
 
-      <div className="flex flex-col items-center space-y-6">
-        <div className="relative w-64 h-64">
-          <svg className="w-full h-full" viewBox="0 0 100 100">
-            {/* Background circle */}
-            <circle
-              className="text-emerald-100"
-              strokeWidth="8"
-              stroke="currentColor"
-              fill="transparent"
-              r="46"
-              cx="50"
-              cy="50"
-            />
-            {/* Progress circle */}
-            <circle
-              className="text-emerald-500 transform -rotate-90 origin-center"
-              strokeWidth="8"
-              stroke="currentColor"
-              fill="transparent"
-              r="46"
-              cx="50"
-              cy="50"
-              strokeDasharray={2 * Math.PI * 46}
-              strokeDashoffset={2 * Math.PI * 46 * (1 - progress / 100)}
-              style={{ transition: 'stroke-dashoffset 1s linear' }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-4xl font-bold text-emerald-600">{formatTime(timeLeft)}</span>
-          </div>
-        </div>
+      <div className="text-center text-gray-600 text-lg">
+        {isBreak ? 'Take a moment to breathe and restore your energy' : selectedTask ? `Focusing on: ${tasks.find(task => task._id === selectedTask)?.title || ''}` : 'Select a cultivation to begin'}
+      </div>
 
-        <div className="flex space-x-4">
-          {!isRunning && timeLeft === currentFocusDuration * 60 ? (
-            <button
-              onClick={handleStart}
-              className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 transition duration-300"
-            >
-              <FaPlay />
-              <span>Begin Cultivation</span>
-            </button>
-          ) : !isRunning && timeLeft < currentFocusDuration * 60 ? (
-            <button
-              onClick={toggleTimer}
-              className="flex items-center space-x-2 px-6 py-3 bg-emerald-500 text-white rounded-full shadow-lg hover:bg-emerald-600 transition duration-300"
-            >
-              <FaPlay />
-              <span>Resume Rhythm</span>
-            </button>
-          ) : (
-            <button
-              onClick={toggleTimer}
-              className="flex items-center space-x-2 px-6 py-3 bg-yellow-500 text-white rounded-full shadow-lg hover:bg-yellow-600 transition duration-300"
-            >
-              <FaPause />
-              <span>Pause Rhythm</span>
-            </button>
-          )}
-          <button
-            onClick={handleReset}
-            className="flex items-center space-x-2 px-6 py-3 bg-gray-300 text-gray-800 rounded-full shadow-lg hover:bg-gray-400 transition duration-300"
-          >
-            <FaRedo />
-            <span>Reset Cycle</span>
-          </button>
-        </div>
-
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 border border-emerald-100 space-y-4">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Adjust Rhythm</h3>
-          
-          <div>
-            <label htmlFor="selectTask" className="block text-sm font-medium text-gray-700 mb-1">Select Cultivation:</label>
-            <div className="relative">
-              <select
-                id="selectTask"
-                value={selectedTask}
-                onChange={(e) => setSelectedTask(e.target.value)}
-                className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white pr-8"
+      <div className="flex space-x-4">
+        {!isRunning ? (
+          isBreak ? (
+            timeLeft === currentBreakDuration * 60 ? (
+              <button
+                onClick={handleStart}
+                className="flex-1 px-8 py-4 bg-lime-500 hover:bg-lime-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
               >
-                {tasks.filter(task => !task.completed).length === 0 && (
-                  <option value="">No unharvested cultivations</option>
-                )}
-                {tasks.filter(task => !task.completed).map((task) => (
-                  <option key={task._id} value={task._id}>
-                    {task.title}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                </svg>
-              </div>
+                <FaPlay className="text-xl" />
+                <span>Begin Rejuvenation</span>
+              </button>
+            ) : (
+              <button
+                onClick={toggleTimer}
+                className="flex-1 px-8 py-4 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+              >
+                <FaPlay className="text-xl" />
+                <span>Resume Rejuvenation</span>
+              </button>
+            )
+          ) : (
+            timeLeft === currentFocusDuration * 60 ? (
+              <button
+                onClick={handleStart}
+                className="flex-1 px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+              >
+                <FaPlay className="text-xl" />
+                <span>Begin Cultivation</span>
+              </button>
+            ) : (
+              <button
+                onClick={toggleTimer}
+                className="flex-1 px-8 py-4 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+              >
+                <FaPlay className="text-xl" />
+                <span>Resume Cultivation</span>
+              </button>
+            )
+          )
+        ) : (
+          <button
+            onClick={toggleTimer}
+            className="flex-1 px-8 py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+          >
+            <FaPause className="text-xl" />
+            <span>Pause</span>
+          </button>
+        )}
+        <button
+          onClick={handleReset}
+          className="flex-1 px-8 py-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-lg shadow-lg transform transition-all duration-300 flex items-center justify-center space-x-2"
+        >
+          <FaRedo className="text-xl" />
+          <span>Reset Cycle</span>
+        </button>
+      </div>
+
+      {/* Task Selection */}
+      <div className="bg-white p-6 rounded-xl shadow-lg">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Adjust Rhythm</h3>
+        
+        <div>
+          <label htmlFor="selectTask" className="block text-sm font-medium text-gray-700 mb-1">Select Cultivation:</label>
+          <div className="relative">
+            <select
+              id="selectTask"
+              value={selectedTask}
+              onChange={(e) => setSelectedTask(e.target.value)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white pr-8"
+            >
+              {tasks.filter(task => !task.completed).length === 0 && (
+                <option value="">No unharvested cultivations</option>
+              )}
+              {tasks.filter(task => !task.completed).map((task) => (
+                <option key={task._id} value={task._id}>
+                  {task.title}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+              </svg>
             </div>
-            {tasks.filter(task => !task.completed).length === 0 && (
-              <p className="mt-2 text-sm text-gray-500 flex items-center space-x-1">
-                <span>All cultivations harvested.</span>
-                <Link to="/tasks" className="text-emerald-600 hover:underline flex items-center space-x-1">
-                  <FaPlusCircle className="w-4 h-4" />
-                  <span>Plant a new seed</span>
-                </Link>
-              </p>
-            )}
           </div>
+          {tasks.filter(task => !task.completed).length === 0 && (
+            <p className="mt-2 text-sm text-gray-500 flex items-center space-x-1">
+              <span>All cultivations harvested.</span>
+              <Link to="/tasks" className="text-emerald-600 hover:underline flex items-center space-x-1">
+                <FaPlusCircle className="w-4 h-4" />
+                <span>Plant a new seed</span>
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>
