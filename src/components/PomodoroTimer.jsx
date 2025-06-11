@@ -230,14 +230,54 @@ function PomodoroTimer({ onPomodoroEnd }) {
   return (
     <div className="space-y-8 flex flex-col items-center">
       {notification && (
-        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-xl flex items-center space-x-3 z-50 transition-all duration-300 ease-out transform
-          ${notification.type === 'reward' ? 'bg-emerald-500 text-white' : notification.type === 'punishment' ? 'bg-amber-500 text-white' : 'bg-blue-500 text-white'}`}>
+        <div className={`fixed top-8 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-xl flex items-center space-x-3 z-50 transition-all duration-300 ease-out transform
+          ${notification.type === 'reward' ? 'bg-emerald-500 text-white' : notification.type === 'punishment' ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'}`}>
           <span>{notification.message}</span>
           <button onClick={handleNotificationClose} className="ml-2 text-white/80 hover:text-white focus:outline-none">
             <FaTimes className="w-4 h-4" />
           </button>
         </div>
       )}
+
+      {/* Task Selection */}
+      <div className="rounded-xl shadow-lg border border-emerald-100 p-6 w-full max-w-md bg-white/50 backdrop-blur-sm">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Select Your Path</h3>
+        
+        <div>
+          <label htmlFor="selectTask" className="block text-sm font-medium text-gray-700 mb-1">Choose Your Cultivation:</label>
+          <div className="relative">
+            <select
+              id="selectTask"
+              value={selectedTask}
+              onChange={(e) => setSelectedTask(e.target.value)}
+              className="block w-full p-3 border border-emerald-200 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white/90 backdrop-blur-sm pr-8 transition-all duration-300 ease-in-out"
+            >
+              {tasks.filter(task => !task.completed).length === 0 && (
+                <option value="">No unharvested cultivations</option>
+              )}
+              {tasks.filter(task => !task.completed).map((task) => (
+                <option key={task._id} value={task._id}>
+                  {task.title}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+              </svg>
+            </div>
+          </div>
+          {tasks.filter(task => !task.completed).length === 0 && (
+            <p className="mt-2 text-sm text-gray-500 flex items-center space-x-1">
+              <span>All cultivations harvested.</span>
+              <Link to="/tasks" className="text-emerald-600 hover:underline flex items-center space-x-1">
+                <FaPlusCircle className="w-4 h-4" />
+                <span>Plant a new seed</span>
+              </Link>
+            </p>
+          )}
+        </div>
+
       <div className="bg-white/50 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-emerald-100 space-y-6 flex flex-col items-center">
         {/* Main Timer Display */}
         <div className={`relative w-72 h-72 mx-auto rounded-full flex items-center justify-center shadow-xl transition-all duration-500 ease-in-out
@@ -331,46 +371,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
             <FaRedo className="text-xl" />
             <span>Reset Cycle</span>
           </button>
-        </div>
-      </div>
-
-      {/* Task Selection */}
-      <div className="rounded-xl shadow-lg border border-emerald-100 p-6 w-full max-w-md">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Select Your Path</h3>
-        
-        <div>
-          <label htmlFor="selectTask" className="block text-sm font-medium text-gray-700 mb-1">Choose Your Cultivation:</label>
-          <div className="relative">
-            <select
-              id="selectTask"
-              value={selectedTask}
-              onChange={(e) => setSelectedTask(e.target.value)}
-              className="block w-full p-3 border border-emerald-200 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 appearance-none bg-white/90 backdrop-blur-sm pr-8 transition-all duration-300 ease-in-out"
-            >
-              {tasks.filter(task => !task.completed).length === 0 && (
-                <option value="">No unharvested cultivations</option>
-              )}
-              {tasks.filter(task => !task.completed).map((task) => (
-                <option key={task._id} value={task._id}>
-                  {task.title}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-              </svg>
-            </div>
-          </div>
-          {tasks.filter(task => !task.completed).length === 0 && (
-            <p className="mt-2 text-sm text-gray-500 flex items-center space-x-1">
-              <span>All cultivations harvested.</span>
-              <Link to="/tasks" className="text-emerald-600 hover:underline flex items-center space-x-1">
-                <FaPlusCircle className="w-4 h-4" />
-                <span>Plant a new seed</span>
-              </Link>
-            </p>
-          )}
         </div>
       </div>
     </div>
