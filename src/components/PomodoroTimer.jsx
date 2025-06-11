@@ -138,14 +138,18 @@ function PomodoroTimer({ onPomodoroEnd }) {
                 const randomReward = userRef.current.rewards[Math.floor(Math.random() * userRef.current.rewards.length)];
                 showNotification(randomReward, 'reward');
                 // Don't start break timer yet - it will start when notification is closed
-                setIsBreak(true);
-                setTimeLeft(breakDurationRef.current * 60);
-                setIsRunning(false);
+                setTimeout(() => {
+                  setIsBreak(true);
+                  setTimeLeft(breakDurationRef.current * 60);
+                  setIsRunning(false);
+                }, 0);
               } else {
                 // No rewards, switch to break immediately
-                setIsBreak(true);
-                setTimeLeft(breakDurationRef.current * 60);
-                setIsRunning(true);
+                setTimeout(() => {
+                  setIsBreak(true);
+                  setTimeLeft(breakDurationRef.current * 60);
+                  setIsRunning(true);
+                }, 0);
               }
               
               // Update stats in background
@@ -154,9 +158,11 @@ function PomodoroTimer({ onPomodoroEnd }) {
               onPomodoroEndRef.current('completed', focusDurationRef.current, userRef.current.rewards, userRef.current.punishments);
             } else {
               // Break session ended
-              setIsBreak(false);
-              setTimeLeft(focusDurationRef.current * 60);
-              setIsRunning(false);
+              setTimeout(() => {
+                setIsBreak(false);
+                setTimeLeft(focusDurationRef.current * 60);
+                setIsRunning(false);
+              }, 0);
               // Call onPomodoroEnd for break session end if needed, though usually not for rewards/punishments
               onPomodoroEndRef.current('breakEnded', breakDurationRef.current);
             }
@@ -172,7 +178,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
         clearInterval(intervalId);
       }
     };
-  }, [isRunning, handlePomodoroComplete, showNotification]);
+  }, [isRunning, handlePomodoroComplete]);
 
   const handleNotificationClose = useCallback(() => {
     setNotification(null);
