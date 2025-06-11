@@ -103,13 +103,12 @@ function TaskList() {
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={() => toggleTask(task._id)}
-                    className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 ease-in-out ${
-                      task.completed
-                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 border-transparent text-white'
-                        : 'border-emerald-300 hover:border-emerald-500'
+                    className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 ease-in-out ${task.completed
+                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 border-transparent text-white shadow-md'
+                        : 'bg-white ring-2 ring-emerald-300 text-gray-600 hover:ring-emerald-500 shadow-sm hover:scale-105'
                     }`}
                   >
-                    {task.completed && <FaCheck className="w-3 h-3" />}
+                    {task.completed && <FaCheck className="w-4 h-4" />}
                   </button>
                   <span
                     className={`text-gray-700 transition-all duration-300 ease-in-out ${
