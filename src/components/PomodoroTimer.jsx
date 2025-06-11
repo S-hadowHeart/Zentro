@@ -190,7 +190,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   const handleStart = useCallback(() => {
     if (!selectedTask && !isBreak) {
-      alert('Please select a cultivation to focus on');
+      showNotification('Please select a cultivation to focus on, Gardener.', 'info');
       return;
     }
     // This function is strictly for starting a *new* session from full time.
