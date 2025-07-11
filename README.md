@@ -2,6 +2,10 @@
 
 A minimalist and calming productivity tool that helps users stay focused using the Pomodoro technique, task management, and a unique reward/punishment system.
 
+## Demo Video
+
+https://github.com/user-attachments/assets/ccbe3e2b-d0f6-4a23-b5c8-a26410325166
+
 ## Features
 
 - 🎯 Pomodoro Timer (25/5 minutes)
