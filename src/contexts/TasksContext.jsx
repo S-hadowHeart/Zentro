@@ -40,7 +40,7 @@ export function TasksProvider({ children }) {
       
       if (response.ok) {
         const data = await response.json();
-        setTasks(data); // This will also save to localStorage via the useEffect above
+        setTasks(data);
       } else {
         setTasks([]);
       }
@@ -181,7 +181,7 @@ export function TasksProvider({ children }) {
     toggleTask,
     deleteTask,
     updateTasks,
-incrementPomodorosForTask
+    incrementPomodorosForTask
   }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask, updateTasks, incrementPomodorosForTask]);
 
   return (
