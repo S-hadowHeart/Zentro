@@ -4,15 +4,7 @@ import { useAuth } from './AuthContext';
 const TasksContext = createContext(null);
 
 export function TasksProvider({ children }) {
-  const [tasks, setTasks] = useState(() => {
-    try {
-      const savedTasks = localStorage.getItem('tasks');
-      return savedTasks ? JSON.parse(savedTasks) : [];
-    } catch (error) {
-      console.error("Error parsing tasks from localStorage:", error);
-      return [];
-    }
-  });
+  const [tasks, setTasks] = useState([]);
 
   const [isLoadingApi, setIsLoadingApi] = useState(false);
   const { user, loading: authLoading } = useAuth();
@@ -21,14 +13,6 @@ export function TasksProvider({ children }) {
 
   // Overall loading state: true if auth is loading OR (API is loading AND no tasks are yet displayed)
   const loading = authLoading || (isLoadingApi && tasks.length === 0);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    } catch (error) {
-      console.error("Error saving tasks to localStorage:", error);
-    }
-  }, [tasks]);
 
   const fetchTasks = useCallback(async (currentUserId) => {
     if (!currentUserId) {
@@ -197,7 +181,7 @@ export function TasksProvider({ children }) {
     toggleTask,
     deleteTask,
     updateTasks,
-    incrementPomodorosForTask
+incrementPomodorosForTask
   }), [tasks, loading, fetchTasks, addTask, toggleTask, deleteTask, updateTasks, incrementPomodorosForTask]);
 
   return (
@@ -213,4 +197,4 @@ export function useTasks() {
     throw new Error('useTasks must be used within a TasksProvider');
   }
   return context;
-} 
+}

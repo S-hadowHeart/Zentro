@@ -75,9 +75,7 @@ router.patch('/settings',
       console.log('Server: Before save, req.user.settings.dailyGoal:', req.user.settings.dailyGoal);
       await req.user.save();
       console.log('Server: After save, req.user.settings.dailyGoal:', req.user.settings.dailyGoal);
-      res.json({
-        user: req.user // Return the entire user object
-      });
+      res.json(req.user);
     } catch (error) {
       res.status(500).json({ error: 'Server error' });
     }
