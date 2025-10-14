@@ -13,28 +13,20 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Keep true initially to show auth loading
+  const [loading, setLoading] = useState(true); // Start loading until session is verified
   const navigate = useNavigate();
 
+  // This is the key function to fetch user data based on a token
   const fetchUser = useCallback(async (token) => {
-    if (!token) {
-      setUser(null); // Ensure user is null if no token
-      setLoading(false); // Auth loading is done if no token
-      return;
-    }
-
-    setLoading(true); // Start loading when token exists
     try {
       const response = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
       } else {
+        // Token is invalid or expired
         setUser(null);
         localStorage.removeItem('token');
       }
@@ -45,55 +37,16 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []); // Dependencies are stable
-
-  // Effect to handle navigation after auth state is determined
-  // useEffect(() => {
-  //   if (!loading && !user && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-  //     navigate('/login');
-  //   }
-  // }, [loading, user, navigate]);
-
-  const logout = useCallback(() => {
-    setUser(null);
-    localStorage.removeItem('token');
-    navigate('/login');
-  }, [navigate]);
-
-  const updateUser = useCallback((updatedUserData) => {
-    setUser(prevUser => {
-      const newUser = {
-        ...prevUser,
-        ...updatedUserData
-      };
-      // Persist the entire updated user object to localStorage
-      // Note: Make sure updatedUserData from backend includes rewards and punishments
-      localStorage.setItem('user', JSON.stringify(newUser)); 
-      console.log('Saving user to localStorage:', newUser); // Debugging line
-      return newUser;
-    });
   }, []);
 
+  // On initial app load, check for a token and fetch user data
   useEffect(() => {
-    const localUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-
-    if (localUser) {
-      try {
-        setUser(JSON.parse(localUser));
-      } catch (e) {
-        console.error("Failed to parse user from localStorage", e);
-        setUser(null);
-        localStorage.removeItem('user');
-      }
-    }
-
-    // Always attempt to fetch user from API to ensure data is fresh
-    // This will also handle cases where only a token exists but no user in localStorage
     if (token) {
       fetchUser(token);
-    } else if (!localUser) {
-      setLoading(false); // If no token and no local user, auth loading is complete
+    } else {
+      // No token, so we are done with authentication loading
+      setLoading(false);
     }
   }, [fetchUser]);
 
@@ -101,14 +54,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-
       const data = await response.json();
-      
       if (response.ok) {
         localStorage.setItem('token', data.token);
         setUser(data.user);
@@ -127,14 +76,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-
       const data = await response.json();
-      
       if (response.ok) {
         localStorage.setItem('token', data.token);
         setUser(data.user);
@@ -149,13 +94,27 @@ export const AuthProvider = ({ children }) => {
     }
   }, [navigate]);
 
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('token');
+    navigate('/login');
+  }, [navigate]);
+
+  // updateUser no longer needs to touch localStorage
+  const updateUser = useCallback((updatedUserData) => {
+    setUser(prevUser => ({
+      ...prevUser,
+      ...updatedUserData
+    }));
+  }, []);
+
   const value = useMemo(() => ({
     user,
     loading,
     login,
     logout,
     register,
-    fetchUser,
+    fetchUser, // This is not really used by consumers, but can be kept
     updateUser
   }), [user, loading, login, logout, register, fetchUser, updateUser]);
 
@@ -164,4 +123,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-}; 
+};
