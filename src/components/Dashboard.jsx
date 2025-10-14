@@ -9,6 +9,7 @@ import Report from './Report';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 import { FaTimes } from 'react-icons/fa';
+import AnimatedBackground from './ui/AnimatedBackground';
 
 function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -51,12 +52,7 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen bg-background-color text-text-color font-sans relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-10 left-20 w-48 h-48 bg-secondary/30 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob"></div>
-        <div className="absolute top-60 right-20 w-48 h-48 bg-primary/30 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-10 left-1/2 w-48 h-48 bg-accent/50 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-4000"></div>
-      </div>
+      <AnimatedBackground />
 
       {/* Static Sidebar for desktop */}
       <div className="hidden md:flex flex-shrink-0">

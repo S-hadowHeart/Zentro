@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { FaClock, FaTasks, FaCog, FaChartBar, FaLeaf, FaSignOutAlt } from 'react-icons/fa';
@@ -21,8 +20,8 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
   };
 
   return (
-    <aside className={`bg-white/10 backdrop-blur-lg border-r border-emerald-100 flex flex-col p-4 transition-all duration-300 ${isMobile ? 'w-full' : 'w-64'}`}>
-      <div className="flex items-center space-x-3 p-4 border-b border-emerald-100">
+    <aside className={`bg-white/10 backdrop-blur-lg border-r border-primary-light/30 flex flex-col p-4 transition-all duration-300 ${isMobile ? 'w-full' : 'w-64'}`}>
+      <div className="flex items-center space-x-3 p-4 border-b border-primary-light/30">
         <FaLeaf className="w-10 h-10 text-primary" />
         <span className="text-2xl font-bold text-text-color">Zen Garden</span>
       </div>
@@ -36,8 +35,8 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
             className={({ isActive }) =>
               `flex items-center space-x-4 p-3 rounded-lg text-lg font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'text-text-color hover:bg-primary/10'
+                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg'
+                  : 'text-text-color hover:bg-primary-light'
               }`
             }
           >
@@ -47,10 +46,10 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
         ))}
       </nav>
 
-      <div className="pt-4 border-t border-emerald-100">
+      <div className="pt-4 border-t border-primary-light/30">
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-4 p-3 w-full rounded-lg text-lg font-medium text-text-color hover:bg-danger/10 hover:text-danger transition-all duration-200"
+          className="flex items-center space-x-4 p-3 w-full rounded-lg text-lg font-medium text-text-color hover:bg-danger-light hover:text-danger transition-all duration-200"
         >
           <FaSignOutAlt className="w-6 h-6" />
           <span>Leave Garden</span>
