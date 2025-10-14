@@ -7,10 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'zen-green': '#4A7C59',
-        'zen-beige': '#F5F5DC',
-        'zen-gray': '#E5E7EB',
-        'zen-sky': '#B8D8D8'
+        primary: 'var(--primary-color)',
+        secondary: 'var(--secondary-color)',
+        accent: 'var(--accent-color)',
+        'text-color': 'var(--text-color)',
+        'background-color': 'var(--background-color)',
+        danger: 'var(--danger-color)',
       }
     },
   },
