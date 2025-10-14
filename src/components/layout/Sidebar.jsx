@@ -21,7 +21,7 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
   };
 
   return (
-    <aside className={`bg-white/60 backdrop-blur-lg border-r border-emerald-100 flex flex-col p-4 transition-all duration-300 ${isMobile ? 'w-full' : 'w-64'}`}>
+    <aside className={`bg-white/10 backdrop-blur-lg border-r border-emerald-100 flex flex-col p-4 transition-all duration-300 ${isMobile ? 'w-full' : 'w-64'}`}>
       <div className="flex items-center space-x-3 p-4 border-b border-emerald-100">
         <FaLeaf className="w-10 h-10 text-primary" />
         <span className="text-2xl font-bold text-text-color">Zen Garden</span>
@@ -36,7 +36,7 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
             className={({ isActive }) =>
               `flex items-center space-x-4 p-3 rounded-lg text-lg font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary/90 text-white shadow-lg'
+                  ? 'bg-primary text-white shadow-lg'
                   : 'text-text-color hover:bg-primary/10'
               }`
             }

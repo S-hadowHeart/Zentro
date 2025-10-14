@@ -37,7 +37,7 @@ const App = () => {
       <AuthProvider>
         <TasksProvider>
           <Preloader />
-          <div className="min-h-screen bg-background-color text-text-color">
+          <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent text-text-color">
             <AppRoutes />
           </div>
         </TasksProvider>
