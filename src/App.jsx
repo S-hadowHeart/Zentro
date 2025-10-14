@@ -7,6 +7,7 @@ import EnterTheGarden from './components/auth/Login';
 import CultivatePath from './components/auth/Register';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/auth/LandingPage';
+import AnimatedBackground from './components/ui/AnimatedBackground';
 
 // A component to handle routes based on authentication status
 function AppRoutes() {
@@ -37,7 +38,8 @@ const App = () => {
       <AuthProvider>
         <TasksProvider>
           <Preloader />
-          <div className="min-h-screen bg-gradient-to-br from-primary via-secondary to-accent text-text-color">
+          <div className="min-h-screen bg-background-color text-text-color">
+            <AnimatedBackground />
             <AppRoutes />
           </div>
         </TasksProvider>
