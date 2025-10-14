@@ -1,27 +1,22 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 
 const TasksContext = createContext(null);
 
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
-
   const [isLoadingApi, setIsLoadingApi] = useState(false);
   const { user, loading: authLoading } = useAuth();
-  const fetchTasksRef = useRef(null);
-  const hasFetchedInitialTasksRef = useRef(false); // Ref to ensure fetch is only triggered once per session
 
-  // Overall loading state: true if auth is loading OR (API is loading AND no tasks are yet displayed)
   const loading = authLoading || (isLoadingApi && tasks.length === 0);
 
-  const fetchTasks = useCallback(async (currentUserId) => {
-    if (!currentUserId) {
+  const fetchTasks = useCallback(async () => {
+    if (!user) {
       setTasks([]);
-      setIsLoadingApi(false); // No user, so not loading from API
       return;
     }
 
-    setIsLoadingApi(true); // Start API loading
+    setIsLoadingApi(true);
 
     try {
       const token = localStorage.getItem('token');
@@ -48,37 +43,19 @@ export function TasksProvider({ children }) {
       console.error('Error fetching tasks:', error);
       setTasks([]);
     } finally {
-      setIsLoadingApi(false); // API fetch completed
+      setIsLoadingApi(false);
     }
-  }, []);
+  }, [user]);
 
-  // Store the latest fetchTasks function in a ref
   useEffect(() => {
-    fetchTasksRef.current = fetchTasks;
-  }, [fetchTasks]);
+    if (!authLoading && user) {
+      fetchTasks();
+    }
+  }, [authLoading, user, fetchTasks]);
 
   const updateTasks = useCallback((updatedTaskData) => {
     setTasks(updatedTaskData);
   }, []);
-
-  useEffect(() => {
-    if (!authLoading) { // Once auth loading is complete
-      if (user) {
-        // Trigger initial fetch of tasks only if not already fetched for this session
-        if (!hasFetchedInitialTasksRef.current) {
-          // Call fetchTasks and ensure hasFetchedInitialTasksRef is set after it completes
-          fetchTasksRef.current?.(user._id).finally(() => {
-            hasFetchedInitialTasksRef.current = true;
-          });
-        }
-      } else {
-        // If no user (e.g., logged out or failed auth), clear tasks and reset fetch flag
-        setTasks([]);
-        setIsLoadingApi(false);
-        hasFetchedInitialTasksRef.current = false; // Reset for next login
-      }
-    }
-  }, [authLoading, user]); // Re-run when auth status or user changes
 
   const addTask = useCallback(async (title) => {
     try {
