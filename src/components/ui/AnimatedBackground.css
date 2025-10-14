@@ -1,1 +1,20 @@
-@keyframes move {\n  0% { transform: translate(-50%, -50%) scale(1); }\n  50% { transform: translate(-50%, -50%) scale(1.2); }\n  100% { transform: translate(-50%, -50%) scale(1); }\n}\n\n.blob {\n  position: absolute;\n  border-radius: 50%;\n  filter: blur(80px);\n  opacity: 0.3;\n}\n
+
+@keyframes move {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  animation: move 10s infinite;
+}
