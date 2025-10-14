@@ -49,21 +49,6 @@ function Dashboard() {
     setCurrentPunishment('');
   };
 
-  const renderContent = () => {
-    switch (location.pathname) {
-      case '/pomodoro':
-        return <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />;
-      case '/tasks':
-        return <TaskList />;
-      case '/settings':
-        return <Settings />;
-      case '/report':
-        return <Report key={reportRefreshKey} />;
-      default:
-        return <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />;
-    }
-  };
-
   return (
     <div className="flex h-screen bg-background-color text-text-color font-sans relative overflow-hidden">
       {/* Background decorations */}
@@ -101,7 +86,18 @@ function Dashboard() {
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10">
           <div className="mx-auto max-w-7xl">
-            {renderContent()}
+            <div style={{ display: location.pathname === '/pomodoro' || location.pathname === '/' ? 'block' : 'none' }}>
+              <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
+            </div>
+            <div style={{ display: location.pathname === '/tasks' ? 'block' : 'none' }}>
+              <TaskList />
+            </div>
+            <div style={{ display: location.pathname === '/settings' ? 'block' : 'none' }}>
+              <Settings />
+            </div>
+            <div style={{ display: location.pathname === '/report' ? 'block' : 'none' }}>
+              <Report key={reportRefreshKey} />
+            </div>
           </div>
         </main>
       </div>

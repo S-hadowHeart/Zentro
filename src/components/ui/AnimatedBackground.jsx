@@ -1,1 +1,41 @@
-import React from 'react';\n\nconst AnimatedBackground = () => {\n  return (\n    <div className=\"fixed top-0 left-0 w-full h-full -z-10 overflow-hidden bg-background-color\">\n      <style>\n        {\`\n          @keyframes move {\n            0% { transform: translate(-50%, -50%) scale(1); }\n            50% { transform: translate(-50%, -50%) scale(1.2); }\n            100% { transform: translate(-50%, -50%) scale(1); }\n          }\n\n          .blob {\n            position: absolute;\n            border-radius: 50%;\n            filter: blur(80px);\n            opacity: 0.3;\n          }\n        \`}\n      </style>\n      <div\n        className=\"blob bg-primary\"\n        style={{\n          width: '400px',\n          height: '400px',\n          top: '20%',\n          left: '30%',\n          animation: 'move 15s infinite ease-in-out',\n        }}\n      ></div>\n      <div\n        className=\"blob bg-secondary\"\n        style={{\n          width: '300px',\n          height: '300px',\n          top: '50%',\n          left: '70%',\n          animation: 'move 20s infinite ease-in-out reverse',\n        }}\n      ></div>\n      <div\n        className=\"blob bg-accent\"\n        style={{\n          width: '250px',\n          height: '250px',\n          top: '80%',\n          left: '40%',\n          animation: 'move 18s infinite ease-in-out',\n        }}\n      ></div>\n    </div>\n  );\n};\n\nexport default AnimatedBackground;\n
+import React from 'react';
+import './AnimatedBackground.css';
+
+const AnimatedBackground = () => {
+  return (
+    <div className="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden bg-background-color">
+      <div
+        className="blob bg-primary"
+        style={{
+          width: '400px',
+          height: '400px',
+          top: '20%',
+          left: '30%',
+          animation: 'move 15s infinite ease-in-out',
+        }}
+      ></div>
+      <div
+        className="blob bg-secondary"
+        style={{
+          width: '300px',
+          height: '300px',
+          top: '50%',
+          left: '70%',
+          animation: 'move 20s infinite ease-in-out reverse',
+        }}
+      ></div>
+      <div
+        className="blob bg-accent"
+        style={{
+          width: '250px',
+          height: '250px',
+          top: '80%',
+          left: '40%',
+          animation: 'move 18s infinite ease-in-out',
+        }}
+      ></div>
+    </div>
+  );
+};
+
+export default AnimatedBackground;

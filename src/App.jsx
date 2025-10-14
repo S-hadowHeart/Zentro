@@ -9,24 +9,45 @@ import Dashboard from './components/Dashboard';
 import LandingPage from './components/auth/LandingPage';
 import AnimatedBackground from './components/ui/AnimatedBackground';
 
+// A wrapper for routes that should only be accessible to authenticated users
+function PrivateRoute({ children }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null; // Preloader will be shown
+  }
+
+  return user ? children : <Navigate to="/" replace />;
+}
+
+// A wrapper for routes that should only be accessible to unauthenticated users
+function PublicRoute({ children }) {
+  const { user } = useAuth();
+  return !user ? children : <Navigate to="/pomodoro" replace />;
+}
+
+// A component for the fallback redirect
+function FallbackRedirect() {
+    const { user } = useAuth();
+    return user ? <Navigate to="/pomodoro" replace /> : <Navigate to="/" replace />;
+}
+
 // A component to handle routes based on authentication status
 function AppRoutes() {
-  const { user } = useAuth();
-
   return (
     <Routes>
-      <Route path="/login" element={!user ? <EnterTheGarden /> : <Navigate to="/pomodoro" replace />} />
-      <Route path="/register" element={!user ? <CultivatePath /> : <Navigate to="/pomodoro" replace />} />
-      <Route path="/" element={user ? <Navigate to="/pomodoro" replace /> : <LandingPage />} />
+      <Route path="/login" element={<PublicRoute><EnterTheGarden /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><CultivatePath /></PublicRoute>} />
+      <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
 
       {/* Authenticated routes */}
-      <Route path="/tasks" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
-      <Route path="/settings" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
-      <Route path="/report" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
-      <Route path="/pomodoro" element={user ? <Dashboard /> : <Navigate to="/" replace />} />
+      <Route path="/tasks" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="/settings" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="/report" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="/pomodoro" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
 
       {/* Fallback redirect */}
-      <Route path="*" element={user ? <Navigate to="/pomodoro" replace /> : <Navigate to="/" replace />} />
+      <Route path="*" element={<FallbackRedirect />} />
     </Routes>
   );
 }

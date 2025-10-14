@@ -3,6 +3,14 @@ import { useAuth } from './AuthContext';
 
 const TasksContext = createContext(null);
 
+export function useTasks() {
+  const context = useContext(TasksContext);
+  if (!context) {
+    throw new Error('useTasks must be used within a TasksProvider');
+  }
+  return context;
+}
+
 export function TasksProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [isLoadingApi, setIsLoadingApi] = useState(false);
@@ -166,12 +174,4 @@ export function TasksProvider({ children }) {
       {children}
     </TasksContext.Provider>
   );
-}
-
-export function useTasks() {
-  const context = useContext(TasksContext);
-  if (!context) {
-    throw new Error('useTasks must be used within a TasksProvider');
-  }
-  return context;
 }
