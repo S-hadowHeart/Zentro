@@ -4,7 +4,7 @@ function RewardModal({ show, onClose, reward }) {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex justify-center items-center p-2 sm:p-4 z-50 transition-opacity duration-300">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xl flex justify-center items-center p-2 sm:p-4 z-[60] transition-opacity duration-300">
       <div className="relative bg-white/10 rounded-3xl shadow-2xl p-4 sm:p-8 max-w-md w-full transform transition-all duration-500 ease-in-out scale-95 hover:scale-100 border border-white/20">
         <div className="absolute top-0 left-0 -mt-4 -ml-4 sm:-mt-8 sm:-ml-8 w-16 h-16 sm:w-24 sm:h-24 bg-green-400/50 rounded-full filter blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 right-0 -mb-4 -mr-4 sm:-mb-8 sm:-mr-8 w-16 h-16 sm:w-24 sm:h-24 bg-blue-400/50 rounded-full filter blur-3xl animate-pulse delay-200"></div>

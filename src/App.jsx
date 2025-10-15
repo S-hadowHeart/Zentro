@@ -3,22 +3,20 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TasksProvider } from './contexts/TasksContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { PomodoroProvider } from './contexts/PomodoroContext';
+import { PomodoroProvider, usePomodoro } from './contexts/PomodoroContext';
 import Preloader from './components/ui/Preloader';
 import EnterTheGarden from './components/auth/Login';
 import CultivatePath from './components/auth/Register';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/auth/LandingPage';
 import AnimatedBackground from './components/ui/AnimatedBackground';
+import RewardModal from './components/RewardModal';
+import PunishmentModal from './components/PunishmentModal';
 
 // A wrapper for routes that should only be accessible to authenticated users
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
-
-  if (loading) {
-    return null; // Preloader will be shown
-  }
-
+  if (loading) return null;
   return user ? children : <Navigate to="/" replace />;
 }
 
@@ -33,27 +31,40 @@ function AppRoutes() {
   return (
     <div className="relative z-10">
       <Routes>
-        <Route
-          path="/login"
-          element={<PublicRoute><EnterTheGarden /></PublicRoute>}
-        />
-        <Route
-          path="/register"
-          element={<PublicRoute><CultivatePath /></PublicRoute>}
-        />
+        <Route path="/login" element={<PublicRoute><EnterTheGarden /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><CultivatePath /></PublicRoute>} />
         <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
-
-        {/* Authenticated routes rendered within the Dashboard */}
-        <Route
-          path="/*"
-          element={<PrivateRoute><Dashboard /></PrivateRoute>}
-        />
+        <Route path="/*" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       </Routes>
     </div>
   );
 }
 
-// Main App component with providers and preloader
+// Wrapper to render main content and global modals
+function AppContent() {
+  const {
+    showRewardModal,
+    closeRewardModal,
+    currentReward,
+    showPunishmentModal,
+    closePunishmentModal,
+    currentPunishment,
+  } = usePomodoro();
+
+  return (
+    <>
+      <Preloader />
+      <div className="min-h-screen bg-background text-text font-sans">
+        <AnimatedBackground />
+        <AppRoutes />
+      </div>
+      <RewardModal show={showRewardModal} onClose={closeRewardModal} reward={currentReward} />
+      <PunishmentModal show={showPunishmentModal} onClose={closePunishmentModal} punishment={currentPunishment} />
+    </>
+  );
+}
+
+// Main App component with providers
 const App = () => {
   return (
     <Router>
@@ -61,11 +72,7 @@ const App = () => {
         <TasksProvider>
           <PomodoroProvider>
             <ThemeProvider>
-              <Preloader />
-              <div className="min-h-screen bg-background text-text font-sans">
-                <AnimatedBackground />
-                <AppRoutes />
-              </div>
+              <AppContent />
             </ThemeProvider>
           </PomodoroProvider>
         </TasksProvider>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { usePomodoro } from '../contexts/PomodoroContext';
 import Sidebar from './layout/Sidebar';
 import Header from './layout/Header';
 import PomodoroTimer from './PomodoroTimer';
@@ -8,22 +7,11 @@ import TaskList from './TaskList';
 import Settings from './Settings';
 import Report from './Report';
 import MusicPlayer from './MusicPlayer';
-import RewardModal from './RewardModal';
-import PunishmentModal from './PunishmentModal';
 import ZenGarden from './ui/ZenGarden';
 import { FaTimes } from 'react-icons/fa';
 
 function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const {
-    showRewardModal,
-    closeRewardModal,
-    currentReward,
-    showPunishmentModal,
-    closePunishmentModal,
-    currentPunishment,
-  } = usePomodoro();
 
   const handleToggleMobileMenu = () => {
     setIsMobileMenuOpen(prev => !prev);
@@ -36,14 +24,14 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen text-zen-charcoal dark:text-zen-sand font-sans relative overflow-hidden bg-white dark:bg-zen-night">
+    <div className="flex h-screen text-zen-charcoal dark:text-zen-sand font-sans relative bg-white dark:bg-zen-night">
       <ZenGarden />
 
       <Sidebar isMobile={false} onLinkClick={handleCloseMobileMenu} />
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed inset-0 z-50 flex md:hidden transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-0 z-40 flex md:hidden transition-transform duration-300 ease-in-out ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -75,8 +63,6 @@ function Dashboard() {
       </div>
 
       <MusicPlayer />
-      <RewardModal show={showRewardModal} onClose={closeRewardModal} reward={currentReward} />
-      <PunishmentModal show={showPunishmentModal} onClose={closePunishmentModal} punishment={currentPunishment} />
     </div>
   );
 }
