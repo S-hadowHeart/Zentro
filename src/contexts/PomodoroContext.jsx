@@ -74,7 +74,7 @@ export const PomodoroProvider = ({ children }) => {
 
     try {
       const token = localStorage.getItem('token');
-      await fetch('/api/users/pomo-session', {
+      await fetch('https://zentro-yerp.onrender.com/api/users/pomo-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

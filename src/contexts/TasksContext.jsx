@@ -34,7 +34,7 @@ export function TasksProvider({ children }) {
         return;
       }
 
-      const response = await fetch('/api/tasks', {
+      const response = await fetch('https://zentro-yerp.onrender.com/api/tasks', {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -70,7 +70,7 @@ export function TasksProvider({ children }) {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch('/api/tasks', {
+      const response = await fetch('https://zentro-yerp.onrender.com/api/tasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export function TasksProvider({ children }) {
   const incrementPomodorosForTask = useCallback(async (taskId, duration) => {
     if (!taskId) return;
     try {
-      const response = await fetch(`/api/tasks/${taskId}/pomodoro`, {
+      const response = await fetch(`https://zentro-yerp.onrender.com/api/tasks/${taskId}/pomodoro`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export function TasksProvider({ children }) {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch(`/api/tasks/${taskId}/toggle`, {
+      const response = await fetch(`https://zentro-yerp.onrender.com/api/tasks/${taskId}/toggle`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -146,7 +146,7 @@ export function TasksProvider({ children }) {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch(`/api/tasks/${taskId}`, {
+      const response = await fetch(`https://zentro-yerp.onrender.com/api/tasks/${taskId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

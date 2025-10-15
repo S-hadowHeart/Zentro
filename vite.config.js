@@ -35,6 +35,13 @@ export default defineConfig({
     host: true,
     watch: {
       usePolling: true
+    },
+    proxy: {
+      '/api': {
+        target: 'https://zentro-yerp.onrender.com',
+        changeOrigin: true,
+        secure: false,
+      }
     }
   },
   define: {
