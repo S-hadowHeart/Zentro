@@ -6,7 +6,7 @@ import PomodoroTimer from './PomodoroTimer';
 import TaskList from './TaskList';
 import Settings from './Settings';
 import Report from './Report';
-import MusicPlayer from './MusicPlayer'; // Import the MusicPlayer component
+import MusicPlayer from './MusicPlayer';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 import ZenGarden from './ui/ZenGarden';
@@ -52,11 +52,12 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen text-zen-charcoal dark:text-zen-sand font-sans relative overflow-hidden">
+    <div className="flex h-screen text-zen-charcoal dark:text-zen-sand font-sans relative overflow-hidden bg-white dark:bg-zen-night">
       <ZenGarden />
 
       <Sidebar isMobile={false} />
 
+      {/* Mobile Sidebar */}
       <div
         className={`fixed inset-0 z-50 flex md:hidden transition-transform duration-300 ease-in-out ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
@@ -72,10 +73,11 @@ function Dashboard() {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 z-10 bg-white/10 dark:bg-zen-night/40">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 z-10">
           <div className="mx-auto max-w-4xl">
             {location.pathname === '/pomodoro' || location.pathname === '/' ? (
               <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
