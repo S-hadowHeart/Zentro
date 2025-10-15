@@ -80,7 +80,12 @@ router.patch('/:id/pomodoro', auth, async (req, res) => {
     
     // Log PomodoroHistory
     const { duration } = req.body; // Get duration from request body
-    await PomodoroHistory.create({ user: req.user._id, task: task._id, duration: duration || 25, completedAt: new Date() }); // Save duration, default to 25 mins
+    await PomodoroHistory.create({ 
+        user: req.user._id, 
+        task: task._id, 
+        duration: Math.round(duration / 60), // Save duration in minutes
+        completedAt: new Date() 
+    });
     
     res.json(task);
   } catch (error) {
@@ -102,4 +107,4 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
-export default router; 
+export default router;
