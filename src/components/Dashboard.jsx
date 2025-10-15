@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { usePomodoro } from '../contexts/PomodoroContext';
 import Sidebar from './layout/Sidebar';
 import Header from './layout/Header';
 import PomodoroTimer from './PomodoroTimer';
@@ -14,48 +15,33 @@ import { FaTimes } from 'react-icons/fa';
 
 function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showRewardModal, setShowRewardModal] = useState(false);
-  const [showPunishmentModal, setShowPunishmentModal] = useState(false);
-  const [currentReward, setCurrentReward] = useState('');
-  const [currentPunishment, setCurrentPunishment] = useState('');
-  const [reportRefreshKey, setReportRefreshKey] = useState(0);
   const location = useLocation();
 
-  useEffect(() => {
+  const {
+    showRewardModal,
+    closeRewardModal,
+    currentReward,
+    showPunishmentModal,
+    closePunishmentModal,
+    currentPunishment,
+    reportRefreshKey
+  } = usePomodoro();
+
+  const handleToggleMobileMenu = () => {
+    setIsMobileMenuOpen(prev => !prev);
+  };
+
+  const handleCloseMobileMenu = () => {
     if (isMobileMenuOpen) {
       setIsMobileMenuOpen(false);
     }
-  }, [location.pathname]);
-
-  const handlePomodoroEnd = useCallback(async (eventType, duration, rewards, punishments) => {
-    setReportRefreshKey(prevKey => prevKey + 1);
-
-    if (eventType === 'completed' && rewards?.length > 0) {
-      const randomReward = rewards[Math.floor(Math.random() * rewards.length)];
-      setCurrentReward(randomReward);
-      setShowRewardModal(true);
-    } else if (eventType === 'interrupted' && punishments?.length > 0) {
-      const randomPunishment = punishments[Math.floor(Math.random() * punishments.length)];
-      setCurrentPunishment(randomPunishment);
-      setShowPunishmentModal(true);
-    }
-  }, []);
-
-  const closeRewardModal = () => {
-    setShowRewardModal(false);
-    setCurrentReward('');
-  };
-
-  const closePunishmentModal = () => {
-    setShowPunishmentModal(false);
-    setCurrentPunishment('');
   };
 
   return (
     <div className="flex h-screen text-zen-charcoal dark:text-zen-sand font-sans relative overflow-hidden bg-white dark:bg-zen-night">
       <ZenGarden />
 
-      <Sidebar isMobile={false} />
+      <Sidebar isMobile={false} onLinkClick={handleCloseMobileMenu} />
 
       {/* Mobile Sidebar */}
       <div
@@ -64,9 +50,9 @@ function Dashboard() {
         }`}
       >
         <div className="w-64 bg-white/80 dark:bg-zen-night-dark/90 backdrop-blur-lg shadow-2xl border-r border-white/20 dark:border-zen-night-light/20">
-          <Sidebar isMobile onLinkClick={() => setIsMobileMenuOpen(false)} />
+          <Sidebar isMobile onLinkClick={handleCloseMobileMenu} />
         </div>
-        <div className="flex-1 bg-black/60" onClick={() => setIsMobileMenuOpen(false)}>
+        <div className="flex-1 bg-black/60" onClick={handleToggleMobileMenu}>
           <button className="p-4 text-white">
             <FaTimes className="h-6 w-6" />
           </button>
@@ -75,12 +61,12 @@ function Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
+        <Header onMenuClick={handleToggleMobileMenu} />
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 z-10">
           <div className="mx-auto max-w-4xl">
             {location.pathname === '/pomodoro' || location.pathname === '/' ? (
-              <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
+              <PomodoroTimer />
             ) : location.pathname === '/tasks' ? (
               <TaskList />
             ) : location.pathname === '/settings' ? (

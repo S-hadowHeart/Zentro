@@ -110,7 +110,7 @@ export function TasksProvider({ children }) {
         );
       }
     } catch (error) {
-      console.error('Error updating task:', error);
+      console.error('Error incrementing pomodoros for task:', error);
     }
   }, []);
 

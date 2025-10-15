@@ -1,118 +1,34 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useEffect } from 'react';
+import { usePomodoro } from '../contexts/PomodoroContext';
 import { useTasks } from '../contexts/TasksContext';
 import { FaPlay, FaPause, FaRedo, FaSeedling } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-function PomodoroTimer({ onPomodoroEnd }) {
-  const { user } = useAuth();
-  const { tasks, incrementPomodorosForTask } = useTasks();
-  
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isBreak, setIsBreak] = useState(false);
-  const [selectedTask, setSelectedTask] = useState('');
-  const audioRef = useRef(null);
-  const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
+function PomodoroTimer() {
+  const {
+    timeLeft,
+    setTimeLeft,
+    isRunning,
+    setIsRunning,
+    isBreak,
+    setIsBreak,
+    selectedTask,
+    setSelectedTask,
+    focusDuration,
+    breakDuration,
+    formatTime,
+    unlockAudio,
+    onPomodoroEnd,
+  } = usePomodoro();
 
-  const focusDuration = user?.settings?.pomodoroDuration || 25;
-  const breakDuration = user?.settings?.breakDuration || 5;
-
-  useEffect(() => {
-    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-      Notification.requestPermission();
-    }
-    audioRef.current = new Audio('/sounds/notification.mp3');
-    audioRef.current.load();
-  }, []);
-
-  useEffect(() => {
-    setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
-  }, [focusDuration, breakDuration, isBreak]);
+  const { tasks } = useTasks();
 
   useEffect(() => {
     const nonCompletedTasks = tasks.filter(task => !task.completed);
     if (nonCompletedTasks.length > 0 && !selectedTask) {
       setSelectedTask(nonCompletedTasks[0]._id);
     }
-  }, [tasks, selectedTask]);
-
-  useEffect(() => {
-    if (isRunning) {
-      document.title = `${formatTime(timeLeft)} - ${isBreak ? 'Resting' : 'Focusing'}`;
-    } else {
-      document.title = 'Zen Garden';
-    }
-    return () => { document.title = 'Zen Garden'; };
-  }, [timeLeft, isRunning, isBreak]);
-
-  const playNotificationSound = useCallback(() => {
-    if (audioRef.current && isAudioUnlocked) {
-      audioRef.current.play().catch(e => console.error("Error playing sound:", e));
-    }
-  }, [isAudioUnlocked]);
-
-  const showBrowserNotification = useCallback((message) => {
-    if (Notification.permission === 'granted') {
-      new Notification('Zen Garden', {
-        body: message,
-        icon: '/leaf-solid.svg',
-      });
-    }
-  }, []);
-
-  const handleSessionEnd = useCallback(async () => {
-    const wasBreak = isBreak;
-    setIsRunning(false);
-    playNotificationSound();
-
-    if (!wasBreak) {
-      showBrowserNotification('Focus complete. Time to rest in the garden.');
-      const durationInSeconds = focusDuration * 60;
-      if(selectedTask) incrementPomodorosForTask(selectedTask, durationInSeconds);
-      if (user) {
-        onPomodoroEnd('completed', durationInSeconds, user.rewards, user.punishments);
-      }
-    } else {
-      showBrowserNotification('Rest is over. Time to cultivate focus again.');
-      onPomodoroEnd('breakEnded', breakDuration * 60);
-    }
-    
-    setIsBreak(!wasBreak);
-
-  }, [isBreak, selectedTask, focusDuration, breakDuration, user, playNotificationSound, showBrowserNotification, incrementPomodorosForTask, onPomodoroEnd]);
-
-  useEffect(() => {
-    if (!isRunning) return;
-    const intervalId = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalId);
-          handleSessionEnd();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, [isRunning, handleSessionEnd]);
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const unlockAudio = () => {
-    if (isAudioUnlocked) return;
-    audioRef.current.muted = true;
-    audioRef.current.play().then(() => {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        audioRef.current.muted = false;
-        setIsAudioUnlocked(true);
-    }).catch(e => console.error("Audio unlock failed:", e));
-  };
+  }, [tasks, selectedTask, setSelectedTask]);
 
   const handleStartPause = () => {
     if (!selectedTask && !isBreak) {
@@ -126,9 +42,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
   const handleReset = () => {
     if (isRunning && !isBreak) {
         const interruptedDuration = focusDuration * 60 - timeLeft;
-        if (user) {
-            onPomodoroEnd('interrupted', interruptedDuration, user.rewards, user.punishments);
-        }
+        onPomodoroEnd('interrupted', interruptedDuration);
     }
     setIsRunning(false);
     setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
@@ -139,9 +53,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
     if (!isBreak && timeLeft < focusDuration * 60) {
         const interruptedDuration = focusDuration * 60 - timeLeft;
-        if (user) {
-            onPomodoroEnd('interrupted', interruptedDuration, user.rewards, user.punishments);
-        }
+        onPomodoroEnd('interrupted', interruptedDuration);
     }
     setIsBreak(prev => !prev);
     setIsRunning(false);

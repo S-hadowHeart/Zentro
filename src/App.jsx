@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TasksProvider } from './contexts/TasksContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { PomodoroProvider } from './contexts/PomodoroContext';
 import Preloader from './components/ui/Preloader';
 import EnterTheGarden from './components/auth/Login';
 import CultivatePath from './components/auth/Register';
@@ -61,13 +62,15 @@ const App = () => {
     <Router>
       <AuthProvider>
         <TasksProvider>
-          <ThemeProvider>
-            <Preloader />
-            <div className="min-h-screen bg-background text-text font-sans">
-              <AnimatedBackground />
-              <AppRoutes />
-            </div>
-          </ThemeProvider>
+            <PomodoroProvider>
+              <ThemeProvider>
+                <Preloader />
+                <div className="min-h-screen bg-background text-text font-sans">
+                  <AnimatedBackground />
+                  <AppRoutes />
+                </div>
+              </ThemeProvider>
+            </PomodoroProvider>
         </TasksProvider>
       </AuthProvider>
     </Router>
