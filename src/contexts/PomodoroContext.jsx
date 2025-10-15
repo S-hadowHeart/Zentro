@@ -42,7 +42,7 @@ export const PomodoroProvider = ({ children }) => {
     if (!isRunning) {
       setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
     }
-  }, [focusDuration, breakDuration, isBreak]);
+  }, [focusDuration, breakDuration, isBreak, user]);
 
   useEffect(() => {
     if (isRunning) {
@@ -71,33 +71,39 @@ export const PomodoroProvider = ({ children }) => {
 
   const onPomodoroEnd = useCallback(async (status, duration) => {
     if (!user) return;
-    
+
     setReportRefreshKey(prev => prev + 1);
 
-    if (status === 'completed' && user.rewards?.length > 0) {
-        const randomReward = user.rewards[Math.floor(Math.random() * user.rewards.length)];
+    try {
+      // First, update the session on the backend
+      const token = localStorage.getItem('token');
+      await fetch('/api/users/pomo-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status, duration })
+      });
+
+      // Now, fetch the updated user object which includes the new streak
+      const freshUser = await updateUser();
+      if (!freshUser) return;
+
+      // Then, show reward or punishment based on the result of the session
+      if (status === 'completed' && freshUser.rewards?.length > 0) {
+        const randomReward = freshUser.rewards[Math.floor(Math.random() * freshUser.rewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
-    } else if (status === 'interrupted' && user.punishments?.length > 0) {
-        const randomPunishment = user.punishments[Math.floor(Math.random() * user.punishments.length)];
+      } else if (status === 'interrupted' && freshUser.punishments?.length > 0) {
+        const randomPunishment = freshUser.punishments[Math.floor(Math.random() * freshUser.punishments.length)];
         setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
-    }
-
-    try {
-        const token = localStorage.getItem('token');
-        await fetch('/api/users/pomo-session', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ status, duration })
-        });
+      }
     } catch (error) {
-        console.error('Error updating session:', error);
+      console.error('Error updating session:', error);
     }
-  }, [user]);
+  }, [user, updateUser]);
 
   const handleSessionEnd = useCallback(async () => {
     const wasBreak = isBreak;

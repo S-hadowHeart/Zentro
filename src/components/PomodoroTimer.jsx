@@ -40,7 +40,7 @@ function PomodoroTimer() {
   };
 
   const handleReset = () => {
-    if (isRunning && !isBreak) {
+    if (!isBreak && timeLeft < focusDuration * 60) { // Check if it's a focus session and timer has started
         const interruptedDuration = focusDuration * 60 - timeLeft;
         onPomodoroEnd('interrupted', interruptedDuration);
     }
