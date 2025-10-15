@@ -98,7 +98,7 @@ function Settings() {
 
             <SettingsCard icon={FaClock} title="Flow & Rest Rhythm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <NumberInput label="Focus (minutes)" value={pomodoroDuration} onChange={setPomodoroDuration} min={5} max={90} />
+                    <NumberInput label="Focus (minutes)" value={pomodoroDuration} onChange={setPomodoroDuration} min={1} max={90} />
                     <NumberInput label="Rest (minutes)" value={breakDuration} onChange={setBreakDuration} min={1} max={30} />
                 </div>
                 <SaveButton onClick={handleSettingsUpdate} isSaving={isUpdating} text="Save Rhythm" />

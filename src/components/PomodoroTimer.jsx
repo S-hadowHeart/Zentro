@@ -94,7 +94,7 @@ function PomodoroTimer() {
                       <FaRedo className="w-6 h-6" />
                   </button>
                   <button onClick={handleStartPause} className={`w-28 h-28 rounded-full text-white font-bold flex items-center justify-center shadow-2xl transform transition-all duration-300 hover:scale-105 ${isRunning ? 'bg-gradient-to-br from-zen-orange to-red-500' : (isBreak ? 'bg-gradient-to-br from-zen-sky to-blue-500' : 'bg-gradient-to-br from-zen-green to-teal-500')}`}>
-                      {isRunning ? <FaPause className="w-10 h-10" /> : <FaPlay className="w-10 h-10 ml-2" />}
+                      {isRunning ? <FaPause className="w-10 h-10 text-white" /> : <FaPlay className="w-10 h-10 ml-2 text-white" />}
                   </button>
                   <button onClick={handleModeSwitch} disabled={isRunning} title="Switch Mode" className="w-20 h-20 rounded-full bg-zen-sand/60 dark:bg-zen-night/50 text-zen-charcoal/70 dark:text-zen-sand/70 flex items-center justify-center shadow-lg transform transition-all duration-300 hover:scale-105 hover:bg-zen-sand/80 dark:hover:bg-zen-night/70 backdrop-blur-sm disabled:opacity-50">
                       <FaSeedling className="w-6 h-6" />

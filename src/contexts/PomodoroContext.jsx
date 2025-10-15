@@ -39,10 +39,10 @@ export const PomodoroProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!isRunning) {
+    if (!isRunning && timeLeft === 0) {
       setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
     }
-  }, [focusDuration, breakDuration, isBreak, isRunning]);
+  }, [focusDuration, breakDuration, isBreak, isRunning, timeLeft]);
 
   useEffect(() => {
     if (isRunning) {
