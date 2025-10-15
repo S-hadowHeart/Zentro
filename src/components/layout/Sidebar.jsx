@@ -23,7 +23,7 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
   const activeItemClass = "bg-gradient-to-r from-zen-green/80 to-zen-green text-white shadow-lg shadow-zen-green/30";
 
   return (
-    <aside className={`flex-col p-4 transition-all duration-300 ${isMobile ? 'w-full h-full flex' : 'w-64 hidden md:flex'}`}>
+    <aside className={`flex-col p-4 transition-all duration-300 bg-white/50 dark:bg-zen-night/60 backdrop-blur-xl border-r border-white/20 dark:border-zen-night-light/10 ${isMobile ? 'w-full h-full flex' : 'w-64 hidden md:flex'}`}>
       <div className="flex items-center space-x-3 p-4 mb-4">
         <div className="p-2 bg-gradient-to-br from-zen-green to-zen-green-dark rounded-xl shadow-lg">
             <FaLeaf className="w-8 h-8 text-white" />

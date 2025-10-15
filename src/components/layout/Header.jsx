@@ -19,7 +19,7 @@ const Header = ({ onMenuClick }) => {
   }, [user]);
 
   return (
-    <header className="flex items-center justify-between p-4 sm:p-6 sticky top-0 z-30 bg-transparent backdrop-blur-md md:bg-transparent md:backdrop-blur-none">
+    <header className="flex items-center justify-between p-4 sm:p-6 sticky top-0 z-30 bg-white/50 dark:bg-zen-night/60 backdrop-blur-xl border-b border-white/20 dark:border-zen-night-light/10">
         <div className="flex items-center">
             <button onClick={onMenuClick} className="p-2.5 rounded-full text-zen-charcoal/70 dark:text-zen-sand/70 hover:bg-black/10 dark:hover:bg-white/10 transition-colors md:hidden">
                 <FaBars className="w-5 h-5" />
