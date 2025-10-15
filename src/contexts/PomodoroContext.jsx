@@ -110,11 +110,18 @@ export const PomodoroProvider = ({ children }) => {
         const randomReward = freshUser.rewards[Math.floor(Math.random() * freshUser.rewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
-      } else if (status === 'interrupted' && freshUser && freshUser.punishments?.length > 0) {
-        const randomPunishment = freshUser.punishments[Math.floor(Math.random() * freshUser.punishments.length)];
-        setCurrentPunishment(randomPunishment);
+      } else if (status === 'interrupted' && freshUser) {
+        const punishment = freshUser.punishments?.[Math.floor(Math.random() * freshUser.punishments.length)] || "No punishment found.";
+        const rewardsForDebug = JSON.stringify(freshUser.rewards);
+        setCurrentPunishment(`DEBUG: Rewards are: ${rewardsForDebug}. Punishment: ${punishment}`);
+        setShowPunishmentModal(true);
+      } else if (status === 'completed') {
+        // Fallback for debugging on mobile
+        const rewardsForDebug = JSON.stringify(freshUser?.rewards);
+        setCurrentPunishment(`DEBUG: COMPLETED but no reward. Rewards: ${rewardsForDebug}`);
         setShowPunishmentModal(true);
       }
+
     } catch (error) {
       console.error('Error during pomodoro end process:', error);
     }
