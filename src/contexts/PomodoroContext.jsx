@@ -199,4 +199,4 @@ export const PomodoroProvider = ({ children }) => {
   };
 
   return <PomodoroContext.Provider value={value}>{children}</PomodoroContext.Provider>;
-});
+};
