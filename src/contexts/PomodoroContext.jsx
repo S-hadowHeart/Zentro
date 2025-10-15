@@ -42,7 +42,7 @@ export const PomodoroProvider = ({ children }) => {
     if (!isRunning) {
       setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
     }
-  }, [focusDuration, breakDuration, isBreak, user]);
+  }, [focusDuration, breakDuration, isBreak, user, isRunning]);
 
   useEffect(() => {
     if (isRunning) {
@@ -53,12 +53,33 @@ export const PomodoroProvider = ({ children }) => {
     return () => { document.title = 'Zen Garden'; };
   }, [timeLeft, isRunning, isBreak]);
 
+  const unlockAudio = useCallback(() => {
+    if (isAudioUnlocked || !audioRef.current) return;
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+        }).catch(error => {
+            console.error("Audio unlock failed initially:", error);
+        });
+    }
+    setIsAudioUnlocked(true); // Assume unlocked after first user interaction
+  }, [isAudioUnlocked]);
+
+  // When the timer starts running, attempt to unlock the audio
+  useEffect(() => {
+    if (isRunning && !isAudioUnlocked) {
+      unlockAudio();
+    }
+  }, [isRunning, isAudioUnlocked, unlockAudio]);
+
   const playNotificationSound = useCallback(() => {
-    if (audioRef.current && isAudioUnlocked) {
+    if (audioRef.current) {
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(e => console.error("Error playing sound:", e));
     }
-  }, [isAudioUnlocked]);
+  }, []);
 
   const showBrowserNotification = useCallback((message) => {
     if (Notification.permission === 'granted') {
@@ -142,17 +163,6 @@ export const PomodoroProvider = ({ children }) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const unlockAudio = () => {
-    if (isAudioUnlocked) return;
-    audioRef.current.muted = true;
-    audioRef.current.play().then(() => {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        audioRef.current.muted = false;
-        setIsAudioUnlocked(true);
-    }).catch(e => console.error("Audio unlock failed:", e));
-  };
-
   const closeRewardModal = () => {
     setShowRewardModal(false);
     setCurrentReward('');
@@ -175,7 +185,7 @@ export const PomodoroProvider = ({ children }) => {
     focusDuration,
     breakDuration,
     formatTime,
-    unlockAudio,
+    unlockAudio, // Keep for any direct calls if needed
     onPomodoroEnd,
     showRewardModal,
     closeRewardModal,
