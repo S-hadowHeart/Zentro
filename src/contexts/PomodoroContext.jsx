@@ -14,6 +14,7 @@ export const PomodoroProvider = ({ children }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
+  const [sessionCount, setSessionCount] = useState(0); // Used to reset timer only when a session ends
   const [selectedTask, setSelectedTask] = useState('');
 
   // Audio and notifications
@@ -38,11 +39,10 @@ export const PomodoroProvider = ({ children }) => {
     audioRef.current.load();
   }, []);
 
+  // This effect now correctly resets the timer only when a new session starts.
   useEffect(() => {
-    if (!isRunning) {
-      setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
-    }
-  }, [focusDuration, breakDuration, isBreak, user, isRunning]);
+    setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
+  }, [focusDuration, breakDuration, isBreak, sessionCount]);
 
   useEffect(() => {
     if (isRunning) {
@@ -57,12 +57,12 @@ export const PomodoroProvider = ({ children }) => {
     if (isAudioUnlocked || !audioRef.current) return;
     const playPromise = audioRef.current.play();
     if (playPromise !== undefined) {
-        playPromise.then(() => {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-        }).catch(error => {
-            console.error("Audio unlock failed initially:", error);
-        });
+      playPromise.then(() => {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }).catch(error => {
+        console.error("Audio unlock failed initially:", error);
+      });
     }
     setIsAudioUnlocked(true);
   }, [isAudioUnlocked]);
@@ -89,8 +89,9 @@ export const PomodoroProvider = ({ children }) => {
     }
   }, []);
 
+  // This function now returns a boolean indicating if a reward was shown.
   const onPomodoroEnd = useCallback(async (status, duration) => {
-    if (!user) return;
+    if (!user) return false;
 
     try {
       const token = localStorage.getItem('token');
@@ -108,9 +109,9 @@ export const PomodoroProvider = ({ children }) => {
       if (status === 'completed' && freshUser && freshUser.rewards?.length > 0) {
         const randomReward = freshUser.rewards[Math.floor(Math.random() * freshUser.rewards.length)];
         setCurrentReward(randomReward);
-        setTimeout(() => {
-          setShowRewardModal(true);
-        }, 0);
+        setShowRewardModal(true);
+        setReportRefreshKey(prev => prev + 1);
+        return true; // Indicate that a reward is being shown.
       } else if (status === 'interrupted' && freshUser && freshUser.punishments?.length > 0) {
         const randomPunishment = freshUser.punishments[Math.floor(Math.random() * freshUser.punishments.length)];
         setCurrentPunishment(randomPunishment);
@@ -120,26 +121,33 @@ export const PomodoroProvider = ({ children }) => {
       console.error('Error during pomodoro end process:', error);
     }
     setReportRefreshKey(prev => prev + 1);
+    return false;
   }, [user, updateUser]);
 
-  const handleSessionEnd = useCallback(() => {
+  const handleSessionEnd = useCallback(async () => {
     const wasBreak = isBreak;
     setIsRunning(false);
+    playNotificationSound();
 
     if (!wasBreak) {
       showBrowserNotification('Focus complete. Time to rest in the garden.');
       const durationInSeconds = focusDuration * 60;
       if (selectedTask) incrementPomodorosForTask(selectedTask, durationInSeconds);
-      onPomodoroEnd('completed', durationInSeconds);
+      const rewardWasShown = await onPomodoroEnd('completed', durationInSeconds);
+
+      // If a reward is shown, we wait. The break will start when the modal is closed.
+      // Otherwise, start the break immediately.
+      if (!rewardWasShown) {
+        setIsBreak(true);
+        setSessionCount(c => c + 1);
+      }
     } else {
       showBrowserNotification('Rest is over. Time to cultivate focus again.');
-      onPomodoroEnd('breakEnded', breakDuration * 60);
+      await onPomodoroEnd('breakEnded', breakDuration * 60);
+      setIsBreak(false);
+      setSessionCount(c => c + 1);
     }
-    
-    playNotificationSound();
-    setIsBreak(prev => !prev);
-
-  }, [isBreak, selectedTask, focusDuration, breakDuration, playNotificationSound, showBrowserNotification, incrementPomodorosForTask, onPomodoroEnd]);
+  }, [isBreak, selectedTask, focusDuration, playNotificationSound, showBrowserNotification, incrementPomodorosForTask, onPomodoroEnd]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -167,6 +175,9 @@ export const PomodoroProvider = ({ children }) => {
   const closeRewardModal = () => {
     setShowRewardModal(false);
     setCurrentReward('');
+    // Now that the modal is closed, we start the break.
+    setIsBreak(true);
+    setSessionCount(c => c + 1);
   };
 
   const closePunishmentModal = () => {
