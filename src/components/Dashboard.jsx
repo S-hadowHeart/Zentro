@@ -9,7 +9,6 @@ import Report from './Report';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
 import { FaTimes } from 'react-icons/fa';
-import AnimatedBackground from './ui/AnimatedBackground';
 
 function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -51,8 +50,8 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-background-color text-text-color font-sans relative overflow-hidden">
-      <AnimatedBackground />
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans relative overflow-hidden">
+      <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-primary-light via-white to-secondary-light dark:from-gray-800 dark:via-gray-900 dark:to-black opacity-50"></div>
 
       {/* Static Sidebar for desktop */}
       <div className="hidden md:flex flex-shrink-0">
@@ -65,7 +64,7 @@ function Dashboard() {
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="w-64">
+        <div className="w-64 bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg shadow-lg">
           <Sidebar isMobile onLinkClick={() => setIsMobileMenuOpen(false)} />
         </div>
         <div className="flex-1 bg-black/40" onClick={() => setIsMobileMenuOpen(false)}>
@@ -80,8 +79,8 @@ function Dashboard() {
         <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10">
-          <div className="mx-auto max-w-7xl">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 z-10">
+          <div className="mx-auto max-w-4xl">
             <div style={{ display: location.pathname === '/pomodoro' || location.pathname === '/' ? 'block' : 'none' }}>
               <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
             </div>

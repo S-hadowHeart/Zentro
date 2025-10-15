@@ -22,7 +22,7 @@ const Preloader = () => {
       style={{ pointerEvents: isHiding ? 'none' : 'auto' }}
     >
       <div className="text-center">
-        <img src="/assets/zen-garden-loader.png" alt="Loading Zen Garden" className="mx-auto h-48 w-48 rounded-full shadow-2xl animate-pulse" />
+        <img src="/assets/leaf-solid.svg" alt="Loading Zen Garden" className="mx-auto h-48 w-48 rounded-full shadow-2xl animate-pulse" />
         <h1 className="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mt-8">Entering the Zen Garden</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">Preparing your sanctuary for focus and growth...</p>
         <div className="mt-8">

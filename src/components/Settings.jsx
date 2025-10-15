@@ -1,372 +1,184 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTrash, FaCog, FaSeedling, FaLeaf, FaSun, FaMoon, FaPlus, FaCheck, FaClock } from 'react-icons/fa';
+import { FaTrash, FaCog, FaPlus, FaCheck, FaClock, FaHeart, FaExclamationTriangle } from 'react-icons/fa';
 
 function Settings() {
-  const { user, fetchUser, updateUser } = useAuth();
-  const [rewards, setRewards] = useState([]);
-  const [punishments, setPunishments] = useState([]);
-  const [newReward, setNewReward] = useState('');
-  const [newPunishment, setNewPunishment] = useState('');
-  const [message, setMessage] = useState('');
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [updateType, setUpdateType] = useState(null);
-  const [dailyGoal, setDailyGoal] = useState(25);
-  const [pomodoroDurationSetting, setPomodoroDurationSetting] = useState(25);
-  const [breakDurationSetting, setBreakDurationSetting] = useState(5);
+    const { user, updateUser } = useAuth();
+    const [rewards, setRewards] = useState([]);
+    const [punishments, setPunishments] = useState([]);
+    const [newReward, setNewReward] = useState('');
+    const [newPunishment, setNewPunishment] = useState('');
+    const [message, setMessage] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [pomodoroDuration, setPomodoroDuration] = useState(25);
+    const [breakDuration, setBreakDuration] = useState(5);
 
-  useEffect(() => {
-    if (user) {
-      setRewards(user.rewards || []);
-      setPunishments(user.punishments || []);
-      setDailyGoal(user.settings?.dailyGoal || 25);
-      setPomodoroDurationSetting(user.settings?.pomodoroDuration || 25);
-      setBreakDurationSetting(user.settings?.breakDuration || 5);
-    }
-  }, [user]);
+    useEffect(() => {
+        if (user) {
+            setRewards(user.rewards || []);
+            setPunishments(user.punishments || []);
+            setPomodoroDuration(user.settings?.pomodoroDuration || 25);
+            setBreakDuration(user.settings?.breakDuration || 5);
+        }
+    }, [user]);
 
-  const handleUpdate = async (type) => {
-    if (isUpdating) return;
+    const handleSettingsUpdate = async () => {
+        if (isUpdating) return;
+        setIsUpdating(true);
+        setMessage('');
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/users/settings`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ settings: { pomodoroDuration, breakDuration } }),
+            });
+            if (!response.ok) throw new Error('Failed to update settings');
+            const updatedUser = await response.json();
+            updateUser(updatedUser);
+            setMessage('Rhythm adjusted successfully!');
+        } catch (error) {
+            setMessage(error.message || 'Error updating settings.');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+    
+    const handleListUpdate = async (type, list) => {
+        if (isUpdating) return;
+        setIsUpdating(true);
+        setMessage('');
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/users/${type}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ [type]: list }),
+            });
+            if (!response.ok) throw new Error(`Failed to update ${type}`);
+            const updatedUser = await response.json();
+            updateUser(updatedUser);
+            setMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`);
+        } catch (error) {
+            setMessage(error.message || `Error updating ${type}.`);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
 
-    setMessage('');
-    setIsUpdating(true);
-    setUpdateType(type);
+    const addItem = (type) => {
+        const list = type === 'rewards' ? rewards : punishments;
+        const newItem = type === 'rewards' ? newReward : newPunishment;
+        const setter = type === 'rewards' ? setRewards : setPunishments;
+        const newItemSetter = type === 'rewards' ? setNewReward : setNewPunishment;
 
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setMessage('Please log in again');
-        return;
-      }
+        if (newItem.trim()) {
+            const updatedList = [...list, newItem.trim()];
+            setter(updatedList);
+            newItemSetter('');
+            handleListUpdate(type, updatedList);
+        }
+    };
 
-      let requestBody = {};
-      let endpoint = `/api/users/${type}`;
-      let successMessage = '';
+    const removeItem = (type, index) => {
+        const list = type === 'rewards' ? rewards : punishments;
+        const setter = type === 'rewards' ? setRewards : setPunishments;
+        const updatedList = list.filter((_, i) => i !== index);
+        setter(updatedList);
+        handleListUpdate(type, updatedList);
+    };
 
-      if (type === 'rewards' || type === 'punishments') {
-        requestBody = { [type]: type === 'rewards' ? rewards : punishments };
-        successMessage = `${type === 'rewards' ? 'Seeds of joy nurtured!' : 'Weeds uprooted!'}`;
-      } else if (type === 'settings') {
-        requestBody = { 
-          settings: {
-            dailyGoal: dailyGoal,
-            pomodoroDuration: pomodoroDurationSetting,
-            breakDuration: breakDurationSetting
-          }
-        };
-        successMessage = 'Arrangements harmonized!';
-      } else {
-        throw new Error('Invalid update type');
-      }
+    return (
+        <div className="space-y-8">
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Arrangements</h2>
+            
+            {message && <div className={`p-4 rounded-xl text-sm ${message.includes('Error') ? 'bg-danger-light text-danger' : 'bg-primary-light text-primary'}`}>{message}</div>}
 
-      const response = await fetch(endpoint, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(requestBody)
-      });
+            <SettingsCard icon={FaClock} title="Rhythm Adjustments">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <NumberInput label="Focus Duration (min)" value={pomodoroDuration} onChange={setPomodoroDuration} min={1} max={60} />
+                    <NumberInput label="Break Duration (min)" value={breakDuration} onChange={setBreakDuration} min={1} max={30} />
+                </div>
+                <SaveButton onClick={handleSettingsUpdate} isSaving={isUpdating} text="Adjust Rhythm" />
+            </SettingsCard>
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Server error');
-      }
+            <SettingsCard icon={FaHeart} title="Seeds of Joy (Rewards)" iconColor="text-green-500">
+                <ListManager type="rewards" list={rewards} newItem={newReward} setNewItem={setNewReward} addItem={addItem} removeItem={removeItem} placeholder="E.g., Enjoy a cup of tea" />
+            </SettingsCard>
 
-      const updatedUserData = await response.json();
-      console.log('Updated user data from backend:', updatedUserData);
-      setMessage(successMessage);
-      updateUser(updatedUserData);
-
-    } catch (error) {
-      setMessage(`Error updating ${type}: ${error.message || 'Server unreachable. Please check if the server is running.'}`);
-    } finally {
-      setIsUpdating(false);
-      setUpdateType(null);
-    }
-  };
-
-  const addItem = (type, item, setter, newItemSetter) => {
-    if (item.trim()) {
-      if (type === 'rewards') {
-        setter([...rewards, item.trim()]);
-      } else {
-        setter([...punishments, item.trim()]);
-      }
-      newItemSetter('');
-    }
-  };
-
-  const removeItem = (type, index, setter) => {
-    if (type === 'rewards') {
-      setter(rewards.filter((_, i) => i !== index));
-    } else {
-      setter(punishments.filter((_, i) => i !== index));
-    }
-  };
-
-  const handleGoalSubmit = (e) => {
-    e.preventDefault();
-    handleUpdate('settings');
-  };
-
-  const handleAddReward = () => {
-    addItem('rewards', newReward, setRewards, setNewReward);
-  };
-
-  const handleRemoveReward = (index) => {
-    removeItem('rewards', index, setRewards);
-  };
-
-  const handleSaveRewards = () => {
-    handleUpdate('rewards');
-  };
-
-  const handleAddPunishment = () => {
-    addItem('punishments', newPunishment, setPunishments, setNewPunishment);
-  };
-
-  const handleRemovePunishment = (index) => {
-    removeItem('punishments', index, setPunishments);
-  };
-
-  const handleSavePunishments = () => {
-    handleUpdate('punishments');
-  };
-
-  return (
-    <div className="space-y-8">
-      <div className="flex items-center space-x-3">
-        <div className="p-2 rounded-full bg-primary-light">
-          <FaCog className="w-6 h-6 text-primary" />
+            <SettingsCard icon={FaExclamationTriangle} title="Weeds to Clear (Punishments)" iconColor="text-red-500">
+                <ListManager type="punishments" list={punishments} newItem={newPunishment} setNewItem={setNewPunishment} addItem={addItem} removeItem={removeItem} placeholder="E.g., 10 push-ups" />
+            </SettingsCard>
         </div>
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-          Arrangements
-        </h2>
-      </div>
-
-      {message && (
-        <div className={`p-4 rounded-xl text-sm flex items-center space-x-2 ${
-          message.includes('Error') 
-            ? 'bg-danger-light text-danger border border-danger-light' 
-            : 'bg-primary-light text-primary border border-primary-light'
-        }`}>
-          {message.includes('Error') ? (
-            <FaMoon className="w-5 h-5" />
-          ) : (
-            <FaSun className="w-5 h-5" />
-          )}
-          <span>{message}</span>
-        </div>
-      )}
-
-      {/* Daily Goal Section */}
-      <form onSubmit={handleGoalSubmit} className="bg-white/50 rounded-xl shadow-md p-4 sm:p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
-        <div className="flex items-center space-x-3 mb-4">
-          <FaSeedling className="w-5 h-5 text-primary" />
-          <label htmlFor="dailyGoal" className="text-lg font-semibold text-text-color">Daily Cultivation Goal (minutes)</label>
-        </div>
-        <div className="relative">
-          <input
-            type="number"
-            id="dailyGoal"
-            value={dailyGoal}
-            onChange={(e) => setDailyGoal(e.target.value)}
-            className="w-full px-4 py-3 pl-12 border border-secondary rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
-            placeholder="e.g., 120"
-            required
-          />
-          <FaLeaf className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-primary" />
-        </div>
-        <button
-          type="submit"
-          disabled={isUpdating}
-          className="mt-4 w-full bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-white font-medium py-2 px-4 sm:py-3 sm:px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {isUpdating ? (
-            <>
-              <FaCog className="w-4 h-4 animate-spin" />
-              <span>Harmonizing...</span>
-            </>
-          ) : (
-            <>
-              <FaCheck className="w-4 h-4" />
-              <span>Nurture Goal</span>
-            </>
-          )}
-        </button>
-      </form>
-
-      {/* Pomodoro and Break Duration Settings */}
-      <div className="bg-white/50 rounded-xl shadow-md p-4 sm:p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
-        <div className="flex items-center space-x-3 mb-4">
-          <FaClock className="w-5 h-5 text-primary" />
-          <h3 className="text-lg font-semibold text-text-color">Rhythm Adjustments</h3>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="pomodoroDurationSetting" className="block text-sm font-medium text-text-light mb-1">Focus Duration (minutes):</label>
-            <input
-              type="number"
-              id="pomodoroDurationSetting"
-              value={pomodoroDurationSetting}
-              onChange={(e) => setPomodoroDurationSetting(Math.max(1, parseInt(e.target.value) || 0))}
-              min="1"
-              max="60"
-              className="w-full px-4 py-3 border border-secondary rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
-            />
-          </div>
-          <div>
-            <label htmlFor="breakDurationSetting" className="block text-sm font-medium text-text-light mb-1">Break Duration (minutes):</label>
-            <input
-              type="number"
-              id="breakDurationSetting"
-              value={breakDurationSetting}
-              onChange={(e) => setBreakDurationSetting(Math.max(1, parseInt(e.target.value) || 0))}
-              min="1"
-              max="30"
-              className="w-full px-4 py-3 border border-secondary rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
-            />
-          </div>
-          <button
-            onClick={() => handleUpdate('settings')}
-            disabled={isUpdating}
-            className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-white font-medium py-2 px-4 sm:py-3 sm:px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isUpdating && updateType === 'settings' ? (
-              <>
-                <FaCog className="w-4 h-4 animate-spin" />
-                <span>Adjusting Rhythm...</span>
-              </>
-            ) : (
-              <>
-                <FaCheck className="w-4 h-4" />
-                <span>Adjust Rhythm</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Custom Rewards Section */}
-      <div className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
-        <div className="flex items-center space-x-3 mb-4">
-          <FaSun className="w-5 h-5 text-accent" />
-          <h3 className="text-lg font-semibold text-text-color">Seeds of Joy</h3>
-        </div>
-        <div className="flex gap-3 mb-4">
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={newReward}
-              onChange={(e) => setNewReward(e.target.value)}
-              className="w-full px-4 py-3 pl-12 border border-secondary rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
-              placeholder="Sow a new seed of joy..."
-            />
-            <FaSeedling className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-accent" />
-          </div>
-          <button
-            onClick={handleAddReward}
-            className="px-6 py-3 bg-gradient-to-r from-accent to-accent-dark text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
-          >
-            <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
-            <span>Sow</span>
-          </button>
-        </div>
-        <ul className="space-y-3">
-          {rewards.map((reward, index) => (
-            <li key={index} className="group flex justify-between items-center bg-white/50 p-4 rounded-lg border border-secondary-light shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
-              <span className="text-text-color">{reward}</span>
-              <button
-                onClick={() => handleRemoveReward(index)}
-                className="p-2 text-gray-400 hover:text-danger opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out rounded-lg hover:bg-danger-light"
-              >
-                <FaTrash className="w-4 h-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
-        {rewards.length > 0 && (
-          <button
-            onClick={handleSaveRewards}
-            disabled={isUpdating}
-            className="mt-6 w-full bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isUpdating ? (
-              <>
-                <FaCog className="w-4 h-4 animate-spin" />
-                <span>Nurturing...</span>
-              </>
-            ) : (
-              <>
-                <FaCheck className="w-4 h-4" />
-                <span>Nurture Seeds</span>
-              </>
-            )}
-          </button>
-        )}
-      </div>
-
-      {/* Custom Punishments Section */}
-      <div className="bg-white/50 rounded-xl shadow-md p-6 transform transition-all duration-300 ease-in-out hover:shadow-lg">
-        <div className="flex items-center space-x-3 mb-4">
-          <FaMoon className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-text-color">Weeds to Clear</h3>
-        </div>
-        <div className="flex gap-3 mb-4">
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={newPunishment}
-              onChange={(e) => setNewPunishment(e.target.value)}
-              className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-danger focus:border-transparent shadow-sm transition-all duration-300 ease-in-out"
-              placeholder="Identify a weed to uproot..."
-            />
-            <FaLeaf className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-          </div>
-          <button
-            onClick={handleAddPunishment}
-            className="px-6 py-3 bg-gradient-to-r from-danger to-danger-dark text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 ease-in-out flex items-center space-x-2 group"
-          >
-            <FaPlus className="w-4 h-4 transform group-hover:rotate-90 transition-transform duration-300" />
-            <span>Uproot</span>
-          </button>
-        </div>
-        <ul className="space-y-3">
-          {punishments.map((punishment, index) => (
-            <li key={index} className="group flex justify-between items-center bg-white/50 p-4 rounded-lg border border-danger-light shadow-sm transition-all duration-300 ease-in-out hover:shadow-md">
-              <span className="text-text-color">{punishment}</span>
-              <button
-                onClick={() => handleRemovePunishment(index)}
-                className="p-2 text-gray-400 hover:text-danger opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out rounded-lg hover:bg-danger-light"
-              >
-                <FaTrash className="w-4 h-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
-        {punishments.length > 0 && (
-          <button
-            onClick={handleSavePunishments}
-            disabled={isUpdating}
-            className="mt-6 w-full bg-gradient-to-r from-danger to-danger-dark hover:from-danger-dark hover:to-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-md flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isUpdating ? (
-              <>
-                <FaCog className="w-4 h-4 animate-spin" />
-                <span>Clearing...</span>
-              </>
-            ) : (
-              <>
-                <FaCheck className="w-4 h-4" />
-                <span>Clear Weeds</span>
-              </>
-            )}
-          </button>
-        )}
-      </div>
-    </div>
-  );
+    );
 }
+
+const SettingsCard = ({ icon: Icon, title, iconColor, children }) => (
+    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl shadow-lg p-6 border border-white/30 dark:border-gray-700/50">
+        <div className="flex items-center space-x-3 mb-5">
+            <Icon className={`w-6 h-6 ${iconColor || 'text-primary dark:text-primary-light'}`} />
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{title}</h3>
+        </div>
+        <div className="space-y-4">{children}</div>
+    </div>
+);
+
+const NumberInput = ({ label, value, onChange, min, max }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{label}</label>
+        <input
+            type="number"
+            value={value}
+            onChange={(e) => onChange(Math.max(min, Math.min(max, parseInt(e.target.value) || 0)))}
+            min={min} max={max}
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-700/80 focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark shadow-sm transition-all duration-300 ease-in-out dark:text-white"
+        />
+    </div>
+);
+
+const ListManager = ({ type, list, newItem, setNewItem, addItem, removeItem, placeholder }) => (
+    <>
+        <div className="flex gap-3">
+            <input
+                type="text"
+                value={newItem}
+                onChange={(e) => setNewItem(e.target.value)}
+                placeholder={placeholder}
+                className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-700/80 focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark shadow-sm transition-all duration-300 ease-in-out dark:text-white dark:placeholder-gray-400"
+            />
+            <button
+                onClick={() => addItem(type)}
+                className="px-5 py-3 bg-primary hover:bg-primary-dark dark:bg-primary-dark dark:hover:bg-primary text-white rounded-xl shadow-md transition-all duration-300 flex items-center justify-center">
+                <FaPlus />
+            </button>
+        </div>
+        <ul className="space-y-2 pt-2">
+            {list.map((item, index) => (
+                <li key={index} className="group flex justify-between items-center bg-white/50 dark:bg-gray-700/50 p-3.5 rounded-lg transition-all duration-300">
+                    <span className="text-gray-700 dark:text-gray-200">{item}</span>
+                    <button onClick={() => removeItem(type, index)} className="p-2 text-gray-400 hover:text-danger opacity-0 group-hover:opacity-100 rounded-full hover:bg-danger/10 transition-all duration-300">
+                        <FaTrash />
+                    </button>
+                </li>
+            ))}
+        </ul>
+    </>
+);
+
+const SaveButton = ({ onClick, isSaving, text }) => (
+    <button
+        onClick={onClick}
+        disabled={isSaving}
+        className="w-full mt-4 bg-primary hover:bg-primary-dark dark:bg-primary-dark dark:hover:bg-primary text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 ease-in-out shadow-md disabled:opacity-60 flex items-center justify-center space-x-2">
+        {isSaving ? <FaCog className="w-5 h-5 animate-spin" /> : <FaCheck className="w-5 h-5" />}
+        <span>{isSaving ? 'Saving...' : text}</span>
+    </button>
+);
 
 export default Settings;

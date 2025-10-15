@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaChartLine, FaFire, FaLeaf, FaClock } from 'react-icons/fa';
+import { FaCalendarDay, FaCalendarWeek, FaCalendarAlt, FaFireAlt } from 'react-icons/fa';
 
 function Report() {
   const { user } = useAuth();
@@ -9,7 +9,7 @@ function Report() {
     week: 0,
     month: 0,
     streak: 0,
-    dailyGoal: 120, // Default to 120 minutes if not fetched
+    dailyGoal: 120,
     todayFocusTime: 0
   });
 
@@ -17,7 +17,7 @@ function Report() {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('token');
-        if (!token) return; // Exit if no token
+        if (!token) return;
 
         const response = await fetch('/api/users/pomodoro-stats', {
           headers: {
@@ -36,7 +36,7 @@ function Report() {
             todayFocusTime: data.todayFocusTime || 0
           });
         } else {
-          console.error('Failed to fetch stats:', response.status, response.statusText);
+          console.error('Failed to fetch stats:', response.statusText);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -44,117 +44,64 @@ function Report() {
     };
 
     fetchStats();
-  }, [user]); // Add user to dependency array to re-fetch if user changes
+  }, [user]);
+
+  const dailyProgress = Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 1)) * 100));
 
   const statCards = [
-    {
-      title: "Today's Cultivation",
-      value: `${Math.floor(stats.todayFocusTime / 60)}h ${stats.todayFocusTime % 60}m`,
-      icon: FaClock,
-      color: "from-emerald-500 to-emerald-600"
-    },
-    {
-      title: "Weekly Growth",
-      value: `${Math.floor(stats.week / 60)}h ${stats.week % 60}m`,
-      icon: FaChartLine,
-      color: "from-emerald-400 to-emerald-500"
-    },
-    {
-      title: "Monthly Journey",
-      value: `${Math.floor(stats.month / 60)}h ${stats.month % 60}m`,
-      icon: FaLeaf,
-      color: "from-emerald-300 to-emerald-400"
-    },
-    {
-      title: "Current Flow",
-      value: `${stats.streak} days`,
-      icon: FaFire,
-      color: "from-amber-500 to-amber-600"
-    }
+    { title: "Today's Focus", value: `${stats.todayFocusTime} min`, icon: FaCalendarDay, color: "text-blue-500" },
+    { title: "Weekly Focus", value: `${Math.floor(stats.week / 60)}h ${stats.week % 60}m`, icon: FaCalendarWeek, color: "text-purple-500" },
+    { title: "Monthly Focus", value: `${Math.floor(stats.month / 60)}h ${stats.month % 60}m`, icon: FaCalendarAlt, color: "text-green-500" },
+    { title: "Focus Streak", value: `${stats.streak} days`, icon: FaFireAlt, color: "text-orange-500" }
   ];
 
   return (
     <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent mb-2">
-          Your Growth Journal
-        </h2>
-        <p className="text-gray-600">Track your journey of mindful cultivation</p>
-      </div>
-
+      <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Growth Journal</h2>
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
-          <div
-            key={index}
-            className="bg-white/50 rounded-xl shadow-md p-4 sm:p-6 transform transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg border border-emerald-100"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-700">{stat.title}</h3>
-              <stat.icon className={`w-6 h-6 text-${stat.color.split('-')[1]}-500`} />
-            </div>
-            <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
-              {stat.value}
-            </p>
-          </div>
+          <StatCard key={index} {...stat} />
         ))}
       </div>
 
-      <div className="bg-white/50 rounded-xl shadow-md p-6 border border-emerald-100">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Growth Insights</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-lg border border-emerald-100">
-            <div>
-              <p className="text-emerald-700 font-medium">Daily Cultivation Progress</p>
-              <p className="text-sm text-emerald-600">
-                {Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}% of your daily cultivation goal
-              </p>
-            </div>
-            <div className="w-16 h-16 relative">
-              <svg className="w-full h-full" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#E5E7EB"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#10B981"
-                  strokeWidth="3"
-                  strokeDasharray={`${Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 120)) * 100))}, 100`}
-                />
-              </svg>
-            </div>
+      <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl shadow-lg p-6 border border-white/30 dark:border-gray-700/50">
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Daily Goal Progress</h3>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center font-semibold text-gray-700 dark:text-gray-300">
+            <span>{stats.todayFocusTime} min</span>
+            <span>{stats.dailyGoal} min</span>
           </div>
-
-          <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-lg border border-emerald-100">
-            <div>
-              <p className="text-emerald-700 font-medium">Weekly Average</p>
-              <p className="text-sm text-emerald-600">
-                {Math.floor(stats.week / 7)} minutes per day
-              </p>
-            </div>
-            <FaChartLine className="w-8 h-8 text-emerald-500" />
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-emerald-50/50 rounded-lg border border-emerald-100">
-            <div>
-              <p className="text-emerald-700 font-medium">Current Streak</p>
-              <p className="text-sm text-emerald-600">
-                {stats.streak} days of consistent cultivation
-              </p>
-            </div>
-            <FaFire className="w-8 h-8 text-emerald-500" />
-          </div>
+          <ProgressBar progress={dailyProgress} />
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400 font-medium">
+            You've completed {dailyProgress}% of your daily goal. Keep it up!
+          </p>
         </div>
       </div>
+      
     </div>
   );
 }
 
-export default Report; 
+const StatCard = ({ title, value, icon: Icon, color }) => (
+  <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg rounded-2xl shadow-md p-5 border border-white/30 dark:border-gray-700/50 flex items-center space-x-4">
+    <div className={`p-3 rounded-full bg-gray-200 dark:bg-gray-700`}>
+      <Icon className={`w-6 h-6 ${color}`} />
+    </div>
+    <div>
+      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
+      <p className="text-2xl font-bold text-gray-800 dark:text-white">{value}</p>
+    </div>
+  </div>
+);
+
+const ProgressBar = ({ progress }) => (
+    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+        <div 
+            className="bg-gradient-to-r from-primary to-secondary h-4 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${progress}%` }}
+        ></div>
+    </div>
+);
+
+export default Report;
