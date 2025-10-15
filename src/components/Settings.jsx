@@ -30,10 +30,7 @@ function Settings() {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/users/settings`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ settings: { pomodoroDuration, breakDuration } }),
             });
             if (!response.ok) throw new Error('Failed to update settings');
@@ -56,10 +53,7 @@ function Settings() {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/users/${type}`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ [type]: list }),
             });
             if (!response.ok) throw new Error(`Failed to update ${type}`);
@@ -98,9 +92,9 @@ function Settings() {
 
     return (
         <div className="space-y-10">
-            <h2 className="text-3xl font-light text-zen-charcoal dark:text-zen-sand tracking-wider text-center">Garden Arrangements</h2>
+            <h2 className="text-4xl font-thin text-zen-charcoal dark:text-zen-sand tracking-wider text-center">Garden Arrangements</h2>
             
-            {message && <div className={`p-4 rounded-xl text-sm font-semibold text-center my-4 ${message.includes('Error') ? 'bg-red-500/10 text-red-500' : 'bg-zen-green/10 text-zen-green-dark'}`}>{message}</div>}
+            {message && <div className={`p-4 rounded-xl text-sm font-semibold text-center my-4 transition-opacity duration-300 ${message.includes('Error') ? 'bg-red-500/10 text-red-500' : 'bg-zen-green/10 text-zen-green-dark'}`}>{message}</div>}
 
             <SettingsCard icon={FaClock} title="Flow & Rest Rhythm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -112,11 +106,11 @@ function Settings() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <SettingsCard icon={FaHeart} title="Seeds of Joy (Rewards)" iconColor="text-green-500">
-                    <ListManager type="rewards" list={rewards} newItem={newReward} setNewItem={setNewReward} addItem={addItem} removeItem={removeItem} placeholder="e.g., Meditate for 5 minutes" />
+                    <ListManager type="rewards" list={rewards} newItem={newReward} setNewItem={setNewReward} addItem={addItem} removeItem={removeItem} placeholder="e.g., 5-min meditation" />
                 </SettingsCard>
 
                 <SettingsCard icon={FaExclamationTriangle} title="Weeds of Distraction (Punishments)" iconColor="text-red-500">
-                    <ListManager type="punishments" list={punishments} newItem={newPunishment} setNewItem={setNewPunishment} addItem={addItem} removeItem={removeItem} placeholder="e.g., 1 minute of plank" />
+                    <ListManager type="punishments" list={punishments} newItem={newPunishment} setNewItem={setNewPunishment} addItem={addItem} removeItem={removeItem} placeholder="e.g., 1-min plank" />
                 </SettingsCard>
             </div>
         </div>
@@ -124,7 +118,7 @@ function Settings() {
 }
 
 const SettingsCard = ({ icon: Icon, title, iconColor, children }) => (
-    <div className="bg-white/40 dark:bg-black/20 backdrop-blur-2xl rounded-[36px] shadow-lg p-6 sm:p-8 border border-white/50 dark:border-black/30 h-full flex flex-col">
+    <div className="bg-white/50 dark:bg-black/25 backdrop-blur-3xl rounded-[36px] shadow-xl p-6 sm:p-8 border border-white/60 dark:border-black/30 h-full flex flex-col">
         <div className="flex items-center space-x-4 mb-6">
             <Icon className={`w-7 h-7 ${iconColor || 'text-zen-green'}`} />
             <h3 className="text-xl font-semibold text-zen-charcoal dark:text-zen-sand tracking-wide">{title}</h3>
@@ -141,7 +135,7 @@ const NumberInput = ({ label, value, onChange, min, max }) => (
             value={value}
             onChange={(e) => onChange(Math.max(min, Math.min(max, parseInt(e.target.value) || 0)))}
             min={min} max={max}
-            className="w-full px-5 py-3 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand"
+            className="w-full px-5 py-3.5 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand"
         />
     </div>
 );
@@ -154,7 +148,7 @@ const ListManager = ({ type, list, newItem, setNewItem, addItem, removeItem, pla
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
                 placeholder={placeholder}
-                className="flex-1 px-5 py-3 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand placeholder-zen-charcoal/50 dark:placeholder-zen-sand/50"
+                className="flex-1 px-5 py-3.5 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand placeholder-zen-charcoal/50 dark:placeholder-zen-sand/50"
             />
             <button
                 onClick={() => addItem(type)}
@@ -164,7 +158,7 @@ const ListManager = ({ type, list, newItem, setNewItem, addItem, removeItem, pla
         </div>
         <ul className="space-y-2.5 pt-4 flex-grow overflow-y-auto max-h-48 custom-scrollbar">
             {list.map((item, index) => (
-                <li key={index} className="group flex justify-between items-center bg-white/30 dark:bg-black/10 p-3 rounded-lg transition-all duration-300">
+                <li key={index} className="group flex justify-between items-center bg-white/40 dark:bg-black/20 p-3 rounded-lg transition-all duration-300 border border-white/50 dark:border-black/30">
                     <span className="text-zen-charcoal dark:text-zen-sand font-medium">{item}</span>
                     <button onClick={() => removeItem(type, index)} className="p-2 text-zen-charcoal/40 dark:text-zen-sand/40 hover:text-red-500 opacity-0 group-hover:opacity-100 rounded-full hover:bg-red-500/10 transition-all duration-300">
                         <FaTrash />
@@ -180,7 +174,7 @@ const SaveButton = ({ onClick, isSaving, text }) => (
     <button
         onClick={onClick}
         disabled={isSaving}
-        className="w-full mt-5 bg-gradient-to-br from-zen-green to-zen-green-dark text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-in-out shadow-lg disabled:opacity-70 flex items-center justify-center space-x-2 transform hover:scale-105">
+        className="w-full mt-5 bg-gradient-to-br from-zen-green to-zen-green-dark text-white font-semibold py-3.5 px-4 rounded-full transition-all duration-300 ease-in-out shadow-lg disabled:opacity-70 flex items-center justify-center space-x-2 transform hover:scale-105">
         {isSaving ? <FaCog className="w-5 h-5 animate-spin" /> : <FaCheck className="w-5 h-5" />}
         <span>{isSaving ? 'Saving...' : text}</span>
     </button>

@@ -22,10 +22,10 @@ function TaskList() {
   };
 
   return (
-    <div className="bg-white/40 dark:bg-black/20 backdrop-blur-2xl rounded-[48px] shadow-2xl p-6 sm:p-10 border border-white/50 dark:border-black/30">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-light text-zen-charcoal dark:text-zen-sand tracking-wider">Task Garden</h2>
-        <div className="flex space-x-2 bg-white/50 dark:bg-black/20 p-1.5 rounded-full shadow-inner">
+    <div className="bg-white/50 dark:bg-black/25 backdrop-blur-3xl rounded-[48px] shadow-2xl p-6 sm:p-10 border border-white/60 dark:border-black/30">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+        <h2 className="text-3xl font-thin text-zen-charcoal dark:text-zen-sand tracking-wider mb-4 sm:mb-0">Task Garden</h2>
+        <div className="flex space-x-2 bg-white/40 dark:bg-black/20 p-1.5 rounded-full shadow-inner">
           {[
             { type: 'all', label: 'All' },
             { type: 'active', label: 'Growing' },
@@ -34,7 +34,7 @@ function TaskList() {
             <button
               key={type}
               onClick={() => setFilter(type)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${filter === type ? 'bg-white dark:bg-black/40 shadow-md text-zen-charcoal dark:text-zen-sand' : 'text-zen-charcoal/60 dark:text-zen-sand/60 hover:bg-white/70 dark:hover:bg-black/30'}`}>
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${filter === type ? 'bg-white dark:bg-black/30 shadow-md text-zen-charcoal dark:text-zen-sand' : 'text-zen-charcoal/60 dark:text-zen-sand/60 hover:bg-white/70 dark:hover:bg-black/25'}`}>
               {label}
             </button>
           ))}
@@ -47,17 +47,17 @@ function TaskList() {
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           placeholder="Plant a new seed of intention..."
-          className="flex-1 px-5 py-3 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand placeholder-zen-charcoal/50 dark:placeholder-zen-sand/50"
+          className="flex-1 px-6 py-3.5 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand placeholder-zen-charcoal/50 dark:placeholder-zen-sand/50"
         />
         <button
           type="submit"
-          className="px-6 py-3 bg-gradient-to-br from-zen-green to-zen-green-dark text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center space-x-2">
+          className="px-6 py-3.5 bg-gradient-to-br from-zen-green to-zen-green-dark text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center space-x-2">
           <FaPlus />
           <span className="hidden sm:inline">Plant</span>
         </button>
       </form>
 
-      <div className="space-y-4 min-h-[250px]">
+      <div className="space-y-4 min-h-[300px]">
         {loading ? (
           <div className="flex items-center justify-center h-full pt-12">
             <FaSpinner className="w-10 h-10 animate-spin text-zen-green dark:text-zen-green-dark" />
@@ -68,19 +68,19 @@ function TaskList() {
               <FaLeaf className="w-10 h-10 text-zen-charcoal/30 dark:text-zen-sand/30" />
             </div>
             <p className="text-zen-charcoal/70 dark:text-zen-sand/70 text-lg font-light tracking-wider">
-              {filter === 'all' ? 'Your garden is ready for new seeds.' : filter === 'active' ? 'No seeds are currently growing.' : 'No crops have been harvested yet.'}
+              {filter === 'all' ? 'Your garden is empty.' : filter === 'active' ? 'No seeds are growing.' : 'No seeds harvested yet.'}
             </p>
           </div>
         ) : (
           filteredTasks.map((task) => (
             <div
               key={task._id}
-              className="group flex items-center justify-between p-4 bg-white/40 dark:bg-black/20 rounded-2xl shadow-md hover:shadow-lg border border-transparent hover:border-zen-green/50 dark:hover:border-zen-green-dark/50 transition-all duration-300 transform hover:scale-[1.03]"
+              className="group flex items-center justify-between p-4 bg-white/50 dark:bg-black/25 rounded-2xl shadow-md hover:shadow-lg border border-white/60 dark:border-black/30 transition-all duration-300 transform hover:scale-[1.02]"
             >
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => toggleTask(task._id)}
-                  className={`w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-300 ${task.completed ? 'bg-zen-green border-zen-green text-white' : 'border-zen-charcoal/40 dark:border-zen-sand/40 hover:border-zen-green'}`}>
+                  className={`w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-300 ${task.completed ? 'bg-zen-green border-zen-green text-white' : 'border-zen-charcoal/40 dark:border-zen-sand/40 hover:border-zen-green dark:hover:border-zen-green-dark'}`}>
                   {task.completed && <FaCheck className="w-4 h-4" />}
                 </button>
                 <span className={`font-medium tracking-wide ${task.completed ? 'line-through text-zen-charcoal/50 dark:text-zen-sand/50' : 'text-zen-charcoal dark:text-zen-sand'}`}>

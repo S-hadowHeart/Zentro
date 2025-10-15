@@ -1,16 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaCalendarDay, FaCalendarWeek, FaCalendarAlt, FaFireAlt, FaBullseye, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { FaCalendarDay, FaCalendarWeek, FaCalendarAlt, FaFireAlt, FaBullseye, FaEdit, FaSave, FaTimes, FaChartLine, FaClock } from 'react-icons/fa';
 
 function Report() {
   const { user, updateUser } = useAuth();
-  const [stats, setStats] = useState({
-    week: 0,
-    month: 0,
-    streak: 0,
-    dailyGoal: 120,
-    todayFocusTime: 0
-  });
+  const [stats, setStats] = useState({ week: 0, month: 0, streak: 0, dailyGoal: 120, todayFocusTime: 0 });
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [newDailyGoal, setNewDailyGoal] = useState(120);
 
@@ -18,20 +12,10 @@ function Report() {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
-
-      const response = await fetch('/api/users/pomodoro-stats', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
+      const response = await fetch('/api/users/pomodoro-stats', { headers: { 'Authorization': `Bearer ${token}` } });
       if (response.ok) {
         const data = await response.json();
-        setStats({
-          week: data.weekly || 0,
-          month: data.monthly || 0,
-          streak: data.currentStreak || 0,
-          dailyGoal: data.dailyGoal || 120,
-          todayFocusTime: data.todayFocusTime || 0
-        });
+        setStats({ week: data.weekly || 0, month: data.monthly || 0, streak: data.currentStreak || 0, dailyGoal: data.dailyGoal || 120, todayFocusTime: data.todayFocusTime || 0 });
         setNewDailyGoal(data.dailyGoal || 120);
       } else {
         console.error('Failed to fetch stats:', response.statusText);
@@ -50,15 +34,12 @@ function Report() {
         const token = localStorage.getItem('token');
         const response = await fetch('/api/users/settings', {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ settings: { dailyGoal: newDailyGoal } }),
         });
         if (!response.ok) throw new Error('Failed to update goal');
         const updatedUser = await response.json();
-        updateUser(updatedUser); // Update user in context
+        updateUser(updatedUser);
         setStats(prev => ({ ...prev, dailyGoal: newDailyGoal }));
         setIsEditingGoal(false);
     } catch (error) {
@@ -67,46 +48,46 @@ function Report() {
   };
   
   const today = new Date();
-  const daysInWeek = today.getDay() + 1;
+  const dayOfWeek = today.getDay(); // Sunday = 0, Monday = 1, etc.
   const daysInMonth = today.getDate();
 
-  const weeklyAvg = stats.week > 0 ? Math.round(stats.week / daysInWeek) : 0;
+  const weeklyAvg = stats.week > 0 ? Math.round(stats.week / (dayOfWeek + 1)) : 0;
   const monthlyAvg = stats.month > 0 ? Math.round(stats.month / daysInMonth) : 0;
   const dailyProgress = Math.min(100, Math.floor((stats.todayFocusTime / (stats.dailyGoal || 1)) * 100));
 
   const statCards = [
-    { title: "Today's Flow", value: `${stats.todayFocusTime} min`, icon: FaCalendarDay, color: "text-zen-sky-dark" },
-    { title: "Weekly Average", value: `${weeklyAvg} min/day`, icon: FaCalendarWeek, color: "text-zen-green-dark" },
-    { title: "Monthly Average", value: `${monthlyAvg} min/day`, icon: FaCalendarAlt, color: "text-zen-sun" },
-    { title: "Focus Streak", value: `${stats.streak} days`, icon: FaFireAlt, color: "text-orange-500" }
+    { title: "Today's Flow", value: `${stats.todayFocusTime} min`, icon: FaClock, color: "text-zen-sky-dark dark:text-zen-sky-light" },
+    { title: "This Week", value: `${stats.week} min`, subtitle: `Avg: ${weeklyAvg} min/day`, icon: FaCalendarWeek, color: "text-zen-green-dark dark:text-zen-green" },
+    { title: "This Month", value: `${stats.month} min`, subtitle: `Avg: ${monthlyAvg} min/day`, icon: FaCalendarAlt, color: "text-zen-sun dark:text-yellow-300" },
+    { title: "Focus Streak", value: `${stats.streak} days`, icon: FaFireAlt, color: "text-orange-500 dark:text-orange-400" }
   ];
 
   return (
     <div className="space-y-10">
-      <h2 className="text-3xl font-light text-zen-charcoal dark:text-zen-sand tracking-wider text-center">Growth Journal</h2>
+      <h2 className="text-4xl font-thin text-zen-charcoal dark:text-zen-sand tracking-wider text-center">Growth Journal</h2>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {statCards.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}
       </div>
 
-      <div className="bg-white/40 dark:bg-black/20 backdrop-blur-2xl rounded-[36px] shadow-lg p-6 sm:p-8 border border-white/50 dark:border-black/30">
+      <div className="bg-white/50 dark:bg-black/25 backdrop-blur-3xl rounded-[36px] shadow-xl p-6 sm:p-8 border border-white/60 dark:border-black/30">
         <div className="flex justify-between items-center mb-5">
-            <div className="flex items-center space-x-3">
-                <FaBullseye className="w-6 h-6 text-zen-green" />
-                <h3 className="text-xl font-semibold text-zen-charcoal dark:text-zen-sand">Daily Goal Progress</h3>
+            <div className="flex items-center space-x-4">
+                <FaBullseye className="w-7 h-7 text-zen-green-dark" />
+                <h3 className="text-xl font-semibold text-zen-charcoal dark:text-zen-sand">Daily Cultivation Goal</h3>
             </div>
             {!isEditingGoal && (
-                <button onClick={() => setIsEditingGoal(true)} className="flex items-center space-x-2 text-sm font-medium text-zen-charcoal/70 dark:text-zen-sand/70 hover:text-zen-green dark:hover:text-zen-green-dark transition-colors">
+                <button onClick={() => setIsEditingGoal(true)} className="flex items-center space-x-2 text-sm font-medium text-zen-charcoal/70 dark:text-zen-sand/70 hover:text-zen-green-dark dark:hover:text-zen-green transition-colors">
                     <FaEdit />
-                    <span>Edit Goal</span>
+                    <span>Edit</span>
                 </button>
             )}
         </div>
         
         {isEditingGoal ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 py-2">
                 <input 
                     type="number"
                     value={newDailyGoal}
@@ -117,14 +98,14 @@ function Report() {
                 <button onClick={() => setIsEditingGoal(false)} className="p-3.5 bg-white/70 dark:bg-black/30 text-zen-charcoal/80 dark:text-zen-sand/80 rounded-full hover:bg-white dark:hover:bg-black/40 transition-colors"><FaTimes /></button>
             </div>
         ) : (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center font-semibold text-zen-charcoal dark:text-zen-sand">
-                <span>{stats.todayFocusTime} min</span>
-                <span className="text-zen-charcoal/60 dark:text-zen-sand/60">/ {stats.dailyGoal} min</span>
+            <div className="space-y-4 pt-2">
+              <div className="flex justify-between items-baseline font-semibold text-zen-charcoal dark:text-zen-sand">
+                <span className="text-2xl">{stats.todayFocusTime}<span className="text-base ml-1">min</span></span>
+                <span className="text-base text-zen-charcoal/60 dark:text-zen-sand/60">/ {stats.dailyGoal} min</span>
               </div>
               <ProgressBar progress={dailyProgress} />
               <p className="text-center text-sm text-zen-charcoal/70 dark:text-zen-sand/70 font-medium">
-                You've completed {dailyProgress}% of your daily cultivation goal.
+                You've completed {dailyProgress}% of your daily cultivation.
               </p>
             </div>
         )}
@@ -133,22 +114,23 @@ function Report() {
   );
 }
 
-const StatCard = ({ title, value, icon: Icon, color }) => (
-  <div className="bg-white/40 dark:bg-black/20 backdrop-blur-2xl rounded-3xl shadow-lg p-5 border border-white/50 dark:border-black/30 flex items-center space-x-4 transform transition-all hover:scale-105 hover:shadow-xl">
-    <div className={`p-3 rounded-full bg-white/50 dark:bg-black/20`}>
-      <Icon className={`w-6 h-6 ${color}`} />
+const StatCard = ({ title, value, subtitle, icon: Icon, color }) => (
+  <div className="bg-white/50 dark:bg-black/25 backdrop-blur-3xl rounded-3xl shadow-lg hover:shadow-2xl p-6 border border-white/60 dark:border-black/30 flex flex-col justify-between transform transition-all hover:scale-105 min-h-[150px]">
+    <div className="flex items-start justify-between">
+      <p className="text-base font-semibold text-zen-charcoal/80 dark:text-zen-sand/80">{title}</p>
+      <Icon className={`w-7 h-7 ${color} opacity-80`} />
     </div>
     <div>
-      <p className="text-sm font-medium text-zen-charcoal/70 dark:text-zen-sand/70">{title}</p>
-      <p className="text-2xl font-bold text-zen-charcoal dark:text-zen-sand">{value}</p>
+      <p className="text-3xl font-bold text-zen-charcoal dark:text-zen-sand">{value}</p>
+      {subtitle && <p className="text-sm font-medium text-zen-charcoal/60 dark:text-zen-sand/60 mt-1">{subtitle}</p>}
     </div>
   </div>
 );
 
 const ProgressBar = ({ progress }) => (
-    <div className="w-full bg-white/50 dark:bg-black/20 rounded-full h-3.5 overflow-hidden shadow-inner">
+    <div className="w-full bg-white/40 dark:bg-black/20 rounded-full h-4 shadow-inner border border-white/50 dark:border-black/25">
         <div 
-            className="bg-gradient-to-r from-zen-green to-zen-green-dark h-full rounded-full transition-all duration-700 ease-out"
+            className="bg-gradient-to-r from-zen-green to-zen-sky-light h-full rounded-full transition-all duration-700 ease-out"
             style={{ width: `${progress}%` }}
         ></div>
     </div>
