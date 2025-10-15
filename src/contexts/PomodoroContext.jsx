@@ -39,10 +39,10 @@ export const PomodoroProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (!isRunning && timeLeft === 0) {
+    if (!isRunning) {
       setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
     }
-  }, [focusDuration, breakDuration, isBreak, isRunning, timeLeft]);
+  }, [focusDuration, breakDuration, isBreak]);
 
   useEffect(() => {
     if (isRunning) {
@@ -55,6 +55,7 @@ export const PomodoroProvider = ({ children }) => {
 
   const playNotificationSound = useCallback(() => {
     if (audioRef.current && isAudioUnlocked) {
+      audioRef.current.currentTime = 0;
       audioRef.current.play().catch(e => console.error("Error playing sound:", e));
     }
   }, [isAudioUnlocked]);
