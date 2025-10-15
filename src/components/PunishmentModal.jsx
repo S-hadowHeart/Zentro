@@ -11,7 +11,7 @@ function PunishmentModal({ show, onClose, punishment }) {
 
         <div className="relative z-10">
           <div className="text-center mb-6">
-            <span className="text-6xl animate-pulse">â ï¸</span>
+            <span className="text-6xl animate-pulse">⚠️</span>
             <h2 className="text-4xl font-bold text-white mt-4">A Moment for Growth</h2>
             <p className="text-yellow-200 text-lg mt-2">A challenge to help you refocus.</p>
           </div>
