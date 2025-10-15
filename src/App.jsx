@@ -36,20 +36,22 @@ function FallbackRedirect() {
 // A component to handle routes based on authentication status
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/login" element={<PublicRoute><EnterTheGarden /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><CultivatePath /></PublicRoute>} />
-      <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+    <div className="relative z-10">
+        <Routes>
+            <Route path="/login" element={<PublicRoute><EnterTheGarden /></PublicRoute>} />
+            <Route path="/register" element={<PublicRoute><CultivatePath /></PublicRoute>} />
+            <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
 
-      {/* Authenticated routes */}
-      <Route path="/tasks" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-      <Route path="/settings" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-      <Route path="/report" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-      <Route path="/pomodoro" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            {/* Authenticated routes */}
+            <Route path="/tasks" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/settings" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/report" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/pomodoro" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
 
-      {/* Fallback redirect */}
-      <Route path="*" element={<FallbackRedirect />} />
-    </Routes>
+            {/* Fallback redirect */}
+            <Route path="*" element={<FallbackRedirect />} />
+        </Routes>
+    </div>
   );
 }
 
@@ -61,7 +63,7 @@ const App = () => {
         <TasksProvider>
           <ThemeProvider>
             <Preloader />
-            <div className="min-h-screen bg-background-color text-text-color">
+            <div className="min-h-screen bg-background text-text font-sans">
               <AnimatedBackground />
               <AppRoutes />
             </div>
