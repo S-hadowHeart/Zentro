@@ -133,11 +133,10 @@ export const PomodoroProvider = ({ children }) => {
       showBrowserNotification('Focus complete. Time to rest in the garden.');
       const durationInSeconds = focusDuration * 60;
       if (selectedTask) incrementPomodorosForTask(selectedTask, durationInSeconds);
-<<<<<<< HEAD
-      
+
       try {
         const rewardWasShown = await onPomodoroEnd('completed', durationInSeconds);
-        
+
         // Only proceed with break if no reward was shown
         if (!rewardWasShown) {
           setIsBreak(true);
@@ -150,25 +149,13 @@ export const PomodoroProvider = ({ children }) => {
         setIsBreak(true);
         setSessionCount(c => c + 1);
         setTimeLeft(breakDuration * 60);
-=======
-      const rewardWasShown = await onPomodoroEnd('completed', durationInSeconds);
-
-      // If a reward is shown, we wait. The break will start when the modal is closed.
-      // Otherwise, start the break immediately.
-      if (!rewardWasShown) {
-        setIsBreak(true);
-        setSessionCount(c => c + 1);
->>>>>>> 61448fcb67120ffd147b1541b0200dc3451d8c97
       }
     } else {
       showBrowserNotification('Rest is over. Time to cultivate focus again.');
       await onPomodoroEnd('breakEnded', breakDuration * 60);
-      setIsBreak(false);
-      setSessionCount(c => c + 1);
-<<<<<<< HEAD
-      setTimeLeft(focusDuration * 60); // Explicitly set focus time
-=======
->>>>>>> 61448fcb67120ffd147b1541b0200dc3451d8c97
+  setIsBreak(false);
+  setSessionCount(c => c + 1);
+  setTimeLeft(focusDuration * 60); // Explicitly set focus time
     }
   }, [isBreak, selectedTask, focusDuration, playNotificationSound, showBrowserNotification, incrementPomodorosForTask, onPomodoroEnd]);
 
@@ -196,7 +183,6 @@ export const PomodoroProvider = ({ children }) => {
   };
 
   const closeRewardModal = () => {
-<<<<<<< HEAD
     // First set up the break timer values
     setTimeLeft(breakDuration * 60);
     setIsBreak(true);
@@ -205,13 +191,6 @@ export const PomodoroProvider = ({ children }) => {
     // Then close the modal
     setShowRewardModal(false);
     setCurrentReward('');
-=======
-    setShowRewardModal(false);
-    setCurrentReward('');
-    // Now that the modal is closed, we start the break.
-    setIsBreak(true);
-    setSessionCount(c => c + 1);
->>>>>>> 61448fcb67120ffd147b1541b0200dc3451d8c97
   };
 
   const closePunishmentModal = () => {
