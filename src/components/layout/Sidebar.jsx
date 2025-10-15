@@ -1,13 +1,11 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { FaClock, FaTasks, FaCog, FaChartBar, FaLeaf, FaSignOutAlt, FaSun, FaMoon } from 'react-icons/fa';
+import { NavLink } from 'react-router-dom';
+import { FaClock, FaTasks, FaCog, FaChartBar, FaLeaf, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
-import { useThemeContext } from '../../contexts/ThemeContext';
 
 const Sidebar = ({ isMobile, onLinkClick }) => {
   const { logout } = useAuth();
-  const { theme, toggleTheme } = useThemeContext();
-
+  
   const navLinks = [
     { to: '/pomodoro', icon: FaClock, label: 'Zen Focus' },
     { to: '/tasks', icon: FaTasks, label: 'Cultivations' },
@@ -20,30 +18,30 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
     logout();
   };
 
+  const baseItemClass = "flex items-center space-x-4 p-3.5 rounded-xl text-lg font-medium transition-all duration-200";
+  const inactiveItemClass = "text-zen-charcoal/70 dark:text-zen-sand/60 hover:bg-black/5 dark:hover:bg-white/10 hover:text-zen-charcoal dark:hover:text-zen-sand";
+  const activeItemClass = "bg-gradient-to-r from-zen-green/80 to-zen-green text-white shadow-lg shadow-zen-green/30";
+
   return (
-    <aside className={`bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg border-r border-primary-light/30 dark:border-primary-dark/30 flex flex-col p-4 transition-all duration-300 ${isMobile ? 'w-full' : 'w-64'}`}>
-      <div className="flex items-center justify-between p-4 border-b border-primary-light/30 dark:border-primary-dark/30">
-        <div className="flex items-center space-x-3">
-            <FaLeaf className="w-10 h-10 text-primary" />
-            <span className="text-2xl font-bold text-text-color">Zen Garden</span>
+    <aside className={`flex-col p-4 transition-all duration-300 ${isMobile ? 'w-full h-full flex' : 'w-64 hidden md:flex'}`}>
+      <div className="flex items-center space-x-3 p-4 mb-4">
+        <div className="p-2 bg-gradient-to-br from-zen-green to-zen-green-dark rounded-xl shadow-lg">
+            <FaLeaf className="w-8 h-8 text-white" />
         </div>
-        <button onClick={toggleTheme} className="p-2 text-text-color hover:bg-primary-light/50 dark:hover:bg-primary-dark/50 rounded-full">
-          {theme === 'light' ? <FaMoon className="w-6 h-6" /> : <FaSun className="w-6 h-6" />}
-        </button>
+        <div className="flex flex-col">
+            <span className="text-2xl font-bold bg-gradient-to-r from-zen-charcoal to-zen-green bg-clip-text text-transparent dark:from-zen-sand dark:to-zen-green">Zen Garden</span>
+            <span className="text-xs text-zen-charcoal/50 dark:text-zen-sand/50">v1.00</span>
+        </div>
       </div>
 
-      <nav className="flex-1 space-y-3 py-6">
+      <nav className="flex-1 space-y-3">
         {navLinks.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             onClick={onLinkClick}
             className={({ isActive }) =>
-              `flex items-center space-x-4 p-3 rounded-lg text-lg font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg'
-                  : 'text-text-color dark:text-gray-300 hover:bg-primary-light dark:hover:bg-primary-dark'
-              }`
+              `${baseItemClass} ${isActive ? activeItemClass : inactiveItemClass}`
             }
           >
             <Icon className="w-6 h-6" />
@@ -52,10 +50,10 @@ const Sidebar = ({ isMobile, onLinkClick }) => {
         ))}
       </nav>
 
-      <div className="pt-4 border-t border-primary-light/30 dark:border-primary-dark/30">
+      <div className="pt-4 mt-4 border-t border-black/5 dark:border-white/10">
         <button
           onClick={handleLogout}
-          className="flex items-center space-x-4 p-3 w-full rounded-lg text-lg font-medium text-text-color dark:text-gray-300 hover:bg-danger-light dark:hover:bg-danger-dark hover:text-danger dark:hover:text-danger-light transition-all duration-200"
+          className={`${baseItemClass} w-full text-zen-charcoal/70 dark:text-zen-sand/60 hover:bg-red-500/10 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400`}
         >
           <FaSignOutAlt className="w-6 h-6" />
           <span>Leave Garden</span>

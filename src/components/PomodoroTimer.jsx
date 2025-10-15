@@ -21,22 +21,31 @@ function PomodoroTimer({ onPomodoroEnd }) {
     if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
       Notification.requestPermission();
     }
-    // Initialize Audio object once
     audioRef.current = new Audio('/sounds/notification.mp3');
+    audioRef.current.load(); // Preload audio to prevent playback issues
   }, []);
 
   useEffect(() => {
-    // Reset timer only when mode changes OR initially
     setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
   }, [focusDuration, breakDuration, isBreak]);
 
   useEffect(() => {
-    // Auto-select the first available task
     const nonCompletedTasks = tasks.filter(task => !task.completed);
     if (nonCompletedTasks.length > 0 && !selectedTask) {
       setSelectedTask(nonCompletedTasks[0]._id);
     }
   }, [tasks, selectedTask]);
+
+  // Update document title with remaining time
+  useEffect(() => {
+    if (isRunning) {
+      document.title = `${formatTime(timeLeft)} - ${isBreak ? 'Resting' : 'Focusing'}`;
+    } else {
+      document.title = 'Zentro';
+    }
+    // Reset title on unmount
+    return () => { document.title = 'Zentro'; };
+  }, [timeLeft, isRunning, isBreak]);
 
   const playNotificationSound = useCallback(() => {
     if (audioRef.current) {
@@ -46,7 +55,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
 
   const showBrowserNotification = useCallback((message) => {
     if (Notification.permission === 'granted') {
-      new Notification('ZenFlow', {
+      new Notification('Zentro', {
         body: message,
         icon: '/img/favicon.ico',
       });
@@ -62,7 +71,6 @@ function PomodoroTimer({ onPomodoroEnd }) {
     if (!wasBreak) {
       showBrowserNotification('Focus complete. Time to rest in the garden.');
       if(selectedTask) incrementPomodorosForTask(selectedTask);
-      // Ensure user object is available before accessing its properties
       if (user) {
         onPomodoroEnd('completed', focusDuration, user.rewards, user.punishments);
       }
@@ -112,6 +120,20 @@ function PomodoroTimer({ onPomodoroEnd }) {
     setTimeLeft(isBreak ? breakDuration * 60 : focusDuration * 60);
   };
 
+  // Patched to prevent bypassing punishment
+  const handleModeSwitch = () => {
+    if (isRunning) return;
+
+    if (!isBreak && timeLeft < focusDuration * 60) {
+        const interruptedDuration = focusDuration * 60 - timeLeft;
+        if (user) {
+            onPomodoroEnd('interrupted', interruptedDuration, user.rewards, user.punishments);
+        }
+    }
+    setIsBreak(prev => !prev);
+    setIsRunning(false);
+  };
+
   const progress = isBreak
     ? ((breakDuration * 60 - timeLeft) / (breakDuration * 60)) * 100
     : ((focusDuration * 60 - timeLeft) / (focusDuration * 60)) * 100;
@@ -149,7 +171,7 @@ function PomodoroTimer({ onPomodoroEnd }) {
                   <button onClick={handleStartPause} className={`w-28 h-28 rounded-full text-white font-bold flex items-center justify-center shadow-2xl transform transition-all duration-300 hover:scale-105 ${isRunning ? 'bg-gradient-to-br from-red-500 to-red-600' : (isBreak ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gradient-to-br from-zen-green to-zen-green-dark')}`}>
                       {isRunning ? <FaPause className="w-10 h-10" /> : <FaPlay className="w-10 h-10" />}
                   </button>
-                  <button onClick={() => setIsBreak(!isBreak)} disabled={isRunning} title="Switch Mode" className="w-20 h-20 rounded-full bg-white/60 dark:bg-black/20 text-zen-charcoal/70 dark:text-zen-sand/70 flex items-center justify-center shadow-lg transform transition-all duration-300 hover:scale-105 hover:bg-white/80 dark:hover:bg-black/30 disabled:opacity-50 backdrop-blur-sm">
+                  <button onClick={handleModeSwitch} disabled={isRunning} title="Switch Mode" className="w-20 h-20 rounded-full bg-white/60 dark:bg-black/20 text-zen-charcoal/70 dark:text-zen-sand/70 flex items-center justify-center shadow-lg transform transition-all duration-300 hover:scale-105 hover:bg-white/80 dark:hover:bg-black/30 disabled:opacity-50 backdrop-blur-sm">
                       <FaSeedling className="w-6 h-6" />
                   </button>
               </div>
@@ -187,4 +209,3 @@ function PomodoroTimer({ onPomodoroEnd }) {
   }
   
   export default PomodoroTimer;
-  

@@ -3,6 +3,7 @@ import { FaPlay, FaPause, FaVolumeUp, FaVolumeMute, FaMusic } from 'react-icons/
 
 const musicStreams = [
   { name: 'Chillhop', url: 'https://streams.fluxfm.de/Chillhop/mp3-128/streams.fluxfm.de/' },
+  { name: 'New Hits', url: 'https://server.mixify.in/listen/new_hits/radio.mp3' },
   { name: 'ReyFM Lofi', url: 'https://listen.reyfm.de/lofi_320kbps.mp3' },
   { name: 'Digital Malayali', url: 'https://radio.digitalmalayali.in/listen/stream/radio.mp3' },
 ];
@@ -24,7 +25,9 @@ function MusicPlayer() {
   }, [isPlaying, currentStream]);
 
   useEffect(() => {
-    audioRef.current.volume = volume;
+    if (audioRef.current) {
+        audioRef.current.volume = volume;
+    }
   }, [volume]);
 
   const togglePlay = () => {
@@ -39,9 +42,8 @@ function MusicPlayer() {
     const stream = musicStreams.find(s => s.url === e.target.value);
     setCurrentStream(stream);
     if (isPlaying) {
-      // If already playing, changing the source will be handled by the useEffect
+      // The useEffect for [isPlaying, currentStream] will handle the change
     } else {
-      // If paused, just set the new source
       audioRef.current.src = stream.url;
     }
   };
@@ -57,7 +59,7 @@ function MusicPlayer() {
       
       <div className={`fixed bottom-24 right-6 z-50 transition-all duration-500 ease-in-out ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
         <div className="bg-white/50 dark:bg-black/25 backdrop-blur-3xl rounded-3xl shadow-2xl p-6 border border-white/60 dark:border-black/30 w-72">
-          <h4 className="text-lg font-semibold text-zen-charcoal dark:text-zen-sand mb-4 text-center">Lofi Player</h4>
+          <h4 className="text-lg font-semibold text-zen-charcoal dark:text-zen-sand mb-4 text-center">Music Player</h4>
           <div className="flex items-center justify-center space-x-4">
             <button onClick={togglePlay} className="p-4 rounded-full bg-white/70 dark:bg-black/30 text-zen-charcoal dark:text-zen-sand transform transition-transform hover:scale-110">
               {isPlaying ? <FaPause className="w-5 h-5" /> : <FaPlay className="w-5 h-5" />}
