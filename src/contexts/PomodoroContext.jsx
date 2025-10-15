@@ -64,10 +64,9 @@ export const PomodoroProvider = ({ children }) => {
             console.error("Audio unlock failed initially:", error);
         });
     }
-    setIsAudioUnlocked(true); // Assume unlocked after first user interaction
+    setIsAudioUnlocked(true);
   }, [isAudioUnlocked]);
 
-  // When the timer starts running, attempt to unlock the audio
   useEffect(() => {
     if (isRunning && !isAudioUnlocked) {
       unlockAudio();
@@ -110,18 +109,11 @@ export const PomodoroProvider = ({ children }) => {
         const randomReward = freshUser.rewards[Math.floor(Math.random() * freshUser.rewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
-      } else if (status === 'interrupted' && freshUser) {
-        const punishment = freshUser.punishments?.[Math.floor(Math.random() * freshUser.punishments.length)] || "No punishment found.";
-        const rewardsForDebug = JSON.stringify(freshUser.rewards);
-        setCurrentPunishment(`DEBUG: Rewards are: ${rewardsForDebug}. Punishment: ${punishment}`);
-        setShowPunishmentModal(true);
-      } else if (status === 'completed') {
-        // Fallback for debugging on mobile
-        const rewardsForDebug = JSON.stringify(freshUser?.rewards);
-        setCurrentPunishment(`DEBUG: COMPLETED but no reward. Rewards: ${rewardsForDebug}`);
+      } else if (status === 'interrupted' && freshUser && freshUser.punishments?.length > 0) {
+        const randomPunishment = freshUser.punishments[Math.floor(Math.random() * freshUser.punishments.length)];
+        setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
       }
-
     } catch (error) {
       console.error('Error during pomodoro end process:', error);
     }
@@ -131,20 +123,20 @@ export const PomodoroProvider = ({ children }) => {
   const handleSessionEnd = useCallback(async () => {
     const wasBreak = isBreak;
     setIsRunning(false);
-    playNotificationSound();
-  
+
     if (!wasBreak) {
       showBrowserNotification('Focus complete. Time to rest in the garden.');
       const durationInSeconds = focusDuration * 60;
-      if(selectedTask) incrementPomodorosForTask(selectedTask, durationInSeconds);
-      onPomodoroEnd('completed', durationInSeconds);
+      if (selectedTask) incrementPomodorosForTask(selectedTask, durationInSeconds);
+      await onPomodoroEnd('completed', durationInSeconds);
     } else {
       showBrowserNotification('Rest is over. Time to cultivate focus again.');
-      onPomodoroEnd('breakEnded', breakDuration * 60);
+      await onPomodoroEnd('breakEnded', breakDuration * 60);
     }
     
-    setIsBreak(prev => !prev); 
-  
+    playNotificationSound();
+    setIsBreak(prev => !prev);
+
   }, [isBreak, selectedTask, focusDuration, breakDuration, playNotificationSound, showBrowserNotification, incrementPomodorosForTask, onPomodoroEnd]);
 
   useEffect(() => {
@@ -192,7 +184,7 @@ export const PomodoroProvider = ({ children }) => {
     focusDuration,
     breakDuration,
     formatTime,
-    unlockAudio, // Keep for any direct calls if needed
+    unlockAudio,
     onPomodoroEnd,
     showRewardModal,
     closeRewardModal,
