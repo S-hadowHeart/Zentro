@@ -1,4 +1,4 @@
-import express from 'express';
+  import express from 'express';
 import { body, validationResult } from 'express-validator';
 import Task from '../models/Task.js';
 import { auth } from '../middleware/auth.js';
@@ -79,11 +79,15 @@ router.patch('/:id/pomodoro', auth, async (req, res) => {
     await task.save();
     
     // Log PomodoroHistory
-    const { duration } = req.body; // Get duration from request body
+    const { duration } = req.body;
+    
+    // Ensure duration is a valid number, default to 0 otherwise
+    const durationInSeconds = (typeof duration === 'number' && !isNaN(duration)) ? duration : 0;
+
     await PomodoroHistory.create({ 
         user: req.user._id, 
         task: task._id, 
-        duration: Math.round(duration / 60), // Save duration in minutes
+        duration: Math.round(durationInSeconds / 60), // Save duration in minutes
         completedAt: new Date() 
     });
     

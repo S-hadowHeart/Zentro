@@ -98,7 +98,7 @@ export function TasksProvider({ children }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ duration })
+        body: JSON.stringify({ duration: duration || 0 })
       });
 
       if (response.ok) {
@@ -108,6 +108,9 @@ export function TasksProvider({ children }) {
             task._id === updatedTask._id ? updatedTask : task
           )
         );
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to increment pomodoro count:', errorData);
       }
     } catch (error) {
       console.error('Error incrementing pomodoros for task:', error);
