@@ -108,7 +108,10 @@ export const PomodoroProvider = ({ children }) => {
       if (status === 'completed' && freshUser && freshUser.rewards?.length > 0) {
         const randomReward = freshUser.rewards[Math.floor(Math.random() * freshUser.rewards.length)];
         setCurrentReward(randomReward);
-        setShowRewardModal(true);
+        // Use a timeout to ensure the state update is not blocked on mobile browsers
+        setTimeout(() => {
+          setShowRewardModal(true);
+        }, 0);
       } else if (status === 'interrupted' && freshUser && freshUser.punishments?.length > 0) {
         const randomPunishment = freshUser.punishments[Math.floor(Math.random() * freshUser.punishments.length)];
         setCurrentPunishment(randomPunishment);
@@ -196,4 +199,4 @@ export const PomodoroProvider = ({ children }) => {
   };
 
   return <PomodoroContext.Provider value={value}>{children}</PomodoroContext.Provider>;
-};
+});
