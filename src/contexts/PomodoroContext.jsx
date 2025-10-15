@@ -72,37 +72,32 @@ export const PomodoroProvider = ({ children }) => {
   const onPomodoroEnd = useCallback(async (status, duration) => {
     if (!user) return;
 
-    setReportRefreshKey(prev => prev + 1);
-
     try {
-      // First, update the session on the backend
       const token = localStorage.getItem('token');
       await fetch('/api/users/pomo-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ status, duration })
+        body: JSON.stringify({ status, duration }),
       });
 
-      // Now, fetch the updated user object which includes the new streak
       const freshUser = await updateUser();
-      if (!freshUser) return;
 
-      // Then, show reward or punishment based on the result of the session
-      if (status === 'completed' && freshUser.rewards?.length > 0) {
+      if (status === 'completed' && freshUser && freshUser.rewards?.length > 0) {
         const randomReward = freshUser.rewards[Math.floor(Math.random() * freshUser.rewards.length)];
         setCurrentReward(randomReward);
         setShowRewardModal(true);
-      } else if (status === 'interrupted' && freshUser.punishments?.length > 0) {
+      } else if (status === 'interrupted' && freshUser && freshUser.punishments?.length > 0) {
         const randomPunishment = freshUser.punishments[Math.floor(Math.random() * freshUser.punishments.length)];
         setCurrentPunishment(randomPunishment);
         setShowPunishmentModal(true);
       }
     } catch (error) {
-      console.error('Error updating session:', error);
+      console.error('Error during pomodoro end process:', error);
     }
+    setReportRefreshKey(prev => prev + 1);
   }, [user, updateUser]);
 
   const handleSessionEnd = useCallback(async () => {
