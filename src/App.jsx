@@ -28,30 +28,27 @@ function PublicRoute({ children }) {
   return !user ? children : <Navigate to="/pomodoro" replace />;
 }
 
-// A component for the fallback redirect
-function FallbackRedirect() {
-    const { user } = useAuth();
-    return user ? <Navigate to="/pomodoro" replace /> : <Navigate to="/" replace />;
-}
-
 // A component to handle routes based on authentication status
 function AppRoutes() {
   return (
     <div className="relative z-10">
-        <Routes>
-            <Route path="/login" element={<PublicRoute><EnterTheGarden /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><CultivatePath /></PublicRoute>} />
-            <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+      <Routes>
+        <Route
+          path="/login"
+          element={<PublicRoute><EnterTheGarden /></PublicRoute>}
+        />
+        <Route
+          path="/register"
+          element={<PublicRoute><CultivatePath /></PublicRoute>}
+        />
+        <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
 
-            {/* Authenticated routes */}
-            <Route path="/tasks" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/settings" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/report" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/pomodoro" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-
-            {/* Fallback redirect */}
-            <Route path="*" element={<FallbackRedirect />} />
-        </Routes>
+        {/* Authenticated routes rendered within the Dashboard */}
+        <Route
+          path="/*"
+          element={<PrivateRoute><Dashboard /></PrivateRoute>}
+        />
+      </Routes>
     </div>
   );
 }
@@ -62,15 +59,15 @@ const App = () => {
     <Router>
       <AuthProvider>
         <TasksProvider>
-            <PomodoroProvider>
-              <ThemeProvider>
-                <Preloader />
-                <div className="min-h-screen bg-background text-text font-sans">
-                  <AnimatedBackground />
-                  <AppRoutes />
-                </div>
-              </ThemeProvider>
-            </PomodoroProvider>
+          <PomodoroProvider>
+            <ThemeProvider>
+              <Preloader />
+              <div className="min-h-screen bg-background text-text font-sans">
+                <AnimatedBackground />
+                <AppRoutes />
+              </div>
+            </ThemeProvider>
+          </PomodoroProvider>
         </TasksProvider>
       </AuthProvider>
     </Router>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { usePomodoro } from '../contexts/PomodoroContext';
 import Sidebar from './layout/Sidebar';
 import Header from './layout/Header';
@@ -15,7 +15,6 @@ import { FaTimes } from 'react-icons/fa';
 
 function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const location = useLocation();
 
   const {
     showRewardModal,
@@ -24,7 +23,6 @@ function Dashboard() {
     showPunishmentModal,
     closePunishmentModal,
     currentPunishment,
-    reportRefreshKey
   } = usePomodoro();
 
   const handleToggleMobileMenu = () => {
@@ -65,15 +63,13 @@ function Dashboard() {
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 z-10">
           <div className="mx-auto max-w-4xl">
-            {location.pathname === '/pomodoro' || location.pathname === '/' ? (
-              <PomodoroTimer />
-            ) : location.pathname === '/tasks' ? (
-              <TaskList />
-            ) : location.pathname === '/settings' ? (
-              <Settings />
-            ) : (
-              <Report key={reportRefreshKey} />
-            )}
+            <Routes>
+              <Route path="/" element={<PomodoroTimer />} />
+              <Route path="/pomodoro" element={<PomodoroTimer />} />
+              <Route path="/tasks" element={<TaskList />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/report" element={<Report />} />
+            </Routes>
           </div>
         </main>
       </div>

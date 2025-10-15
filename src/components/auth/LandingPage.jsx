@@ -1,97 +1,140 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaLeaf, FaSeedling, FaSun, FaMoon } from 'react-icons/fa'; // Zen Garden theme icons
+import { FaLeaf, FaShieldAlt, FaChartLine, FaHeart, FaStar, FaUserAstronaut } from 'react-icons/fa';
 
-function LandingPage() {
+const LandingPage = () => {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-32 h-32 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-10 left-1/2 w-32 h-32 bg-emerald-400 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
-
-      <div className="max-w-4xl w-full space-y-12 bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 sm:p-10 border border-emerald-200 transform transition-all duration-300 hover:scale-[1.02]">
-        <div className="text-center">
-          <FaLeaf className="mx-auto h-20 w-20 text-emerald-600 mb-4 animate-pulse" />
-          <h1 className="text-4xl font-extrabold text-gray-900 bg-gradient-to-r from-emerald-600 to-green-800 bg-clip-text text-transparent mb-4">
-            Nurture Your Growth, One Task at a Time
-          </h1>
-          <p className="mt-2 text-xl text-gray-700 leading-relaxed font-serif">
-            Step into your personal Zen Garden of Productivity. Here, every task is a seed, every focus session a ray of sunshine, and every completed goal a blossoming achievement.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 text-center md:text-left">
-          <div className="flex flex-col items-center md:items-start group">
-            <div className="p-4 rounded-full bg-emerald-100 mb-4 group-hover:scale-110 transition-transform duration-300">
-              <FaSun className="h-8 w-8 text-emerald-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2 group-hover:text-emerald-700 transition-colors duration-300">Cultivate Deep Focus</h2>
-            <p className="text-gray-600 font-serif">
-              Our unique Pomodoro Timer helps you sow seeds of intention and cultivate uninterrupted focus. Segment your work into serene "growth cycles" and watch your concentration blossom.
-            </p>
-          </div>
-          <div className="flex flex-col items-center md:items-start group">
-            <div className="p-4 rounded-full bg-emerald-100 mb-4 group-hover:scale-110 transition-transform duration-300">
-              <FaMoon className="h-8 w-8 text-emerald-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2 group-hover:text-emerald-700 transition-colors duration-300">Harvest Your Success</h2>
-            <p className="text-gray-600 font-serif">
-              Track your efforts and visualize your garden of achievements. Our insightful reports help you reflect on your journey, celebrate completed "cultivations," and see your progress flourish.
-            </p>
-          </div>
-        </div>
-
-        <div className="text-center mt-10">
-          <h2 className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-green-700 to-emerald-900 bg-clip-text text-transparent mb-4">
-            Ready to Begin Your Growth Journey?
-          </h2>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              to="/register"
-              className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 ease-in-out flex items-center justify-center space-x-2"
-            >
-              <FaLeaf className="h-5 w-5" />
-              <span>Plant Your First Seed</span>
-            </Link>
-            <Link
-              to="/login"
-              className="px-8 py-4 bg-white border border-emerald-300 text-emerald-700 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-300 ease-in-out flex items-center justify-center space-x-2"
-            >
-              <span>Return to My Garden</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-12 pt-8 border-t border-emerald-200 text-center">
-          <h3 className="text-xl font-bold text-gray-800 mb-3">From the Gardener's Heart</h3>
-          <p className="text-gray-600 leading-relaxed mb-4 font-serif">
-            This app is a thoughtful creation by Dharmraj Sodha, a computer engineering student driven by creativity and a belief that coding can be a poetic expression. My aim is to offer you a digital sanctuary where focus flourishes and daily tasks become a serene path to personal growth.
-          </p>
-          <div className="flex justify-center space-x-6">
-            <a
-              href="https://www.linkedin.com/in/dharmraj-sodha/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-600 hover:text-emerald-800 transition-colors duration-300 flex items-center space-x-1"
-            >
-              LinkedIn <FaLeaf className="w-4 h-4 text-emerald-500"/>
-            </a>
-            <a
-              href="https://s-hadowheart.carrd.co/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-600 hover:text-emerald-800 transition-colors duration-300 flex items-center space-x-1"
-            >
-              My Digital Garden <FaLeaf className="w-4 h-4 text-emerald-500"/>
-            </a>
-          </div>
-        </div>
-      </div>
+    <div className="bg-gradient-to-br from-zen-sand-light via-white to-zen-sand-light/70 font-sans">
+      <Header />
+      <main>
+        <Hero />
+        <Features />
+        <Testimonials />
+        <CTA />
+      </main>
+      <Footer />
     </div>
   );
-}
+};
 
-export default LandingPage; 
+const Header = () => (
+  <header className="container mx-auto px-6 py-6 flex justify-between items-center">
+    <div className="flex items-center space-x-3">
+      <FaLeaf className="h-8 w-8 text-zen-green" />
+      <span className="text-2xl font-bold text-zen-charcoal tracking-wider">Zen Garden</span>
+    </div>
+    <nav className="hidden md:flex items-center space-x-8">
+      <a href="#features" className="text-zen-charcoal/80 hover:text-zen-green transition-colors">Features</a>
+      <a href="#testimonials" className="text-zen-charcoal/80 hover:text-zen-green transition-colors">Testimonials</a>
+      <a href="#about" className="text-zen-charcoal/80 hover:text-zen-green transition-colors">About</a>
+    </nav>
+    <Link to="/login" className="px-6 py-2.5 bg-zen-green text-white font-semibold rounded-full shadow-md hover:bg-zen-green-dark transition-all transform hover:scale-105">
+      Enter Garden
+    </Link>
+  </header>
+);
+
+const Hero = () => (
+  <section className="py-20 text-center">
+    <div className="container mx-auto px-6">
+      <FaLeaf className="mx-auto h-24 w-24 text-zen-green mb-6 animate-pulse" />
+      <h1 className="text-5xl md:text-6xl font-extrabold text-zen-charcoal mb-4">
+        Cultivate Your Focus, Blossom into Your Best Self.
+      </h1>
+      <p className="text-xl text-zen-charcoal/70 leading-relaxed max-w-3xl mx-auto mb-10">
+        Welcome to your personal sanctuary for productivity. Here, every task is a seed, every focus session is sunlight, and every goal achieved is a beautiful bloom.
+      </p>
+      <Link to="/register" className="px-10 py-5 bg-gradient-to-r from-zen-green to-teal-500 text-white font-bold rounded-full shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 ease-in-out text-lg flex items-center justify-center space-x-3 mx-auto w-fit">
+        <FaLeaf className="h-6 w-6" />
+        <span>Plant Your First Seed & Start Growing</span>
+      </Link>
+    </div>
+  </section>
+);
+
+const featuresData = [
+  { title: "The Pomodoro Technique, Reimagined", description: "Our timer helps you work in focused bursts, with mindful breaks. It's not just about time; it's about quality and intention.", icon: FaShieldAlt },
+  { title: "Gamified Task Management", description: "Turn your to-do list into a garden. 'Plant' your tasks, 'nurture' them with focus, and 'harvest' your accomplishments.", icon: FaChartLine },
+  { title: "Mindful Rewards & Gentle Discipline", description: "Stay motivated with a system of rewards for consistency and gentle reminders for when you get sidetracked.", icon: FaHeart }
+];
+
+const Features = () => (
+  <section id="features" className="py-24 bg-white/60 backdrop-blur-md">
+    <div className="container mx-auto px-6">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl font-bold text-zen-charcoal">A Garden of Features to Help You Flourish</h2>
+        <p className="text-lg text-zen-charcoal/60 mt-4">Tools designed for tranquility and peak performance.</p>
+      </div>
+      <div className="grid md:grid-cols-3 gap-12">
+        {featuresData.map((feature, i) => (
+          <div key={i} className="text-center p-8 bg-white rounded-3xl shadow-lg border border-gray-200/50 hover:shadow-xl transition-shadow transform hover:-translate-y-2 duration-300">
+            <div className="p-5 rounded-full bg-zen-green/10 mb-6 inline-block">
+              <feature.icon className="h-10 w-10 text-zen-green-dark" />
+            </div>
+            <h3 className="text-2xl font-bold text-zen-charcoal mb-4">{feature.title}</h3>
+            <p className="text-zen-charcoal/70">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+const testimonialsData = [
+  { name: "Alex, Software Developer", quote: "Zen Garden has transformed my workday. The focus cycles keep me on track, and the garden theme is surprisingly motivating. I'm getting more done and feeling less stressed.", avatar: FaUserAstronaut },
+  { name: "Priya, Student", quote: "As a student juggling multiple subjects, this app is a lifesaver. It makes studying feel less like a chore and more like a game. My grades have actually improved!", avatar: FaUserAstronaut },
+  { name: "David, Freelance Writer", quote: "The rewards and punishments system is genius. It provides that little extra push I need to stay disciplined. I finally feel in control of my deadlines.", avatar: FaUserAstronaut }
+];
+
+const Testimonials = () => (
+  <section id="testimonials" className="py-24">
+    <div className="container mx-auto px-6">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl font-bold text-zen-charcoal">Stories of Growth from Our Gardeners</h2>
+        <p className="text-lg text-zen-charcoal/60 mt-4">See what others have cultivated with Zen Garden.</p>
+      </div>
+      <div className="grid md:grid-cols-3 gap-8">
+        {testimonialsData.map((testimonial, i) => (
+          <div key={i} className="bg-white/70 backdrop-blur-lg p-8 rounded-3xl shadow-lg border border-gray-200/50 flex flex-col items-center text-center">
+            <testimonial.avatar className="h-16 w-16 text-zen-green mb-5" />
+            <div className="text-yellow-500 flex space-x-1 mb-5">
+              {[...Array(5)].map((_, i) => <FaStar key={i} />)}
+            </div>
+            <p className="text-zen-charcoal/80 mb-6 font-serif italic">"{testimonial.quote}"</p>
+            <h4 className="font-bold text-zen-charcoal text-lg">- {testimonial.name}</h4>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+const CTA = () => (
+  <section className="py-24 bg-zen-green/10">
+    <div className="container mx-auto px-6 text-center">
+      <h2 className="text-4xl font-bold text-zen-charcoal mb-4">Ready to Plant the Seeds of Success?</h2>
+      <p className="text-xl text-zen-charcoal/70 mb-10">Your journey to a more focused, productive, and peaceful life begins now.</p>
+      <Link to="/register" className="px-10 py-5 bg-gradient-to-r from-zen-green to-teal-500 text-white font-bold rounded-full shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 ease-in-out text-lg inline-block">
+        Start Your Free Trial & Cultivate Your Garden
+      </Link>
+    </div>
+  </section>
+);
+
+const Footer = () => (
+  <footer id="about" className="bg-white py-12">
+    <div className="container mx-auto px-6 text-center text-zen-charcoal/70">
+      <h3 className="text-xl font-bold text-zen-charcoal mb-3">From the Gardener's Heart</h3>
+      <p className="max-w-2xl mx-auto leading-relaxed mb-6 font-serif">
+        Welcome to my digital sanctuary. I'm Dharmraj Sodha, a student with a passion for coding and a belief that technology can be a force for good. I created this app to help you find focus, cultivate discipline, and grow into the best version of yourself. I hope it brings you as much peace as it brought me to create it.
+      </p>
+      <div className="flex justify-center space-x-6 mb-8">
+        <a href="https://www.linkedin.com/in/dharmraj-sodha/" target="_blank" rel="noopener noreferrer" className="hover:text-zen-green transition-colors">LinkedIn</a>
+        <a href="https://s-hadowheart.carrd.co/" target="_blank" rel="noopener noreferrer" className="hover:text-zen-green transition-colors">Portfolio</a>
+      </div>
+      <p>&copy; {new Date().getFullYear()} Zen Garden. All Rights Reserved.</p>
+    </div>
+  </footer>
+);
+
+export default LandingPage;
