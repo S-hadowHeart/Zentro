@@ -108,7 +108,6 @@ export const PomodoroProvider = ({ children }) => {
       if (status === 'completed' && freshUser && freshUser.rewards?.length > 0) {
         const randomReward = freshUser.rewards[Math.floor(Math.random() * freshUser.rewards.length)];
         setCurrentReward(randomReward);
-        // Use a timeout to ensure the state update is not blocked on mobile browsers
         setTimeout(() => {
           setShowRewardModal(true);
         }, 0);
@@ -123,7 +122,7 @@ export const PomodoroProvider = ({ children }) => {
     setReportRefreshKey(prev => prev + 1);
   }, [user, updateUser]);
 
-  const handleSessionEnd = useCallback(async () => {
+  const handleSessionEnd = useCallback(() => {
     const wasBreak = isBreak;
     setIsRunning(false);
 
@@ -131,10 +130,10 @@ export const PomodoroProvider = ({ children }) => {
       showBrowserNotification('Focus complete. Time to rest in the garden.');
       const durationInSeconds = focusDuration * 60;
       if (selectedTask) incrementPomodorosForTask(selectedTask, durationInSeconds);
-      await onPomodoroEnd('completed', durationInSeconds);
+      onPomodoroEnd('completed', durationInSeconds);
     } else {
       showBrowserNotification('Rest is over. Time to cultivate focus again.');
-      await onPomodoroEnd('breakEnded', breakDuration * 60);
+      onPomodoroEnd('breakEnded', breakDuration * 60);
     }
     
     playNotificationSound();
