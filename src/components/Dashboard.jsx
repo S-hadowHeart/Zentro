@@ -8,6 +8,7 @@ import Settings from './Settings';
 import Report from './Report';
 import RewardModal from './RewardModal';
 import PunishmentModal from './PunishmentModal';
+import ZenGarden from './ui/ZenGarden'; // Import the ZenGarden component
 import { FaTimes } from 'react-icons/fa';
 
 function Dashboard() {
@@ -50,10 +51,10 @@ function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans relative overflow-hidden">
-      <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-primary-light via-white to-secondary-light dark:from-gray-800 dark:via-gray-900 dark:to-black opacity-50"></div>
+    <div className="flex h-screen text-zen-charcoal dark:text-zen-sand font-sans relative overflow-hidden">
+      <ZenGarden />
 
-      {/* Static Sidebar for desktop */}
+      {/* Sidebar for desktop */}
       <div className="hidden md:flex flex-shrink-0">
         <Sidebar />
       </div>
@@ -64,10 +65,10 @@ function Dashboard() {
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="w-64 bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg shadow-lg">
+        <div className="w-64 bg-white/80 dark:bg-zen-night-dark/80 backdrop-blur-lg shadow-2xl border-r border-white/20 dark:border-zen-night-light/20">
           <Sidebar isMobile onLinkClick={() => setIsMobileMenuOpen(false)} />
         </div>
-        <div className="flex-1 bg-black/40" onClick={() => setIsMobileMenuOpen(false)}>
+        <div className="flex-1 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}>
           <button className="p-4 text-white">
             <FaTimes className="h-6 w-6" />
           </button>
@@ -75,29 +76,23 @@ function Dashboard() {
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header for Mobile */}
         <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 z-10">
           <div className="mx-auto max-w-4xl">
-            <div style={{ display: location.pathname === '/pomodoro' || location.pathname === '/' ? 'block' : 'none' }}>
+            {location.pathname === '/pomodoro' || location.pathname === '/' ? (
               <PomodoroTimer onPomodoroEnd={handlePomodoroEnd} />
-            </div>
-            <div style={{ display: location.pathname === '/tasks' ? 'block' : 'none' }}>
+            ) : location.pathname === '/tasks' ? (
               <TaskList />
-            </div>
-            <div style={{ display: location.pathname === '/settings' ? 'block' : 'none' }}>
+            ) : location.pathname === '/settings' ? (
               <Settings />
-            </div>
-            <div style={{ display: location.pathname === '/report' ? 'block' : 'none' }}>
+            ) : (
               <Report key={reportRefreshKey} />
-            </div>
+            )}
           </div>
         </main>
       </div>
 
-      {/* Modals */}
       <RewardModal show={showRewardModal} onClose={closeRewardModal} reward={currentReward} />
       <PunishmentModal show={showPunishmentModal} onClose={closePunishmentModal} punishment={currentPunishment} />
     </div>

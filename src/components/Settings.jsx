@@ -44,6 +44,7 @@ function Settings() {
             setMessage(error.message || 'Error updating settings.');
         } finally {
             setIsUpdating(false);
+            setTimeout(() => setMessage(''), 3000);
         }
     };
     
@@ -64,11 +65,12 @@ function Settings() {
             if (!response.ok) throw new Error(`Failed to update ${type}`);
             const updatedUser = await response.json();
             updateUser(updatedUser);
-            setMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} updated successfully!`);
+            setMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} list cultivated successfully!`);
         } catch (error) {
             setMessage(error.message || `Error updating ${type}.`);
         } finally {
             setIsUpdating(false);
+            setTimeout(() => setMessage(''), 3000);
         }
     };
 
@@ -95,87 +97,90 @@ function Settings() {
     };
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Arrangements</h2>
+        <div className="space-y-10">
+            <h2 className="text-3xl font-light text-zen-charcoal dark:text-zen-sand tracking-wider text-center">Garden Arrangements</h2>
             
-            {message && <div className={`p-4 rounded-xl text-sm ${message.includes('Error') ? 'bg-danger-light text-danger' : 'bg-primary-light text-primary'}`}>{message}</div>}
+            {message && <div className={`p-4 rounded-xl text-sm font-semibold text-center my-4 ${message.includes('Error') ? 'bg-red-500/10 text-red-500' : 'bg-zen-green/10 text-zen-green-dark'}`}>{message}</div>}
 
-            <SettingsCard icon={FaClock} title="Rhythm Adjustments">
+            <SettingsCard icon={FaClock} title="Flow & Rest Rhythm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <NumberInput label="Focus Duration (min)" value={pomodoroDuration} onChange={setPomodoroDuration} min={1} max={60} />
-                    <NumberInput label="Break Duration (min)" value={breakDuration} onChange={setBreakDuration} min={1} max={30} />
+                    <NumberInput label="Focus (minutes)" value={pomodoroDuration} onChange={setPomodoroDuration} min={5} max={90} />
+                    <NumberInput label="Rest (minutes)" value={breakDuration} onChange={setBreakDuration} min={1} max={30} />
                 </div>
-                <SaveButton onClick={handleSettingsUpdate} isSaving={isUpdating} text="Adjust Rhythm" />
+                <SaveButton onClick={handleSettingsUpdate} isSaving={isUpdating} text="Save Rhythm" />
             </SettingsCard>
 
-            <SettingsCard icon={FaHeart} title="Seeds of Joy (Rewards)" iconColor="text-green-500">
-                <ListManager type="rewards" list={rewards} newItem={newReward} setNewItem={setNewReward} addItem={addItem} removeItem={removeItem} placeholder="E.g., Enjoy a cup of tea" />
-            </SettingsCard>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <SettingsCard icon={FaHeart} title="Seeds of Joy (Rewards)" iconColor="text-green-500">
+                    <ListManager type="rewards" list={rewards} newItem={newReward} setNewItem={setNewReward} addItem={addItem} removeItem={removeItem} placeholder="e.g., Meditate for 5 minutes" />
+                </SettingsCard>
 
-            <SettingsCard icon={FaExclamationTriangle} title="Weeds to Clear (Punishments)" iconColor="text-red-500">
-                <ListManager type="punishments" list={punishments} newItem={newPunishment} setNewItem={setNewPunishment} addItem={addItem} removeItem={removeItem} placeholder="E.g., 10 push-ups" />
-            </SettingsCard>
+                <SettingsCard icon={FaExclamationTriangle} title="Weeds of Distraction (Punishments)" iconColor="text-red-500">
+                    <ListManager type="punishments" list={punishments} newItem={newPunishment} setNewItem={setNewPunishment} addItem={addItem} removeItem={removeItem} placeholder="e.g., 1 minute of plank" />
+                </SettingsCard>
+            </div>
         </div>
     );
 }
 
 const SettingsCard = ({ icon: Icon, title, iconColor, children }) => (
-    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-3xl shadow-lg p-6 border border-white/30 dark:border-gray-700/50">
-        <div className="flex items-center space-x-3 mb-5">
-            <Icon className={`w-6 h-6 ${iconColor || 'text-primary dark:text-primary-light'}`} />
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{title}</h3>
+    <div className="bg-white/40 dark:bg-black/20 backdrop-blur-2xl rounded-[36px] shadow-lg p-6 sm:p-8 border border-white/50 dark:border-black/30 h-full flex flex-col">
+        <div className="flex items-center space-x-4 mb-6">
+            <Icon className={`w-7 h-7 ${iconColor || 'text-zen-green'}`} />
+            <h3 className="text-xl font-semibold text-zen-charcoal dark:text-zen-sand tracking-wide">{title}</h3>
         </div>
-        <div className="space-y-4">{children}</div>
+        <div className="space-y-5 flex-grow">{children}</div>
     </div>
 );
 
 const NumberInput = ({ label, value, onChange, min, max }) => (
     <div>
-        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{label}</label>
+        <label className="block text-sm font-medium text-zen-charcoal/80 dark:text-zen-sand/80 mb-2.5 tracking-wider">{label}</label>
         <input
             type="number"
             value={value}
             onChange={(e) => onChange(Math.max(min, Math.min(max, parseInt(e.target.value) || 0)))}
             min={min} max={max}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-700/80 focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark shadow-sm transition-all duration-300 ease-in-out dark:text-white"
+            className="w-full px-5 py-3 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand"
         />
     </div>
 );
 
 const ListManager = ({ type, list, newItem, setNewItem, addItem, removeItem, placeholder }) => (
-    <>
+    <div className="flex flex-col h-full">
         <div className="flex gap-3">
             <input
                 type="text"
                 value={newItem}
                 onChange={(e) => setNewItem(e.target.value)}
                 placeholder={placeholder}
-                className="flex-1 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/80 dark:bg-gray-700/80 focus:ring-2 focus:ring-primary dark:focus:ring-primary-dark shadow-sm transition-all duration-300 ease-in-out dark:text-white dark:placeholder-gray-400"
+                className="flex-1 px-5 py-3 rounded-full border border-white/60 dark:border-black/30 bg-white/50 dark:bg-black/20 focus:ring-2 focus:ring-zen-green dark:focus:ring-zen-green-dark shadow-inner transition-all duration-300 ease-in-out text-zen-charcoal dark:text-zen-sand placeholder-zen-charcoal/50 dark:placeholder-zen-sand/50"
             />
             <button
                 onClick={() => addItem(type)}
-                className="px-5 py-3 bg-primary hover:bg-primary-dark dark:bg-primary-dark dark:hover:bg-primary text-white rounded-xl shadow-md transition-all duration-300 flex items-center justify-center">
+                className="p-4 bg-gradient-to-br from-zen-green to-zen-green-dark text-white rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center">
                 <FaPlus />
             </button>
         </div>
-        <ul className="space-y-2 pt-2">
+        <ul className="space-y-2.5 pt-4 flex-grow overflow-y-auto max-h-48 custom-scrollbar">
             {list.map((item, index) => (
-                <li key={index} className="group flex justify-between items-center bg-white/50 dark:bg-gray-700/50 p-3.5 rounded-lg transition-all duration-300">
-                    <span className="text-gray-700 dark:text-gray-200">{item}</span>
-                    <button onClick={() => removeItem(type, index)} className="p-2 text-gray-400 hover:text-danger opacity-0 group-hover:opacity-100 rounded-full hover:bg-danger/10 transition-all duration-300">
+                <li key={index} className="group flex justify-between items-center bg-white/30 dark:bg-black/10 p-3 rounded-lg transition-all duration-300">
+                    <span className="text-zen-charcoal dark:text-zen-sand font-medium">{item}</span>
+                    <button onClick={() => removeItem(type, index)} className="p-2 text-zen-charcoal/40 dark:text-zen-sand/40 hover:text-red-500 opacity-0 group-hover:opacity-100 rounded-full hover:bg-red-500/10 transition-all duration-300">
                         <FaTrash />
                     </button>
                 </li>
             ))}
+             {list.length === 0 && <p className='text-center text-sm text-zen-charcoal/50 dark:text-zen-sand/50 pt-4'>Your list is empty.</p>}
         </ul>
-    </>
+    </div>
 );
 
 const SaveButton = ({ onClick, isSaving, text }) => (
     <button
         onClick={onClick}
         disabled={isSaving}
-        className="w-full mt-4 bg-primary hover:bg-primary-dark dark:bg-primary-dark dark:hover:bg-primary text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 ease-in-out shadow-md disabled:opacity-60 flex items-center justify-center space-x-2">
+        className="w-full mt-5 bg-gradient-to-br from-zen-green to-zen-green-dark text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-in-out shadow-lg disabled:opacity-70 flex items-center justify-center space-x-2 transform hover:scale-105">
         {isSaving ? <FaCog className="w-5 h-5 animate-spin" /> : <FaCheck className="w-5 h-5" />}
         <span>{isSaving ? 'Saving...' : text}</span>
     </button>
