@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap');
+
+:root {
+  --primary-color: #4CAF50;
+  --secondary-color: #FFC107;
+  --accent-color: #795548;
+  --text-color: #212121;
+  --background-color: #F5F5F5;
+  --danger-color: #F44336;
+
+  --font-family-main: 'Nunito', sans-serif;
+  --font-size-base: 16px;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition-speed: 0.3s;
+}
+
+.dark {
+  --primary-color: #388E3C;
+  --secondary-color: #FFA000;
+  --accent-color: #5D4037;
+  --text-color: #F5F5F5;
+  --background-color: #121212;
+  --danger-color: #D32F2F;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-main);
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #388E3C;
+}
+
+*:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.4);
+}
+
+::selection {
+  background: rgba(76, 175, 80, 0.3);
+  color: var(--text-color);
+}
