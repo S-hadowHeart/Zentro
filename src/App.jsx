@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TasksProvider } from './contexts/TasksContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Preloader from './components/ui/Preloader';
 import EnterTheGarden from './components/auth/Login';
 import CultivatePath from './components/auth/Register';
@@ -58,11 +59,13 @@ const App = () => {
     <Router>
       <AuthProvider>
         <TasksProvider>
-          <Preloader />
-          <div className="min-h-screen bg-background-color text-text-color">
-            <AnimatedBackground />
-            <AppRoutes />
-          </div>
+          <ThemeProvider>
+            <Preloader />
+            <div className="min-h-screen bg-background-color text-text-color">
+              <AnimatedBackground />
+              <AppRoutes />
+            </div>
+          </ThemeProvider>
         </TasksProvider>
       </AuthProvider>
     </Router>

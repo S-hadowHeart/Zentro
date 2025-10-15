@@ -5,19 +5,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap');
 
 :root {
-  --primary-color: #74EBD5;
-  --secondary-color: #ACB6E5;
-  --accent-color: #FFD07B;
-  --text-color: #2c3e50;
-  --background-color: #F7F9FC;
-  --white-color: #ffffff;
-  --danger-color: #e74c3c;
+  --primary-color: #4CAF50;
+  --secondary-color: #FFC107;
+  --accent-color: #795548;
+  --text-color: #212121;
+  --background-color: #F5F5F5;
+  --danger-color: #F44336;
 
   --font-family-main: 'Nunito', sans-serif;
   --font-size-base: 16px;
   --border-radius: 12px;
   --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --transition-speed: 0.3s;
+}
+
+.dark {
+  --primary-color: #388E3C;
+  --secondary-color: #FFA000;
+  --accent-color: #5D4037;
+  --text-color: #F5F5F5;
+  --background-color: #121212;
+  --danger-color: #D32F2F;
 }
 
 html, body, #root {
@@ -49,15 +57,15 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6AD3C3;
+  background: #388E3C;
 }
 
 *:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(116, 235, 213, 0.4);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.4);
 }
 
 ::selection {
-  background: rgba(116, 235, 213, 0.3);
+  background: rgba(76, 175, 80, 0.3);
   color: var(--text-color);
 }

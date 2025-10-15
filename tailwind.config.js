@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,21 +8,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: 'var(--primary-color)',
-        'primary-dark': '#6AD3C3',
-        'primary-light': '#E0F2F1',
-        secondary: 'var(--secondary-color)',
-        'secondary-dark': '#9AA6DA',
-        'secondary-light': '#E8EAF6',
-        accent: 'var(--accent-color)',
-        'accent-dark': '#F0B951',
-        'accent-light': '#FFF8E1',
-        'text-color': 'var(--text-color)',
-        'text-light': '#5a7388',
-        'background-color': 'var(--background-color)',
-        danger: 'var(--danger-color)',
-        'danger-dark': '#c0392b',
-        'danger-light': '#FADBD8',
+        primary: '#4CAF50', // A more vibrant green for primary actions
+        'primary-dark': '#388E3C',
+        'primary-light': '#C8E6C9',
+        secondary: '#FFC107', // A warm, inviting amber for secondary elements
+        'secondary-dark': '#FFA000',
+        'secondary-light': '#FFECB3',
+        accent: '#795548', // A rich brown for accents, adding to the earthy feel
+        'accent-dark': '#5D4037',
+        'accent-light': '#D7CCC8',
+        text: '#212121', // Darker text for better readability
+        'text-light': '#757575',
+        background: '#F5F5F5', // A slightly off-white background for a softer look
+        'background-dark': '#121212',
+        danger: '#F44336',
+        'danger-dark': '#D32F2F',
+        'danger-light': '#FFCDD2',
       }
     },
   },
